@@ -14,9 +14,10 @@
 \guide{Replaces sample 1 “Feature Selection and Engineering”; supervisor’s “4.1 Algorithm”. The algorithms of the solution, with pseudocode and the reasons for each choice.}
 
 The project does not train a model.
-Its algorithms are the rules by which the harness controls a large language model (LLM): what the model sees, what it may do, and when its answer counts as finished.
-\Cref{tab:problems} links the main rules to the weaknesses of the model that they address.
-\begin{table}[htb]
+Its algorithms are the rules by which the harness guides a large language model (LLM): what the model sees, what it may do, and when its answer counts as finished.
+\Cref{tab:problems} lists the main weaknesses of a model that these rules address.
+
+\begin{table}[H]
   \centering
   \caption{Weaknesses of a language model and the rules of the harness}\label{tab:problems}
   \begin{tabularx}{\textwidth}{@{}L L l@{}}
@@ -31,97 +32,103 @@ Its algorithms are the rules by which the harness controls a large language mode
     Fills its context in a long task & Sub-agents and ultradesk & \cref{sec:multi-agent}\\
     \bottomrule
   \end{tabularx}
+  \fignote{Source: the group.}
 \end{table}
 
 \subsection{Agent Loop and Stop Gate}\label{sec:agent-loop}
-OpenTrading answers one message of the user in one turn.
-Within a turn the model reasons, calls tools and reads their results, the pattern known as ReAct \parencite{yao2023react}.
-A library runs this basic loop \parencite{vercelndloop}; the group added the rules in \cref{alg:turn}.
-\begin{algorithm}[htb]
+OpenTrading handles each message of the user in one turn.
+During a turn the model reasons, calls tools and reads their results, a pattern known as ReAct \parencite{yao2023react}.
+The basic loop comes from a library \parencite{vercelndloop}; the group added the rules shown in \cref{alg:turn}.
+
+By default the main agent has no limit on steps, because a research question may need many tool calls.
+Two rules keep it from going round in circles.
+When calls have failed and none has succeeded for eight steps in a row, the tools are switched off for a step, so the model has to answer with what it has.
+When the model makes the same call with the same arguments three times in a row, the user is asked whether to go on.
+%% Evidence: E25, E26.
+
+\begin{algorithm}[H]
   \caption{One turn of the agent loop}\label{alg:turn}
   \begin{algorithmic}[1]
-    \Require message $m$; history $H$; tools $T$; optional cap on steps or requests
+    \Require message $m$; history $H$; tools; optional cap on steps or requests
     \Ensure an answer, or a statement that there is none
     \Repeat
       \Repeat \Comment{one step is one model request}
-        \State $f \gets$ number of failed steps in a row
-        \State \textbf{if} $f \ge 8$, or the cap is nearly reached \textbf{then} forbid tool calls in this step
+        \State \textbf{if} eight steps in a row have failed, or the cap is nearly reached \textbf{then} forbid tool calls
         \State send $H$, $m$ and the work so far to the model
         \State run the tool calls it makes, through the permission gate
       \Until{the model stops calling tools, or the cap is reached}
-      \State $v \gets$ verdict of the stop gate on the last step
-      \State \textbf{if} $v$ is \textsc{continue} \textbf{then} remove the broken text (a cut answer is kept) and add an instruction
-    \Until{$v$ is \textsc{accept} or \textsc{give up}, or the cap is reached}
+      \State $g \gets$ verdict of the stop gate on the last step
+      \State \textbf{if} $g$ is \textsc{continue} \textbf{then} remove the broken text (a cut answer is kept) and add an instruction
+    \Until{$g$ is \textsc{accept} or \textsc{give up}, or the cap is reached}
     \State \Return the answer, or a statement that there is none
   \end{algorithmic}
 \end{algorithm}
 
-The number of steps of the main agent is not limited by default, because a research question may need many tool calls.
-Two rules stop a turn that makes no progress.
-After eight steps in a row in which calls failed and none succeeded, the tools are switched off for a step, so the model must answer with the data it has.
-When the model makes the same call with the same arguments three times in a row, the user is asked whether to go on.
-%% Evidence: E25, E26.
-
-When the model stops calling tools, the turn is not necessarily finished.
-In a run recorded during development a small model wrote a price-to-earnings ratio and a revenue under a source line, although no tool had run.
+A model that stops calling tools has not always answered.
+In one run recorded during development, a small model wrote a price-to-earnings ratio and a revenue under a source line although no tool had run.
 The stop gate looks for such endings.
-It is a set of rules in code and asks no second model, so accepting an answer costs no extra request.
-Its ten cases form four groups (\cref{tab:stop-gate}).
-\begin{table}[htb]
+It consists of rules in code and asks no second model, so accepting an answer costs no extra request.
+Its ten cases fall into four groups, shown in \cref{tab:stop-gate}.
+
+\begin{table}[H]
   \centering
   \caption{Cases of the stop gate}\label{tab:stop-gate}
   \begin{tabularx}{\textwidth}{@{}l L L@{}}
     \toprule
-    {Group} & {Cases} & {Instruction to the model}\\
+    {Group} & {The last step is or contains} & {The model is asked to}\\
     \midrule
-    Broken call & malformed tool call; call written as text & make the call again, or answer\\
-    Cut answer & answer cut at the output limit & continue where it stopped\\
-    No answer & empty; draft; announced plan; fragment; echo of the question; echo of an instruction & answer, or fetch missing data first; tools on or off depending on the case\\
-    Unsupported figures & two or more untraced figures, at least half of all, presented as fetched data although no tool but the task list ran & fetch the data first, or say that it is missing\\
+    Broken call & a malformed tool call; a call written as text & make the call again, or answer\\
+    Cut answer & an answer cut at the output limit & continue where it stopped\\
+    No answer & nothing; a draft; a plan; a fragment; a repeat of the question or of an instruction & answer, or fetch missing data first\\
+    Unsupported figures & untraced figures (at least two, and at least half of all) given as fetched data although no tool ran & fetch the data first, or say that it is missing\\
     \bottomrule
   \end{tabularx}
-  \fignote{Source: OpenTrading \texttt{7319264}, \texttt{src/core/loop/stop-gate.ts}.}
+  \fignote{Note: the task list of the model does not count as a tool here. Source: OpenTrading version 0.5.1 \parencite{group2026opentrading}.}
 \end{table}
+
 A turn may be sent back twice.
-If data is already there, an empty answer can be sent back up to three times in total, so a turn has at most five recoveries.
-If the last text is then still empty or an echo, the user is told that there is no answer; any other text stands, with a notice when its figures are unsupported.
+If data has already been fetched, an empty answer may be sent back up to three times in total, so five recoveries are the most that a turn can have.
+If the text is still empty or only a repeat after that, the user is told that there is no answer; any other text stands, with a warning when its figures are unsupported.
 %% Evidence: E25.
 
 The gate checks the form of an answer, not its truth.
-Some of its reminders are sent only on model interfaces that are known to accept them.
-The version 4.7 benchmark uses an interface without them, so it will not measure them.
+Some of its reminders are sent only on model interfaces known to accept them; the benchmark of \cref{sec:validation} uses another interface and will not measure them.
 %% Evidence: E25, E32.
 
 \subsection{Figure Tracing and Arithmetic}\label{sec:figure-tracing}
-To check whether a figure in an answer comes from the data, the harness compares it with the numbers the model has read.
-Let $V(f)$ be the values that a written figure $f$ can mean; for example, \enquote{16.800} is \num{16800} in Vietnamese notation and 16.8 in a machine format.
-Let $S$ be the numbers in the question, the memory notes, the tool results and the earlier messages, and let $d_v$ be the number of decimals in reading $v$ (0 for \num{16800}, 3 for 16.800).
-The figure is traced when
-\begin{equation}\label{eq:tracing}
-  \exists\, v\in V(f),\; s\in S,\; k\in\{1,10^{\pm2},10^{\pm3},10^{\pm6},10^{\pm9}\}:\quad \bigl|\,|s|\,k-v\,\bigr| \le \tfrac{1}{2}\,10^{-d_v}.
-\end{equation}
-The factor $k$ allows for percentages and for amounts in thousands, millions or billions, and the right-hand side allows for rounding; for amounts written in \enquote{nghìn tỷ}, the value and the tolerance are multiplied by \num{1000}.
-Figures that the answer marks as its own calculation, dates and whole numbers without a unit or separator are not checked.
+A financial answer is only useful if its figures come from the data.
+The harness therefore compares its figures with the numbers that the model has read.
+A figure is traced if it equals one of these numbers after a change of scale and after rounding.
+Suppose that a tool returned a price-to-earnings ratio of 12.34.
+An answer of 12.3 is traced, because the difference of 0.04 is below 0.05, half a unit of the last digit written; an answer of 12.4 is not.
 
-The check is limited, because a false alarm can spoil a correct answer.
-If no tool but the task list ran, the stop gate acts on untraced figures (\cref{tab:stop-gate}).
-If tools ran, untraced figures are only recorded in the session.
-The harness therefore does not guarantee that every figure is correct: a figure can match by chance, and a correct figure can be used in a wrong way.
+In general, a figure $x$ written with $d$ decimals is traced when
+\begin{equation}\label{eq:tracing}
+  \min_{s\in S,\;k\in K}\bigl|\,k\,|s|-x\,\bigr|\;\le\;\tfrac{1}{2}\cdot 10^{-d},
+  \qquad K=\{1,10^{\pm2},10^{\pm3},10^{\pm6},10^{\pm9}\}.
+\end{equation}
+Here $S$ is the set of numbers in the question, the memory notes, the tool results and the earlier messages, and $K$ holds the scales for percentages, thousands, millions and billions.
+A figure that can be read in two ways, such as 16.800 in Vietnamese and in English notation, is traced if either reading is; amounts in \enquote{nghìn tỷ} are first converted to billions.
+Dates, whole numbers without a unit or separator, and figures marked as the model's own calculation are left out.
+
+The result is used carefully, because a false alarm can spoil a correct answer.
+If no tool ran, untraced figures can make the stop gate send the answer back (\cref{tab:stop-gate}); if tools ran, they are only recorded.
+The harness thus cannot guarantee that every figure is correct: a figure may match by chance, and a correct figure may be used wrongly.
 %% Evidence: E27.
 
-LLMs make arithmetic mistakes even when their reasoning steps are right, and handing the calculation to a program reduces them \parencite{gao2023pal}.
-The system prompt therefore asks the model to send calculations to the shell instead of working them out in its head.
-A command made only of arithmetic normally runs without asking the user.
-Such a command must match a small grammar of numbers, operators, a few mathematical functions and variables assigned in the same command; files, loops and other programs are not part of it.
-The model can still mistype an input, so the harness looks for typed numbers, other than common constants, in what the model has read and can remind the model of those it cannot find.
-The benchmark runs OpenTrading in a mode in which commands run without approval inside a sandbox, so it does not measure the grammar.
+LLMs also make arithmetic mistakes even when their reasoning is right, and leaving the calculation to a program reduces them \parencite{gao2023pal}.
+The system prompt therefore asks the model to send calculations to the shell.
+A command that contains only arithmetic normally runs without asking the user; it may use numbers, operators, a few mathematical functions and its own variables, but no files, loops or other programs.
+Since the model can still mistype an input, the harness looks for the typed numbers, apart from common constants, in what the model has read and can remind it of those it cannot find.
+The benchmark runs commands without approval inside a sandbox, so it does not measure this rule.
 %% Evidence: E27, E32.
 
 \subsection{Permissions and Safe Execution}\label{sec:permissions}
-An agent that can write files and run commands can also do damage.
-OpenTrading has no built-in tool that places an order, and every tool call passes a permission gate with four modes (\cref{tab:permission-modes}).
-The idea of switchable modes and of a second model that reviews actions follows Claude Code \parencite{anthropicndmodes,anthropic2026auto}.
-\begin{table}[htb]
+An agent that can write files and run commands can also do harm.
+OpenTrading has no built-in tool that places an order, and every tool call passes a permission gate with the four modes of \cref{tab:permission-modes}.
+The idea of switchable modes, and of a second model that reviews actions, follows Claude Code \parencite{anthropicndmodes,anthropic2026auto}.
+
+\begin{table}[H]
   \centering
   \caption{Permission modes and who decides}\label{tab:permission-modes}
   \begin{tabularx}{\textwidth}{@{}l L L@{}}
@@ -130,38 +137,42 @@ The idea of switchable modes and of a second model that reviews actions follows 
     \midrule
     Read only (default) & the user, every time & the user, every time\\
     Ask & the user, who may allow a folder & the user, who may allow a command\\
-    Auto & new files run; otherwise the reviewing model & simple read-only commands run; otherwise the reviewing model\\
-    Bypass & runs & runs\\
+    Auto & new files: allowed; others: reviewing model & simple read-only commands: allowed; others: reviewing model\\
+    Bypass & allowed & allowed\\
     \bottomrule
   \end{tabularx}
-  \fignote{Arithmetic commands and simple folder listings run in every mode. Source: OpenTrading \texttt{7319264}, \texttt{src/core/permission}.}
+  \fignote{Note: arithmetic commands and simple folder listings are allowed in every mode. Source: OpenTrading version 0.5.1 \parencite{group2026opentrading}.}
 \end{table}
 
-No mode skips the following checks, which go to the user: reading files that hold keys, changing protected folders, writing outside the workspace, and the same call three times in a row.
-The user may allow a key file or a repeated call for the session, and the temporary folder of the session is exempt.
-For shell commands this check reads only the text of the command and can miss a case.
+Some calls go to the user in every mode: reading files that hold keys, changing protected folders, writing outside the workspace, and making the same call three times in a row.
+The user may allow a key file or a repeated call for the whole session, and the temporary folder of the session is exempt.
+For shell commands this check looks only at the text of the command and can miss a case.
 When no user is present, a call that needs approval is refused.
 
-In the auto mode the reviewing model first answers only whether to block; only if it says block, or its reply cannot be read, does it review the action in more detail.
-It is given the messages of the user and the actions of the agent, but not the results of its tools, because text planted in web pages or data could otherwise persuade it \parencite{greshake2023injection}.
-Reports of background agents can also reach it, so this protection is not complete.
-One rule was written for this domain: by default the reviewer is told to block an order or a transfer of money even if the user asks for it.
+In the auto mode the reviewing model first answers only whether to block an action.
+It looks more closely only if this first answer is to block, or cannot be read.
+It is given the messages of the user and the actions of the agent but not the results of tools, because text planted in web pages or data could otherwise persuade it \parencite{greshake2023injection}.
+This protection is not complete, since reports of background agents can also reach it.
+One rule was written for finance: by default the reviewer is told to block an order or a transfer of money even if the user asks for it.
 After three blocks in a row, or when the reviewer gives no answer, the user decides.
-Such a reviewer makes mistakes: \textcite{anthropic2026auto} reported that the one in their product missed 17\% of 52 real actions that went beyond the request.
+
+Such a reviewer makes mistakes.
+\textcite{anthropic2026auto} reported that the one in their product missed 17\% of 52 real actions that went beyond the request.
 This report gives no error rate for OpenTrading.
 %% Evidence: E28.
 
 \subsection{Sub-agents and Ultradesk}\label{sec:multi-agent}
-A long task fills the context of one agent with intermediate data.
-The main agent can hand a part of it to a sub-agent, which does not see the conversation, receives a form with the purpose, the known facts and the questions, and returns a report.
-Sub-agents cannot start other sub-agents, and many types can only read.
-Here the model itself decides how to divide the work.
+A long task fills the context of a single agent with intermediate data.
+The main agent can hand part of the task to a sub-agent.
+The sub-agent does not see the conversation; it receives a form with the purpose, the known facts and the questions, and returns a report.
+It cannot start further sub-agents, and many types of sub-agent can only read.
+In this arrangement the model decides how to divide the work.
 
-For four recurrent tasks the group fixed the division in code instead, following the distinction between agents and predefined workflows \parencite{anthropic2024agents}.
-This component is called ultradesk (\cref{tab:playbooks}).
-As in an orchestrator--worker system \parencite{anthropic2025multiagent}, several agents work in parallel, but here the steps are fixed in code.
-Reports are passed between agents as evidence to weigh, not as instructions, and the agents get only tools declared as read only and a calculator.
-\begin{table}[htb]
+For four recurring tasks the group wrote the division into code instead, following the distinction between agents and predefined workflows \parencite{anthropic2024agents}.
+This component, called ultradesk, resembles an orchestrator--worker system \parencite{anthropic2025multiagent}, except that its steps are fixed in code (\cref{tab:playbooks}).
+Reports pass from one agent to the next as evidence to weigh, not as instructions, and the agents get only tools declared as read only and a calculator.
+
+\begin{table}[H]
   \centering
   \caption{Tasks of ultradesk with the planned number of agents and model requests}\label{tab:playbooks}
   \begin{tabularx}{\textwidth}{@{}l L S[table-format=2.0] S[table-format=2.0] S[table-format=2.0] S[table-format=3.0]@{}}
@@ -170,26 +181,26 @@ Reports are passed between agents as evidence to weigh, not as instructions, and
     \cmidrule(lr){3-4}\cmidrule(l){5-6}
     {Task} & {Method} & {Agents} & {Req.} & {Agents} & {Req.}\\
     \midrule
-    Screening & scorecard per company, ranking in code, refutation of the leaders (large) & 6 & 36 & 46 & 276\\
-    Fact check & extraction of claims, one vote (small) or three votes (large) per claim & 6 & 22 & 61 & 242\\
-    Debate & analysts, bull and bear arguments, fact check (large), referee & 6 & 30 & 18 & 92\\
-    Sector & themes and companies in parallel, critic (large), report & 7 & 40 & 22 & 157\\
+    Screening & scorecard per company, ranking in code; large: challenge of the leaders & 6 & 36 & 46 & 276\\
+    Fact check & extraction of claims, one vote per claim; large: three votes & 6 & 22 & 61 & 242\\
+    Debate & analysts, bull and bear arguments, referee; large: fact check & 6 & 30 & 18 & 92\\
+    Sector & themes and companies in parallel, report; large: critic & 7 & 40 & 22 & 157\\
     \bottomrule
   \end{tabularx}
-  \fignote{Planned values, not measurements: requests are the step limits of all agents, added up; screening assumes at least 5 and 30 companies. Source: OpenTrading \texttt{7319264}, function \texttt{estimate} of each task.}
+  \fignote{Note: planned values, not measurements. Req.: the step limits of all agents, added up. Screening assumes at least 5 (small) and 30 (large) companies. Source: OpenTrading version 0.5.1 \parencite{group2026opentrading}.}
 \end{table}
 
-Two decisions are computed by code from what the agents return.
-In the screening and sector tasks a company with scores $s_i\in[0,10]$ for quality, valuation, growth and financial health is ranked by
-\begin{equation}\label{eq:screening}
-  S=\frac{\sum_{i} w_i s_i}{\sum_{i} w_i},
-\end{equation}
-where $w_i$ is 2 if the user stressed that criterion and 1 otherwise; with more than ten companies the result is averaged with a score from seven financial ratios, and in larger screening runs the refuting agents can change the score of a leader by up to three points.
-In the fact check a claim counts as wrong or correct only if more than half of all votes say so; a failed vote stays in the total but is never counted as \enquote{wrong}.
+Two results are computed in code.
+In the screening and sector tasks, agents give each company four scores from 0 to 10, for quality, valuation, growth and financial health, and the company starts from their mean, in which a criterion stressed by the user counts twice.
+Scores of 8, 6, 7 and 9 with a stress on valuation, for example, give $(8+2\cdot 6+7+9)/5=7.2$.
+With more than ten companies this value is averaged with one computed from seven financial ratios, and in larger screening runs agents that challenge the ranking can move a leader by up to three points.
+
+In the fact check, a claim counts as correct or wrong only if more than half of all votes say so.
+A vote that failed stays in the total but never counts as \enquote{wrong}, so a failed agent alone cannot make a claim wrong.
 
 The debate follows the bull and bear researchers of TradingAgents \parencite{xiao2024tradingagents}.
-Ultradesk runs only when the user asks for it or approves it, because it costs many more requests.
-This report does not measure whether it answers better than the main agent alone and does not claim so.
+Because ultradesk costs many more requests, it runs only when the user asks for it or approves it.
+This report does not measure whether it answers better than the main agent alone.
 %% Evidence: E29.
 
 \section{Model Configuration and Validation}\label{sec:validation}
