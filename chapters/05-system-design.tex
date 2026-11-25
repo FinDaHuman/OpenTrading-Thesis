@@ -4,11 +4,88 @@
 \section{AI Model Integration}\label{sec:integration}
 \guide{Describe how the AI model is integrated into the larger system, including the interface and data exchange between the AI model and other system components.}
 
+\subsection{Overall Architecture}\label{sec:architecture}
+\Cref{fig:architecture} shows the parts of the harness and the programs it talks to.
+\begin{figure}[htb]
+  \centering
+  \includegraphics{harness-architecture}
+  \caption{Architecture of the OpenTrading harness}\label{fig:architecture}
+  \fignote{Source: the group, drawn from OpenTrading \texttt{7319264}; diagram source \texttt{figures/src/harness-architecture.tex}. Dashed boxes are outside the harness.}
+\end{figure}
+The agent loop is at the centre.
+It produces a stream of events, and every interface reads the same events, so the terminal and the evaluation run the same agent loop.
+
+The harness first decides what the model sees.
+The system prompt is assembled from layers: the core rules and working rules, then the profile and constraints of the user, then the style and the list of skills.
+A skill is a written method of analysis; OpenTrading has 43 of them, and only those that the model loads or the user switches on are added in full.
+Reminders, such as the time of the market, travel with the messages.
+Because the first layers stay the same from turn to turn, the provider can reuse its cache.
+%% Evidence: E10.
+
+It then decides what the model can do.
+All tools, built in or from an MCP server, are registered in the same form.
+The permission gate decides on each call, reading tools may run in parallel, and a writing tool runs alone.
+By default a call has a time limit of 60 seconds and a result is shortened to \num{30000} characters.
+
+Finally it keeps evidence.
+In a session, the results of MCP tools are normally kept in full in a file, up to \qty{64}{\mebi\byte}, so that a figure can be traced after the conversation has been shortened.
+A JSON result that holds numbers receives a label such as \texttt{[ref r3]}; for many kinds of chart the model can pass this label instead of copying the numbers.
+%% Evidence: E34.
+
+\subsection{Model Layer}\label{sec:model-layer}
+The harness is not tied to one model.
+It reads the context size and the abilities of each model from a public catalogue \parencite{modelsdevndcatalogue} and connects through 14 provider packages or through an interface compatible with that of OpenAI.
+The user chooses the reasoning effort in five levels, which the harness translates for the models it knows.
+A failed request is treated by its cause: an exhausted daily quota or a wrong key is reported at once, a rate limit is tried again up to twice, and an overloaded service or a network error up to four times.
+A request that stays silent for five minutes is cut and reported as an error.
+%% Evidence: E30.
+
+\subsection{Interface and Charts}\label{sec:interface}
+The user works in a Vietnamese terminal interface.
+It shows status information that does not depend on the model: the permission mode, the share of the context in use, the running tools and sub-agents, and the data tools whose source failed.
+Charts are drawn in the terminal; when a chart is made from a labelled result, the harness reads the numbers itself and the model receives only a short summary.
+\todo{Add a screenshot of OpenTrading 0.5.1 with a light background (rules/04), taken by the group.}
+%% Evidence: E33.
+
 \section{Data Flow and Processing}\label{sec:dataflow}
 \guide{Illustrate and describe the data flow through the system, from data collection, processing, to data analysis and result presentation.}
+
+\subsection{From a Question to an Answer}\label{sec:question-flow}
+\Cref{fig:question-flow} follows one message through the harness.
+\begin{figure}[htb]
+  \centering
+  \includegraphics{question-flow}
+  \caption{Path of one question through the harness}\label{fig:question-flow}
+  \fignote{Source: the group, drawn from OpenTrading \texttt{7319264}; diagram source \texttt{figures/src/question-flow.tex}.}
+\end{figure}
+The profile and constraints of the user are read first (step 2).
+If one of them exists but cannot be read, the turn is held, because the model would otherwise treat the user as having no limits.
+Steps 4 to 6 are the loop of \cref{sec:algorithm}.
+Results from the web or from an MCP server carry a line that names their origin and states that instructions inside the data are not words of the user (step 5d).
+After an accepted answer (step 7), the tools whose source failed are listed.
+
+A long conversation would exceed the context of the model.
+Near the limit, old tool results are first replaced by short notes that, for MCP data, point to the stored evidence.
+If that is not enough, the model writes a summary of the older turns and the latest turns are kept (step 8).
+%% Evidence: E34.
 
 \section{Deployment Strategy}\label{sec:deployment}
 \guide{Detail how the system is deployed, including the deployment environment and deployment procedures.}
 
+\subsection{Release and Update of the Harness}\label{sec:release}
+OpenTrading runs on the computer of the user.
+An automated workflow builds program files for Windows, macOS and Linux that contain their own runtime, and publishes them on GitHub and npm.
+After publication the release is installed on six test machines; for version 0.5.1, of 25 November 2026, all six installations passed.
+An update of a script installation is checked against its checksum and started once before it replaces the old version.
+The files are not signed with a certificate yet, so the operating system may show a warning.
+%% Evidence: E31.
+
 \section{Scalability and Maintenance}\label{sec:scalability}
 \guide{Discuss how the system is designed to handle growth and future maintenance, including system updates, scalability, and version management.}
+
+\subsection{Testing and Maintenance of the Harness}\label{sec:testing}
+Each pull request is tested automatically on Linux and Windows.
+At version 0.5.1, \num{2249} of \num{2253} tests passed on Linux, four that need another system were skipped, and none failed.
+The tests use a stand-in that returns prepared answers, including broken ones, instead of a paid model; for the stop gate they contain both endings that must be caught and answers that must be left alone.
+Some rules of the agent loop can be switched off one at a time in the evaluation, so that their effect can be measured.
+%% Evidence: E11, E35.
