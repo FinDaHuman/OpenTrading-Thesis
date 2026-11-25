@@ -2,13 +2,103 @@
 \chapter{System Design and Implementation}\label{ch:design}
 
 \section{AI Model Integration}\label{sec:integration}
-\guide{Describe how the AI model is integrated into the larger system, including the interface and data exchange between the AI model and other system components.}
+OpenTrading does not contain a model of its own.
+It is a harness: the program around a large language model that decides what the model sees, which actions it may take and when a task is finished.
+The model is reached through the interface of a model provider, and the market data is reached through the Model Context Protocol (MCP), an open standard for connecting models to tools and data.
+\todo{Cite the MCP specification after opening it.}
+\Cref{tab:components} lists the main components and the role of each.
+\begin{table}[htb]
+  \centering
+  \caption{Main components of the system and their roles}\label{tab:components}
+  \begin{tabularx}{\textwidth}{@{}l X@{}}
+    \toprule
+    {Component} & {Role}\\
+    \midrule
+    Language model & Reads the conversation and the tool results, and decides the next step or the final answer\\
+    OpenTrading harness & Runs the agent loop and offers 23 built-in tools, 43 skills and 17 specialised sub-agents\\
+    MCP client & Part of the harness; connects to one or more MCP servers and turns their tools into tools that the model can call\\
+    opentrading-mcp & Data server built by the group; offers 175 tools and 6 analysis workflows over the market data\\
+    Data providers & External sources of prices, financial statements, global markets and news (\cref{sec:market-data})\\
+    \bottomrule
+  \end{tabularx}
+  \fignote{Source: OpenTrading \texttt{7319264} (version 0.5.1) and opentrading-mcp \texttt{de956f8}.}
+\end{table}
+%% Evidence: E10, E12, E21.
+
+\subsection{From Server Tools to Model Tools}\label{sec:tool-exposure}
+Each tool of the server is published with a name, a description, the schema of its inputs and a short search hint.
+The MCP client gives the model the tools of every connected server next to the harness's own tools, with the server's name as a prefix so that two servers cannot clash.
+A full list of 175 tool schemas would take a large part of the model's context in every request.
+When the number of tools passes a threshold, the harness therefore sends only their names, and the model loads the tools it needs through a search tool, as described in \cref{sec:algorithm}.
+The workflows of the server appear to the user as commands, so that a prepared analysis, such as a risk check of a portfolio, can be started in one line.
+
+\subsection{A Shared Answer Contract}\label{sec:answer-contract}
+A tool call can fail for reasons outside the model's control: a provider is down, a market is closed, or a company has not yet published its report.
+If such a failure is returned as an error, the model often stops or, worse, guesses a value.
+Every answer of the server therefore uses the same envelope.
+Besides the data, it states whether the data is available, empty or unavailable; for unavailable data it gives the reason, whether a retry may help and after how long, and which other tools may serve the same need.
+It also states the units of every number and the provenance of the data: the source, the time of the data and whether the answer came from the cache.
+With this contract the model can choose its next step itself, and the final answer can cite where each number came from.
+
+\subsection{Control Over Actions}\label{sec:action-control}
+Most tools of the data server only read data, and each tool declares whether it reads or writes.
+The harness runs reading tools at once.
+Tools that change something, such as saving a watch list or writing a file, are paused until the user confirms them, and a harness running without a user refuses them.
+The user can allow a tool once, for the session or permanently, and a permanent permission is tied to the exact server, so a different server with the same tool name is asked again.
 
 \section{Data Flow and Processing}\label{sec:dataflow}
-\guide{Illustrate and describe the data flow through the system, from data collection, processing, to data analysis and result presentation.}
+\Cref{fig:mcp-lifecycle} follows one tool call from the harness to the data providers and back.
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=0.82\textwidth]{mcp-request-lifecycle}
+  \caption{Life cycle of one tool call through the opentrading-mcp server}\label{fig:mcp-lifecycle}
+  \fignote{Source: the group, drawn from opentrading-mcp \texttt{de956f8}; diagram source \texttt{figures/src/mcp-request-lifecycle.tex}.}
+\end{figure}
+The call first passes an HTTP layer that protects the server.
+The request is logged; it is refused at once if too many calls are already waiting, so that an overloaded server answers quickly instead of timing out; and it must carry a valid access token, stay within a daily quota and respect a rate limit per client.
+A refused call returns a clear reason and, where relevant, the time after which a retry is useful.
+
+The call then enters the tool runtime.
+The runtime first looks for a stored answer to the same question.
+How long an answer may be reused depends on the market: prices are kept only briefly during a trading session and much longer outside it, and an answer that a provider could not give is remembered for a short time, so that the server does not ask the same failing provider again and again.
+If an identical call is already running, the new call waits for its result instead of starting a second request to the provider.
+Otherwise the work is given to a pool of workers; long computations, such as backtests, run in a separate pool so that they cannot block short lookups.
+Each provider is wrapped by a circuit breaker: after repeated failures the server stops calling that provider for a while and returns an unavailable answer at once.
+Before the result is returned, the runtime applies the cleaning rules of \cref{sec:market-data} and builds the answer envelope of \cref{sec:answer-contract}, and the answer is stored for the next identical call.
+
+Some data does not wait for a request.
+Background tasks keep live order-book and trade data from the stock exchange during trading hours only; they pause at the lunch break and do not run on public holidays.
+In the benchmark, the same tools are called, but their answers come from the frozen recording of \cref{sec:evaluation-data} instead of the providers.
 
 \section{Deployment Strategy}\label{sec:deployment}
-\guide{Detail how the system is deployed, including the deployment environment and deployment procedures.}
+The two products are deployed in different ways because they are used in different ways.
+
+OpenTrading runs on the user's own computer.
+Each release is built into one program file per operating system, with its runtime included, so that the user does not install any other software.
+The files are published as releases of the repository and also through the npm package registry, and the user installs them with a one-line script; the program can update itself to the latest release.
+A release is built and checked by automated workflows on real Windows, macOS and Linux machines before it is published.
+
+The data server is packaged as a container image.
+For development it runs on the developer's computer and talks to the harness directly through standard input and output, without a network or a token.
+For the group it runs as a web service in the cloud, together with a PostgreSQL database for stored statistics and a Redis store for the cache and the shared state of the background tasks.
+A local setup with the same three services is described in one compose file, so the same image runs in both places.
+Two health addresses support operation: one answers only whether the process is alive, and the other checks the database, the cache and the background worker.
+Credentials for the providers and the access tokens are given to the service as environment settings and are never stored in the repository.
+\todo{Describe the service as public only after the supervisor confirms the data licences.}
 
 \section{Scalability and Maintenance}\label{sec:scalability}
-\guide{Discuss how the system is designed to handle growth and future maintenance, including system updates, scalability, and version management.}
+\subsection{Scalability}\label{sec:scaling}
+The data server is designed to stay responsive when many calls arrive together, rather than to process an unlimited number of them.
+Three mechanisms serve this goal.
+Connections to providers are shared and reused instead of opened for every call.
+The number of calls that may wait or run at the same time is bounded; above the bound new calls are refused at once with a retry time.
+Identical calls are merged, and answers are reused for as long as the market allows, which avoids asking a provider twice for the same data.
+The group did not run a new load test for this version, so no throughput figure is claimed here.
+
+\subsection{Maintenance}\label{sec:maintenance}
+Both products are maintained through the same process: every change is a pull request that must pass automated tests before it is merged.
+At the versions described in this report, OpenTrading passed \num{2253} tests and opentrading-mcp passed \num{1338} tests with 71.69\% line coverage.
+%% Evidence: E11, E13.
+OpenTrading follows numbered releases with a change log, and the data server records its changes in a dated change log.
+The data server also tracks its dependencies: an audit in November 2026 found that the library used for Vietnamese market data is published only on its vendor's own package index, so a failure of that index would stop every build.
+This risk, together with open work on the handling of provider sessions and health checks, is listed as future work in \cref{sec:future}.
