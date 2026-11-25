@@ -14,10 +14,17 @@ ba mục tiêu 10-12, 8-10, 6-8; đánh giá 2-4; kết luận 1 (cộng 32 đ�
 | II. Project Management Plan | 3 | 5% | 10% |
 | III. Existing Systems/State of the Art | 5 | 5% | 10% |
 | IV. Methodology | 9 | 35% | 35% |
-| V. System Design and Implementation | 7 | 20% | 20% |
-| VI. Results and Discussion | 5 | 15% (cùng VII) | 15% (cùng VII) |
-| VII. Conclusion | 2 | | |
-| Tổng | 34 | | |
+| V. System Design and Implementation | 6,5 | 20% | 20% |
+| VI. Results and Discussion | 7 | 15% (cùng VII) | 15% (cùng VII) |
+| VII. Conclusion | 1,5 | | |
+| Tổng | 35 | | |
+
+## Nội dung nằm ở phần nào
+
+- **IV: thuật toán và lý do.** V: thành phần nằm ở đâu, dữ liệu chảy thế nào. **VI: benchmark** (thiết kế ở VI.1.1-VI.1.4, kết quả ở VI.1.5-VI.1.9).
+- IV.4 và IV.5 giữ ngắn (cách kiểm chứng, công thức), chi tiết trỏ sang VI.1.
+- Không tả một thứ hai lần; trỏ bằng `\cref`. Tối đa ba cấp tiêu đề; tên mục cấp 1, 2 giữ theo trường.
+- Đầu mục cấp 3 và người viết: issue #2.
 
 ## Văn phong
 
