@@ -7,7 +7,7 @@ Chép mẫu từ `tests/sample/sample.tex`.
 - Caption là một câu ngắn, tự hiểu được. Bảng: caption trên. Hình: caption dưới.
 - Vị trí `[H]`, đặt ngay sau đoạn văn nhắc tới nó, có dòng trống trước và sau, để hình không cắt ngang đoạn văn.
   Khi ráp bài mà `[H]` để trống nhiều ở cuối trang thì đưa đoạn kế tiếp lên trước hình, hoặc dùng `[htb]`.
-- Hình vẽ: vector (PDF) từ nguồn trong `figures/src`. Ảnh chụp màn hình: PNG, tối thiểu 200 dpi ở cỡ in, chỉ lấy vùng cần xem, không lộ khóa, token, email, đường dẫn cá nhân.
+- Hình vẽ: vector (PDF) từ nguồn trong `figures/src`. Ảnh chụp màn hình: PNG, tối thiểu 150 dpi ở cỡ in, chỉ lấy vùng cần xem, không lộ khóa, token, email, đường dẫn cá nhân.
 - Chữ trong hình tối thiểu 8 pt sau khi co, Arial hoặc Times New Roman. Phân biệt được khi in đen trắng.
 - Biểu đồ số liệu: có script tạo lại từ dữ liệu đã commit, trục có tên và đơn vị, trục cột bắt đầu từ 0, có khoảng tin cậy khi so sánh.
 - Bảng: `tabularx` + `booktabs`, không kẻ dọc, số canh theo dấu thập phân (cột `S`), đơn vị ở tiêu đề cột.
