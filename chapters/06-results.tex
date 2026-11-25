@@ -5,6 +5,69 @@
 \section{Results and Analysis}\label{sec:results}
 \guide{Present the results obtained from executing the project, including numerical data, graphs, diagrams, and supportive imagery.}
 \guide{Provide a detailed analysis of the results obtained: comparison, error analysis, and their significance.}
+\todo{Skeleton only. Every value waits for the version 4.7 main run; fill it from the analysis output of the run and add one evidence entry per number.}
+This section reports the version 4.7 main run designed in \cref{sec:validation}, scored as defined in \cref{sec:scoring,sec:metrics}.
+
+\subsection{Completion of the Run}\label{sec:run-completion}
+Of the \num{1200} scheduled trials, \TBC{n} were completed, \TBC{n} were voided under the transport rule and run again, and \TBC{n} ended without a final answer.
+Trials without a final answer stay in the denominator as incorrect.
+
+\subsection{Accuracy}\label{sec:accuracy}
+\Cref{tab:accuracy} gives the share of trials answered correctly by each arm, overall and for each task group.
+\begin{table}[htb]
+  \centering
+  \caption{Share of trials answered correctly, by arm and task group (\%)}\label{tab:accuracy}
+  \begin{tabularx}{\textwidth}{@{}X c c c c c c c@{}}
+    \toprule
+    {Arm} & {Overall} & {L} & {C} & {M} & {I} & {R} & {S}\\
+    \midrule
+    OpenTrading & \TBC{--} & \TBC{--} & \TBC{--} & \TBC{--} & \TBC{--} & \TBC{--} & \TBC{--}\\
+    OpenCode & \TBC{--} & \TBC{--} & \TBC{--} & \TBC{--} & \TBC{--} & \TBC{--} & \TBC{--}\\
+    DSH & \TBC{--} & \TBC{--} & \TBC{--} & \TBC{--} & \TBC{--} & \TBC{--} & \TBC{--}\\
+    \bottomrule
+  \end{tabularx}
+  \fignote{Source: \TBC{analysis output of run main-20261124 and its shard, with commit}. Each cell is correct trials over scheduled trials; group sizes in \cref{tab:taskset}.}
+\end{table}
+\TBC{Two to four sentences on the main pattern, including groups where the arms tie or OpenTrading is behind.}
+
+\subsection{Differences Between Harnesses}\label{sec:differences}
+\Cref{tab:differences} gives the difference between OpenTrading and each other arm with its paired bootstrap interval.
+\begin{table}[htb]
+  \centering
+  \caption{Difference in accuracy between OpenTrading and each other arm, with 95\% confidence intervals (percentage points)}\label{tab:differences}
+  \begin{tabularx}{\textwidth}{@{}X c c@{}}
+    \toprule
+    {Comparison} & {Difference} & {95\% CI}\\
+    \midrule
+    OpenTrading $-$ OpenCode & \TBC{--} & \TBC{--}\\
+    OpenTrading $-$ DSH & \TBC{--} & \TBC{--}\\
+    \bottomrule
+  \end{tabularx}
+  \fignote{Source: \TBC{analysis output with commit}; paired bootstrap over tasks, \num{2000} draws.}
+\end{table}
+\todo{Add a figure of the per-group differences with intervals, drawn by a script in figures/src from the committed analysis output.}
+
+\subsection{Stability, Refusals and Cost}\label{sec:stability-cost}
+\begin{table}[htb]
+  \centering
+  \caption{Stability, refusal errors and cost of each arm}\label{tab:stability-cost}
+  \begin{tabularx}{\textwidth}{@{}l *{5}{>{\centering\arraybackslash}X}@{}}
+    \toprule
+    {Arm} & {Correct in 2/2 runs} & {False positives on refusal tasks} & {False refusals} & {Requests} & {Cost (USD)}\\
+    \midrule
+    OpenTrading & \TBC{--} & \TBC{--} & \TBC{--} & \TBC{--} & \TBC{--}\\
+    OpenCode & \TBC{--} & \TBC{--} & \TBC{--} & \TBC{--} & \TBC{--}\\
+    DSH & \TBC{--} & \TBC{--} & \TBC{--} & \TBC{--} & \TBC{--}\\
+    \bottomrule
+  \end{tabularx}
+  \fignote{Source: \TBC{analysis output and paid-budget journal with commit}. Cost separates observed charges from upper-bound estimates.}
+\end{table}
+\Cref{tab:stability-cost} reports stability, refusal errors and cost.
+The recommendation group is read against the always-sell baseline of 11/16 (\cref{sec:metrics}).
+\TBC{Sentences on stability, refusals and cost.}
+
+\subsection{Error Analysis}\label{sec:error-analysis}
+\TBC{Classify the incorrect trials of each arm (wrong value, wrong unit or scale, missing data reported as missing, no final answer, limit reached) and give two short examples.}
 
 \section{Discussion}\label{sec:discussion}
 \guide{Discuss how the results address the research questions and hypotheses, their alignment with related studies, and any limitations or challenges encountered.}
