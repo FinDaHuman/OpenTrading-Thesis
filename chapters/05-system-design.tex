@@ -6,7 +6,7 @@
 
 \subsection{Overall Architecture}\label{sec:architecture}
 \Cref{fig:architecture} shows the parts of the harness and the programs it talks to.
-The agent loop is at the centre.
+The agent loop connects them.
 It produces a stream of events, and every interface reads the same events, so the terminal and the evaluation run the same loop.
 
 \begin{figure}[H]
@@ -20,13 +20,13 @@ The design follows three questions.
 The first is what the model sees.
 The system prompt is built in layers: the core rules and working rules, then the profile and constraints of the user, then the style and the list of skills.
 A skill is a written method of analysis; of the 43 in OpenTrading, only those that the model loads or the user switches on are added in full.
-The first layers stay the same from turn to turn, so the provider can reuse its cache, while reminders such as the time of the market travel with the messages.
+The earlier layers rarely change, so the provider can reuse its cache; reminders such as the time of the market are sent with the messages.
 %% Evidence: E10.
 
 The second question is what the model can do.
-All tools, whether built in or offered by an MCP server, are registered in the same form.
+All tools, whether built in or offered by a Model Context Protocol (MCP) server, are registered in the same form.
 The permission gate decides on each call; reading tools may run in parallel, and a writing tool runs alone.
-By default a call may take 60 seconds, and a longer result is shortened to \num{30000} characters.
+Calls have a time limit, and by default a result longer than \num{30000} characters is shortened.
 
 The third question is what remains as evidence.
 During a session the results of MCP tools are normally kept in full in a file of up to \qty{64}{\mebi\byte}, so a figure can still be traced after the conversation has been shortened.
@@ -82,7 +82,7 @@ OpenTrading runs on the computer of the user.
 An automated workflow builds program files for Windows, macOS and Linux, each with its own runtime, and publishes them on GitHub and npm.
 After publication, the release is installed on six test machines; for version 0.5.1, published on 25 November 2026, all six installations passed.
 An update of a script installation is checked against its checksum and started once before it replaces the old version.
-The files are not signed yet, so the operating system may show a warning.
+The files do not carry the certificate of a publisher yet, so the operating system may show a warning.
 %% Evidence: E31.
 
 \section{Scalability and Maintenance}\label{sec:scalability}
@@ -90,8 +90,8 @@ The files are not signed yet, so the operating system may show a warning.
 
 \subsection{Testing and Maintenance of the Harness}\label{sec:testing}
 Each pull request is tested automatically on Linux and Windows.
-At version 0.5.1, \num{2249} of \num{2253} tests passed on Linux, four that need another operating system were skipped, and none failed.
-Instead of a paid model, the tests use a stand-in that returns prepared answers, including broken ones.
-For the stop gate they contain both endings that must be caught and answers that must be left alone.
+At version 0.5.1, \num{2249} of \num{2253} tests passed on Linux; the four others, which need macOS or Windows, were skipped.
+Instead of a paid model, the tests use a simulated one that returns prepared answers, including broken ones.
+For the stop gate the tests contain both endings that must be caught and answers that must be left alone.
 Some rules of the agent loop can also be switched off one at a time in the evaluation, so that their effect can be measured.
 %% Evidence: E11, E35.
