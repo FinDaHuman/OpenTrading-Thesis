@@ -20,7 +20,7 @@ T = trường (AIP491), G = giáo viên (CS-Thesis Template, Harvard guide, file
 | 14 | Style Normal, Title, Subtitle, Author, H1 đến H3, Figure, Code, Bulleted, Numbered | G | `fptthesis.cls` | replica |
 | 15 | Header, footer "N of M", ngày | G | `fptthesis.cls` | `verify_format.py thesis` |
 | 16 | Methodology được tùy biến (mục 3, 4 đổi tên vì không huấn luyện mô hình) | T | IV | duyệt PR |
-| 17 | 25 đến 35 trang | G | [02-writing.md](02-writing.md) | `verify_format.py thesis` |
+| 17 | 25 đến 35 trang (phạm vi chưa xác nhận) | G | [02-writing.md](02-writing.md) | `verify_format.py thesis`, chỉ cảnh báo |
 | 18 | Viết docx hoặc LaTeX, nộp PDF | G | repo này | |
 | 19 | Định dạng như bài báo khoa học, thống nhất citation, reference, bảng, hình | G | 03, 04 | `check.py` |
 | 20 | Viết việc nhóm làm, việc người khác thì cite | G | [02-writing.md](02-writing.md) | duyệt PR |
