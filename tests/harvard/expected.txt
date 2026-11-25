@@ -1,0 +1,49 @@
+# In-text examples of the guide (tag = line in harvard.tex). Italic parts are between underscores.
+@A@(Comfort, 1997, p. 58)
+@B@Comfort (1997, p. 58)
+@C@(Madden & Hogan, 1997, p. 45)
+@D@Madden and Hogan (1997, p. 45)
+@E@(Leeder et al. 1996, p. 69)
+@F@(_Advertising in the Western Cape_, 1990, p. 14)
+@G@_Advertising in the Western Cape_ (1990, p. 14)
+@H@(Brown, 1982, 1988)
+@I@(Napier, 1993a, 1993b)
+@J@(_Anorexia nervosa_, 1969)
+@K@(Dawson et al. 2002)
+@L@(Royal Institute of British Architects, n.d.)
+@M@(Byrne, 2004; Comfort, 1997)
+@N@(Hamilton, C.L. 1994)
+@O@C.L. Hamilton (1994)
+@P@(_Leafy seadragons and weedy seadragons_, 2001)
+@Q@(Research and Training Centre, 1993, p. 2)
+# Reference list (order is the printed order). 'Maddock' replaces the guide's second Madden,
+# which would otherwise trigger the guide's own same-family-name rule.
+_Advertising in the Western Cape_ (1990) ABC Publishers, Cape Town.
+Anorexia nervosa (1969) _British Medical Journal_, vol. 1, pp. 529-30.
+Blaxter, M. (1976) Social class and health inequalities, in C. Carter & J. Peel (eds.), _Equalities and inequalities in health_, Academic Press, London, pp. 120-135.
+Brown, P. (1982) _Corals in the Capricorn group_, Central Queensland University, Rockhampton.
+Brown, P. (1988) _The effects of anchor on corals_, Central Queensland University, Rockhampton.
+Byrne, A. (2004) The end of history: censorship and libraries, _The Australian Library Journal_, vol. 53, no. 2. Retrieved November 16, 2004, from http://www.alia.org.au/publishing/alj/53.2/full.text/byrne.html
+Comfort, A. (1997) _A good age_, Mitchell Beazley, London.
+Cookson, A.H. (1985) _Particle trap for compressed gas insulated transmission systems_, U.S. Patent 4554399.
+Dawson, J., Smith, L., Deubert, K. & Grey-Smith, S. (2002) _‘S’ Trek 6: referencing, not plagiarism_. Retrieved October 31, 2002, from http://studytrekk.lis.curtin.edu.au/
+Debono, C. (2000) The National Trust into the new millennium, _Proceedings of the ninth meeting of the International National Trust_, Australian Council of National Trusts, Alice Springs, NT, pp. 44-6. Retrieved January 20, 2006, from Informit Online database.
+Example Group (2026) _ExampleTool_ (version 2.1.2) [Computer software]. Retrieved November 25, 2026, from https://example.org/tool
+Hamilton, C.L. (1994) _Alpha_, P, Q.
+Hamilton, D.R. (1995) _Beta_, P, Q.
+Jones, F. (1998) The mechanism of Bayer residue flocculation, PhD Thesis, Curtin University of Technology. Retrieved December 21, 2005, from Curtin University of Technology Digital Theses.
+Kastenbaum, R. (ed.) (1993) _Encyclopedia of adult development_, Oryx Press, Phoenix.
+_Leafy seadragons and weedy seadragons_ (2001) Retrieved November 13, 2002, from http://www.windspeed.net.au/~jenny/seadragons/
+Leeder, S.R., Dobson, A.J., Gibbers, R.W., Patel, N.K., Mathews, P.S., Williams, D.W. & Mariot, D.L. (1996) _The Australian film industry_, Dominion Press, Adelaide.
+Madden, R. & Hogan, T. (1997) _The definition of disability in Australia: moving towards national consistency_, Australian Institute of Health and Welfare, Canberra.
+Maddock, G. (2002) Internet economics and policy: an Australian perspective, _Economic Record_, vol. 78, no. 242, pp. 343-58. Retrieved October 16, 2002, from ABI/INFORM Global database.
+Napier, A. (1993a) _Fatal storm_, Allen & Unwin, Sydney.
+Napier, A. (1993b) _Survival at sea_, Allen & Unwin, Sydney.
+Patton, K.T. (2002) Neuralgia and headaches, _Science_, vol. 4, pp. 2153-55.
+Research and Training Centre on Independent Living (1993) _Guidelines for reporting and writing about people with disabilities_ [Brochure], 4th edn, Research and Training Centre, Lawrence, KS.
+Resource Assessment Commission (1991) _Forest and timber inquiry: draft report_, vol. 1, Australian Government Publishing Service, Canberra.
+Royal Institute of British Architects (n.d.) _Shaping the future: careers in architecture_. Retrieved May 31, 2005, from http://www.careersinarchitecture.net/
+Thibodeau, G.A. & Patton, K.T. (eds.) (2002) _The human body in health and disease_, Mosby, St. Louis, Mo.
+Towers, K. (2000) Doctor not at fault: coroner, _Australian_, 18 January, p. 3.
+Watersmith, C. (2000) _BHP enters new era_, media release, BHP Limited, Melbourne, 1 March.
+Yang, J. & Jimenez, C. (2024) _Example preprint title_, arXiv:2405.15793. Retrieved November 25, 2026, from https://arxiv.org/abs/2405.15793

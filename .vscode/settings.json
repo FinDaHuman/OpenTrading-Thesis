@@ -1,0 +1,32 @@
+{
+  "latex-workshop.latex.recipes": [
+    {
+      "name": "thesis (draft)",
+      "tools": [
+        "latexmk"
+      ]
+    }
+  ],
+  "latex-workshop.latex.tools": [
+    {
+      "name": "latexmk",
+      "command": "latexmk",
+      "args": [
+        "main.tex"
+      ],
+      "env": {}
+    }
+  ],
+  "latex-workshop.latex.outDir": "%DIR%/build",
+  "latex-workshop.latex.rootFile.doNotPrompt": true,
+  "latex-workshop.latex.search.rootFiles.include": [
+    "main.tex"
+  ],
+  "latex-workshop.latex.autoBuild.run": "onSave",
+  "latex-workshop.chktex.enabled": false,
+  "files.eol": "\n",
+  "editor.wordWrap": "on",
+  "[latex]": {
+    "editor.formatOnSave": false
+  }
+}

@@ -1,0 +1,2 @@
+# format checks only (tools/verify_*.py)
+PyMuPDF==1.26.7

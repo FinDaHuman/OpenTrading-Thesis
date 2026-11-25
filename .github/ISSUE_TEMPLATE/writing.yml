@@ -1,0 +1,15 @@
+name: Viết một mục
+description: Giao việc viết một mục của thesis
+labels: [writing]
+body:
+  - type: input
+    id: section
+    attributes: {label: Mục, placeholder: IV.5 Evaluation Metrics}
+    validations: {required: true}
+  - type: textarea
+    id: content
+    attributes: {label: Nội dung cần có, description: Ý chính, hình, bảng, số liệu (ID trong rules/05-evidence.md)}
+    validations: {required: true}
+  - type: input
+    id: deadline
+    attributes: {label: Hạn}

@@ -1,0 +1,97 @@
+{
+ "note": "Titles and order from Template_AIP491 (school). Parts IV.3 and IV.4 are customised, as the school allows. Checked by tools/check.py.",
+ "chapters": [
+  [
+   "Project Introduction",
+   [
+    "Overview",
+    "Project Background",
+    "Project Objective",
+    "Problem Statement",
+    "Significance of the Project",
+    "Project Scope \\& Limitations"
+   ]
+  ],
+  [
+   "Project Management Plan",
+   [
+    "Team Work",
+    "Project Management Approach"
+   ]
+  ],
+  [
+   "Existing Systems/State of the Art",
+   [
+    "Overview of the Field",
+    "Historical Context",
+    "Key Studies and Theories",
+    "Technological Advancements",
+    "Comparison of Existing Systems",
+    "Gaps in the Literature/Technology",
+    "Justification for the Project"
+   ]
+  ],
+  [
+   "Methodology",
+   [
+    "Research Questions and Objectives",
+    "Data Collection and Preprocessing",
+    "Algorithm Design",
+    "Model Configuration and Validation",
+    "Evaluation Metrics",
+    "Implementation Plan",
+    "Ethical Considerations"
+   ]
+  ],
+  [
+   "System Design and Implementation",
+   [
+    "AI Model Integration",
+    "Data Flow and Processing",
+    "Deployment Strategy",
+    "Scalability and Maintenance"
+   ]
+  ],
+  [
+   "Results and Discussion",
+   [
+    "Results and Analysis",
+    "Discussion",
+    "Recommendations",
+    "Personal Reflection (Optional)"
+   ]
+  ],
+  [
+   "Conclusion",
+   [
+    "Summary of Findings",
+    "Contributions and Reflections on the Project",
+    "Limitations and Future Work"
+   ]
+  ],
+  [
+   "References",
+   []
+  ],
+  [
+   "Appendices",
+   [
+    "Appendix - Program Code",
+    "Appendix - Other if needed"
+   ]
+  ]
+ ],
+ "optional": [
+  "Personal Reflection (Optional)",
+  "Appendix - Other if needed"
+ ],
+ "front": [
+  "Project Specification",
+  "Abstract",
+  "Table of Contents",
+  "Acknowledgement",
+  "Definition and Acronyms",
+  "List of tables",
+  "List of figures"
+ ]
+}

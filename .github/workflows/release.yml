@@ -1,0 +1,38 @@
+name: Release
+on:
+  push:
+    tags: ["v*"]
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: windows-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - uses: TeX-Live/setup-texlive-action@eb78d21f41941476d9121e3a0abcab73265c876f # v4.1.1
+        with:
+          version: "2026"
+          package-file: .github/texlive-packages.txt
+      - run: python tools/thesis.py test
+        env:
+          PYTHONUTF8: "1"
+      - run: python tools/thesis.py release
+        env:
+          PYTHONUTF8: "1"
+      - name: Create the release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          pre=""
+          case "$TAG" in v0.*) pre="--prerelease" ;; esac
+          gh release create "$TAG" dist/*.pdf dist/SHA256SUMS --title "Thesis $TAG" --generate-notes --verify-tag $pre --repo "$GITHUB_REPOSITORY"

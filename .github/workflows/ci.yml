@@ -1,0 +1,48 @@
+name: CI
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+jobs:
+  rules:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - run: python3 tools/check.py
+  build:
+    # Windows has the real Times New Roman, Arial, Courier New, Calibri and Cambria
+    runs-on: windows-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - uses: TeX-Live/setup-texlive-action@eb78d21f41941476d9121e3a0abcab73265c876f # v4.1.1
+        with:
+          version: "2026"
+          package-file: .github/texlive-packages.txt
+      - run: python tools/thesis.py test
+        env:
+          PYTHONUTF8: "1"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: thesis-draft-${{ github.sha }}
+          path: |
+            build/main.pdf
+            build/sample/sample.pdf
+            build/main.log
+          retention-days: 30

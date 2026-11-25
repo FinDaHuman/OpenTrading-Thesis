@@ -1,0 +1,15 @@
+name: Góp ý
+description: Góp ý của GVHD, hội đồng hoặc thành viên
+labels: [feedback]
+body:
+  - type: input
+    id: where
+    attributes: {label: Vị trí, placeholder: "Bản v0.2.0, trang 12, mục IV.3"}
+    validations: {required: true}
+  - type: textarea
+    id: what
+    attributes: {label: Góp ý}
+    validations: {required: true}
+  - type: dropdown
+    id: source
+    attributes: {label: Người góp ý, options: [GVHD, Hội đồng, Thành viên]}

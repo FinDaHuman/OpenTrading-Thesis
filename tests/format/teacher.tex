@@ -1,0 +1,70 @@
+%% Replica of the supervisor's sample (CS-Thesis_Template). Compared with teacher.json by
+%% tools/verify_format.py replica. Only content below; all formatting comes from the class.
+\def\ThesisMode{final}
+\documentclass[letterpaper,arabicchapters,nochapterbreak]{fptthesis}
+\ThesisSet{title}{Style Guidelines for Final Year Project Reports}
+\ThesisSet{reporttype}{Final Year Project Final Report}
+\ThesisSet{titleauthors}{A 4th Year Student Name(s)}
+\ThesisSet{headerauthor}{A 4th Year Student}
+\ThesisSet{group}{replica}\ThesisSet{keywords}{}
+\ThesisSet{submission}{A thesis submitted in part fulfilment of the degree of BSc. (Hons.) in Computer Science with the supervision of Prof. Barry SmythName of Professor and moderated by Dr. Liam MurphyName of Doctor.}
+\ThesisSet{degree}{Bachelor of Computer Science}
+\ThesisSet{campus}{Hoa Lac campus - FPT University}
+\ThesisSet{date}{13 October 2021}
+\begin{document}
+\SupervisorTitlePage
+\frontmatter
+\FrontSection[notoc]{Project Specification}
+Your project specification goes here.
+\FrontTop{Abstract}
+This document serves as a guide for final year project reports. \textbf{\textit{NOTE: in your report, you should replace this with an appropriate Abstract for your project report.}}
+\TableOfContents
+\mainmatter
+\chapter{Introduction}
+This document is a guide for final year project reports in the Bachelor of Computer Science at FPT University.
+\chapter{Problem Description}
+Please describe the problem of your project here.
+
+In your report, please use the following standard styles:
+\begin{itemize}
+\item \textbf{Normal} – the style for the basic text of the document.
+\item \textbf{Title} – the main title style.
+\item \textbf{Subtitle} – the subtitle style.
+\item \textbf{Author} – the style used for the author's name on the front page.
+\item \textbf{H1, H2, H3} – styles for different levels of section headings.
+\item \textbf{Figure} – the style for a figure or table caption.
+\item \textbf{Code} – the style for program source code.
+\item \textbf{Bulleted List} – the style for a standard bulleted list such as this one.
+\item \textbf{Numbered List} – similar to the bulleted list style except that the list is numbered.
+\end{itemize}
+\chapter{Review of Literature for Solution}
+This section presents the students{\fontspec{Times New Roman}\char"0027} reading on the state-of-the-art literature, where there may contain suggestions to the solution of the problem.
+\chapter{Solutions}
+This is the main section, where solution of the problem is presented and proven.
+\section{Algorithm}
+The algorithm of the solution.
+\clearpage
+\section{Validation}
+This sub-section presents the experiments, or matematical proof, that validate the algorithm presented.
+\chapter{Conclusion}
+Summary.
+\chapter{References}
+List of references for the content presented
+
+Referencing under the Harvard style
+\chapter{Appendix - Program Code}
+Source code style is a simple indented, single-spaced style using a fixed font (Courier New) to produce code that appears like the following:
+\begin{lstlisting}
+static public void main(String[] args) {
+  try  {
+    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+  }
+  catch(Exception e) {
+    e.printStackTrace();
+  }
+  new WelcomeApp();
+}
+\end{lstlisting}
+\chapter{Appendix - Other if needed}
+Any other supplement content if needed.
+\end{document}

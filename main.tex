@@ -1,0 +1,32 @@
+%% OpenTrading capstone thesis. Entry point: build with "latexmk" or tools/thesis.py.
+%% Format decisions: rules/01-format.md. Do not set fonts, sizes or spacing here.
+\documentclass[a4paper,romanchapters,chapterbreak]{fptthesis}
+
+\input{config/metadata}
+\addbibresource{references/references.bib}
+
+\begin{document}
+\SchoolCover
+\SupervisorTitlePage
+
+\frontmatter
+\input{frontmatter/specification}
+\input{frontmatter/abstract}
+\TableOfContents
+\input{frontmatter/acknowledgement}
+\input{frontmatter/acronyms}
+\ListOfTables
+\ListOfFigures
+
+\mainmatter
+\include{chapters/01-introduction}
+\include{chapters/02-management}
+\include{chapters/03-existing-systems}
+\include{chapters/04-methodology}
+\include{chapters/05-system-design}
+\include{chapters/06-results}
+\include{chapters/07-conclusion}
+\label{fpt:bodyend}
+\References
+\include{appendices/appendices}
+\end{document}

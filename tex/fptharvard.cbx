@@ -1,0 +1,34 @@
+%% fptharvard.cbx -- in-text citations of the Curtin Harvard guide.
+\ProvidesFile{fptharvard.cbx}[2026/11/25 v1.0 Harvard (Curtin) citation style]
+\RequireCitationStyle{authoryear-comp}
+\ExecuteBibliographyOptions{sortcites=true,autocite=inline,ibidtracker=false}
+\newif\iffpt@nocomma
+% (Madden & Hogan, 1997) but Madden and Hogan (1997)
+\DeclareDelimFormat[parencite,cite,autocite]{finalnamedelim}{\addspace\&\space}
+\DeclareDelimFormat[textcite]{finalnamedelim}{\addspace\bibstring{and}\space}
+\DeclareDelimFormat{multinamedelim}{\addcomma\space}
+% (Comfort, 1997) but (Leeder et al. 1996) and (Hamilton, C.L. 1994)
+\DeclareDelimFormat[parencite,cite,autocite]{nameyeardelim}{%
+  \iffpt@nocomma\addspace\else\addcomma\space\fi}
+\DeclareDelimFormat[textcite]{nameyeardelim}{\addspace}
+% no author: (Title, 1990) and Title (1990); a/b years are written out (1993a, 1993b)
+\DeclareDelimFormat{nonameyeardelim}{\addcomma\space}
+\DeclareDelimFormat[textcite]{nonameyeardelim}{\addspace}
+\renewbibmacro*{cite:extradate}{\setunit{\compcitedelim}\usebibmacro{cite:labeldate+extradate}}
+\DeclareDelimFormat{multicitedelim}{\addsemicolon\space}
+\DeclareDelimFormat{compcitedelim}{\addcomma\space}
+\DeclareFieldFormat*{citetitle}{\mkbibemph{#1}}
+\DeclareFieldFormat{labeltitle}{\mkbibemph{#1}}
+\newcommand*{\fpt@citectx}{0}
+\AtEveryCitekey{\global\fpt@nocommafalse}
+\DeclareNameFormat{labelname}{%
+  \ifnumequal{\value{listcount}}{1}{\global\fpt@nocommafalse}{}%
+  \ifnumequal{\value{uniquename}}{0}
+    {\usebibmacro{name:family}{\namepartfamily}{\namepartgiven}{\namepartprefix}{\namepartsuffix}}
+    {\ifdefstring{\blx@delimcontext}{textcite}
+      {\usebibmacro{name:given-family}{\namepartfamily}{\namepartgiveni}{\namepartprefix}{\namepartsuffix}}
+      {\usebibmacro{name:family-given}{\namepartfamily}{\namepartgiveni}{\namepartprefix}{\namepartsuffix}%
+       \global\fpt@nocommatrue}}%
+  \ifboolexpr{test {\ifnumequal{\value{listcount}}{\value{liststop}}} and test \ifmorenames}{\global\fpt@nocommatrue}{}%
+  \usebibmacro{name:andothers}}
+\endinput

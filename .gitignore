@@ -1,0 +1,12 @@
+# build output and local PDFs: never committed (rules/07-versioning.md)
+/build/
+/dist/
+*.aux
+*.log
+*.synctex.gz
+*.xdv
+__pycache__/
+# local reference documents
+/reference/
+.DS_Store
+Thumbs.db

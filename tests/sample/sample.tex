@@ -1,0 +1,69 @@
+%% Style sample: every element the thesis may use, in the approved form. Copy from here.
+\documentclass[a4paper,romanchapters,chapterbreak]{fptthesis}
+\ThesisSet{title}{OpenTrading: An Agentic AI Harness for Financial Analysis and Market Research}
+\ThesisSet{headerauthor}{Style sample}\ThesisSet{group}{sample}\ThesisSet{keywords}{}\ThesisSet{date}{28 November 2026}
+\ThesisSet{titleauthors}{A, B}
+\addbibresource{../harvard/harvard.bib}
+\begin{document}
+\frontmatter
+\TableOfContents
+\ListOfTables
+\ListOfFigures
+\mainmatter
+\chapter{Project Introduction}\label{ch:one}
+Normal text with Vietnamese names: Đoàn Dũng Nguyễn Phạm Hiếu Tuấn Trung, đường, ưỡn, ngoẵng. A parenthetical citation \parencite{leeder} and a textual one: \textcite{madden} show that the rule holds; two at once \parencite{comfort,byrne}. References to \cref{ch:one,sec:two,fig:demo,tab:demo,alg:demo,lst:demo,eq:demo} use \texttt{\textbackslash cref}.
+\section{Second level}\label{sec:two}
+A paragraph before a list.
+\begin{itemize}
+\item A bulleted item.
+\item Another item that is long enough to wrap onto a second line so that the hanging indent of the list can be checked against the template.
+  \begin{itemize}
+  \item A nested item.
+  \end{itemize}
+\end{itemize}
+\begin{enumerate}
+\item A numbered item.
+\item Another numbered item.
+\end{enumerate}
+\subsection{Third level}\label{sec:three}
+The success rate with its paired difference is
+\begin{equation}\label{eq:demo}
+  \hat{p}_a=\frac{1}{N}\sum_{i=1}^{N} y_{a,i},\qquad \Delta=\hat{p}_a-\hat{p}_b .
+\end{equation}
+\begin{figure}[htb]
+  \centering\rule{0.6\textwidth}{2.5cm}
+  \caption{A demonstration figure}\label{fig:demo}
+  \fignote{Source: the group. Data: path and commit of the file that produced the figure.}
+\end{figure}
+\begin{table}[htb]
+  \centering
+  \caption{A demonstration table with numbers aligned on the decimal point}\label{tab:demo}
+  \begin{tabularx}{\textwidth}{@{}L S[table-format=3.0] S[table-format=2.2] S[table-format=1.3]@{}}
+    \toprule
+    {Arm} & {Passed} & {Rate (\%)} & {Cost (USD)}\\
+    \midrule
+    Arm A & 100 & 50.00 & 1.000\\
+    Arm B & 90 & 45.00 & 0.900\\
+    \bottomrule
+  \end{tabularx}
+  \fignote{Illustrative numbers only; not results.}
+\end{table}
+\begin{algorithm}[htb]
+  \caption{Demonstration}\label{alg:demo}
+  \begin{algorithmic}[1]
+    \Require turn history $h$
+    \Function{Judge}{$h$}
+      \If{$h$ is empty} \State \Return \textsc{continue} \EndIf
+      \State \Return \textsc{stop}
+    \EndFunction
+  \end{algorithmic}
+\end{algorithm}
+\begin{lstlisting}[float=htb,caption={A demonstration listing},label={lst:demo}]
+export interface Evidence {
+  id: string;          // [ref rN]
+  sha256: string;
+}
+\end{lstlisting}
+\chapter{References}
+\printbibliography[heading=none]
+\end{document}
