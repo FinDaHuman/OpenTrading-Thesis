@@ -20,6 +20,12 @@ PR thêm số mới phải thêm dòng vào bảng dưới. Ghi "đo" khi tự �
 | E11 | OpenTrading: 2,253 test trên Ubuntu, 0 lỗi | CI run 45617110999 | đo | Tại `7319264` |
 | E12 | opentrading-mcp: 175 tool đăng ký (174 khác nhau) | mcp `de956f8`, đếm bằng `list_tools` | đo | 176 khi có khóa web_search |
 | E13 | opentrading-mcp: 1,338 test qua, độ phủ 71.69% | CI run 45325615006 | đo | Tại `de956f8` |
+| E25 | Vòng lặp: mặc định không giới hạn bước; stop-gate 10 loại phục hồi, ngân sách 2, ngoại lệ câu trả lời rỗng khi đã có dữ liệu (tối đa 3 lần rỗng, 5 lần tất cả); nhắc sau kết quả tool chỉ gửi trên giao diện Anthropic, Google, Groq, OpenAI chính thức | OpenTrading `7319264` `src/core/agent.ts:77,156-165`, `src/core/loop/stop-gate.ts:17-20,233-319`; duyệt hết chuỗi phán quyết của `judgeStop` trên 12 bước mẫu | đo | Luật nhận dạng hình thức, không xét đúng sai |
+| E26 | Nhắc sau 4 bước lỗi liên tiếp, tắt tool ở 8; lặp cùng lời gọi 3 lần thì hỏi người dùng | OpenTrading `7319264` `src/core/loop/failures.ts:31-34,113-153`, `src/core/tools/loop-guard.ts:8` | đo | |
+| E27 | Truy vết số: các tỉ lệ, dung sai nửa đơn vị cuối; cổng chặn khi không tool dữ liệu nào chạy, có ít nhất 2 số không truy được và chiếm ít nhất một nửa; lượt có tool chỉ ghi lại; văn phạm số học 8,000 ký tự, 60 câu lệnh | OpenTrading `7319264` `src/core/loop/figures.ts:127-141`, `stop-gate.ts:469-541`, `operands.ts:13-24`, `src/core/tools/shell/math.ts:36-38` | đo | Chỉ đo, không chặn, ở lượt có tool |
+| E28 | Quyền: 4 chế độ; bộ duyệt 2 tầng, 4 luật tuyệt đối, 12 luật có điều kiện; hỏi người dùng sau 3 lần chặn liên tiếp hoặc 20 lần | OpenTrading `7319264` `src/core/permission/index.ts:13-36`, `mode.ts`, `auto/rules.ts`, `auto/index.ts:21-23` | đo | Tỉ lệ lỗi của bộ duyệt chưa đo |
+| E29 | Subagent 10 chạy cùng lúc; ultradesk 4 playbook, số agent và request dự kiến; ngưỡng ADR 0006 (đang ở trạng thái proposed; 0.10 và 60%) chưa đo | OpenTrading `7319264` `src/core/subagents/manager.ts:29`, `src/core/desk/`, gọi hàm `estimate`; `handbook/architecture/adr/0006-*.md` | đo | Số dự kiến, không phải số thực chạy |
+| E32 | v4.7: OpenTrading chạy chế độ bypass trong sandbox, qua `@ai-sdk/openai-compatible`; chỉ có tool MCP, shell, read_result (và memory_read) | benchmark `3be3e1b` `experiments/finance-v47-study/tools/runners/ot_headless.ts`, `run_opentrading.py:60` | đo | Bản OT là 0.5.0 (`ae7ec48`), không phải 0.5.1. Không đo nhắc giữa bước, văn phạm số học, skill, subagent, ultradesk |
 
 ## Luật riêng
 
