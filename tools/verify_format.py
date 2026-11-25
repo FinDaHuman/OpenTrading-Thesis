@@ -128,8 +128,10 @@ def thesis(pdf):
             errors.append(f"p{page}: front matter must not have a page footer")
     if first_main and refs_page:
         body = refs_page - first_main
-        (errors if body > 35 else warnings).append(f"body (parts I-VII): {body} pages; target 25-35") \
-            if not 25 <= body <= 35 else print(f"body (parts I-VII): {body} pages")
+        # warning only: whether 25-35 counts the body or the whole report is not confirmed
+        print(f"pages: {body} in parts I-VII, {total} in total")
+        if not 25 <= body <= 35:
+            warnings.append(f"parts I-VII have {body} pages; target 25-35")
     print(f"{total} pages, {len(chapters)} numbered parts")
     for w in warnings:
         print("warning:", w)

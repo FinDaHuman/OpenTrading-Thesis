@@ -2,7 +2,11 @@
 
 ## Số trang
 
-Mục tiêu: **25 đến 35 trang** cho phần I đến VII.
+Mục tiêu: **25 đến 35 trang** ("25-35 pages hoàn chỉnh", GVHD). Nhóm tạm hiểu là phần I đến VII; chưa hỏi lại GVHD,
+nên kiểm tra số trang chỉ cảnh báo, không chặn bản nộp.
+
+Ngân sách dưới đây chia theo trọng số điểm. Cột Pages của GVHD chia theo nội dung: ba từ khóa 2-4, 2-3, 1-2;
+ba mục tiêu 10-12, 8-10, 6-8; đánh giá 2-4; kết luận 1 (cộng 32 đến 44). Lệch nhau thì hỏi GVHD.
 
 | Phần | Ngân sách (trang) | Trọng số hội đồng | Trọng số quá trình |
 |---|---|---|---|
