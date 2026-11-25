@@ -24,3 +24,5 @@ T = trường (AIP491), G = giáo viên (CS-Thesis Template, Harvard guide, file
 | 18 | Viết docx hoặc LaTeX, nộp PDF | G | repo này | |
 | 19 | Định dạng như bài báo khoa học, thống nhất citation, reference, bảng, hình | G | 03, 04 | `check.py` |
 | 20 | Viết việc nhóm làm, việc người khác thì cite | G | [02-writing.md](02-writing.md) | duyệt PR |
+| 21 | Time plan: việc đã hoàn thành/dự kiến, tên `2026FALL_Group`, tối đa 2 trang A4 | G | `admin/time-plan` | `thesis.py admin` |
+| 22 | Biên bản làm việc GVHD và nhóm, Excel, mỗi tuần một sheet | T | `admin/minutes` | duyệt PR |

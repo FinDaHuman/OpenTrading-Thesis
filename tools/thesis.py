@@ -3,7 +3,8 @@
   thesis.py draft              build/main.pdf, with guides and a DRAFT stamp
   thesis.py snapshot [NOTE]    draft build, copied to dist/drafts with a versioned name
   thesis.py final              build/main.pdf in final look; fails on open TODO or unconfirmed values
-  thesis.py submit EVENT       clean, tagged, checked final build in dist/submissions + SUBMISSIONS.csv
+  thesis.py admin              time plan (PDF) and weekly minutes (Excel), drafts in dist/drafts
+  thesis.py submit EVENT       thesis, time plan and minutes: clean, tagged, checked, in dist/submissions
   thesis.py release            used by GitHub Actions on a v* tag
   thesis.py test               all checks and fixtures
   thesis.py check [--strict]   static checks only
@@ -23,6 +24,7 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 BUILD, DIST = ROOT / "build", ROOT / "dist"
 NAME = "OpenTrading-Thesis"
+GROUP = "2026FALL_G11"  # file name asked for by the supervisor
 FIELDS = ["created", "kind", "file", "version", "commit", "dirty", "pages", "sha256", "note"]
 TEXBIN = [pathlib.Path(p) for p in (os.environ.get("TEXLIVE_BIN", ""), "D:/texlive/2026/bin/windows",
                                     "C:/texlive/2026/bin/windows") if p]
@@ -90,6 +92,8 @@ def latex(mode):
 
 
 def pages(pdf):
+    if pathlib.Path(pdf).suffix != ".pdf":
+        return ""
     try:
         import fitz
         return len(fitz.open(pdf))
@@ -128,6 +132,36 @@ def check(strict=False):
     return run([sys.executable, "tools/check.py", *(["--strict"] if strict else [])]).returncode
 
 
+def admin_build(mode):
+    """Build the two school documents into build/admin; the time plan may not exceed two pages."""
+    out = BUILD / "admin"
+    out.mkdir(parents=True, exist_ok=True)
+    (out / "version.tex").write_text(f"\\gdef\\ThesisVersion{{{state()['version']}}}\n\\gdef\\ThesisMode{{{mode}}}\n", "utf-8")
+    e = env()
+    e["TEXINPUTS"] = os.pathsep.join(["../../build/admin//", ""])
+    r = run(["latexmk", "-norc", "-g", "-xelatex", "-interaction=nonstopmode", "-halt-on-error", "-file-line-error",
+             "-outdir=../../build/admin", f"{GROUP}.tex"], cwd=ROOT / "admin/time-plan", e=e, quiet=True)
+    problems = log_problems(out / f"{GROUP}.log")
+    if r.returncode or problems:
+        print(*problems, sep="\n")
+        sys.exit("time plan build failed")
+    n = pages(out / f"{GROUP}.pdf")
+    if n and n > 2:
+        sys.exit(f"time plan has {n} pages; the limit is 2")
+    book = out / f"{GROUP}_Bien-ban-lam-viec.xlsx"
+    if run([sys.executable, "tools/minutes.py", str(book), *(["--final"] if mode == "final" else [])]).returncode:
+        sys.exit("minutes failed")
+    print(f"time plan: {n} pages")
+    return out / f"{GROUP}.pdf", book
+
+
+def admin():
+    plan, book = admin_build("draft")
+    stamp = f"{state()['version']}_{datetime.datetime.now().strftime('%Y%m%d-%H%M%S')}_draft"
+    record("draft", plan, DIST / "drafts" / f"{GROUP}_{stamp}.pdf", "time plan")
+    record("draft", book, DIST / "drafts" / f"{GROUP}_Bien-ban-lam-viec_{stamp}.xlsx", "minutes")
+
+
 def submit(event):
     if not re.fullmatch(r"[a-z0-9.-]+", event):
         sys.exit("EVENT: lower case, digits, dot and dash only, e.g. review1.1")
@@ -141,22 +175,32 @@ def submit(event):
     latex("final")
     if run([sys.executable, "tools/verify_format.py", "thesis"]).returncode:
         sys.exit("format check failed")
-    row = record("submission", BUILD / "main.pdf", DIST / "submissions" / f"2026FALL_G11_Thesis_{event}_{tag}.pdf", event)
-    log = ROOT / "SUBMISSIONS.csv"
-    with log.open("a", newline="", encoding="utf-8") as f:
-        csv.writer(f, lineterminator="\n").writerow([row["created"], event, tag, row["commit"], row["pages"], row["sha256"],
-                                                     pathlib.Path(row["file"]).name])
+    plan, book = admin_build("final")
+    folder = DIST / "submissions" / f"{event}_{tag}"
+    rows = [record("submission", src, folder / name, event) for src, name in (
+        (BUILD / "main.pdf", f"{GROUP}_Thesis.pdf"), (plan, plan.name), (book, book.name))]
+    with (ROOT / "SUBMISSIONS.csv").open("a", newline="", encoding="utf-8") as f:
+        w = csv.writer(f, lineterminator="\n")
+        for row in rows:
+            w.writerow([row["created"], event, tag, row["commit"], row["pages"], row["sha256"],
+                        pathlib.Path(row["file"]).name])
     print("SUBMISSIONS.csv updated: commit it")
 
 
 def release():
+    plan, book = admin_build("draft")
     ready = check(strict=True) == 0
     latex("final" if ready else "draft")
     tag = git("describe", "--tags", "--always", "--match", "v*")
     DIST.mkdir(exist_ok=True)
     out = DIST / f"{NAME}_{tag}{'' if ready else '_draft'}.pdf"
     shutil.copy2(BUILD / "main.pdf", out)
-    (DIST / "SHA256SUMS").write_text(f"{hashlib.sha256(out.read_bytes()).hexdigest()}  {out.name}\n", encoding="utf-8")
+    outs = [out]
+    for f in (plan, book):
+        outs.append(DIST / f"{f.stem}_{tag}_draft{f.suffix}")
+        shutil.copy2(f, outs[-1])
+    (DIST / "SHA256SUMS").write_text("".join(
+        f"{hashlib.sha256(o.read_bytes()).hexdigest()}  {o.name}\n" for o in outs), encoding="utf-8")
     print(out.name)
 
 
@@ -183,6 +227,7 @@ def test():
             ("template replicas", lambda: fixture("format", ["teacher", "school"], "format")
              or run([sys.executable, "tools/verify_format.py", "replica"]).returncode),
             ("style sample", lambda: fixture("sample", ["sample"], "sample")),
+            ("time plan and minutes", lambda: admin_build("draft") and 0),
             ("thesis draft", lambda: latex("draft")
              or run([sys.executable, "tools/verify_format.py", "thesis"]).returncode)):
         print(f"== {name}", flush=True)
@@ -206,6 +251,8 @@ def main():
         snapshot(" ".join(rest))
     elif cmd == "submit" and len(rest) == 1:
         submit(rest[0])
+    elif cmd == "admin":
+        admin()
     elif cmd == "release":
         release()
     elif cmd == "test":

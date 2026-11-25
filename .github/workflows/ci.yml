@@ -45,4 +45,6 @@ jobs:
             build/main.pdf
             build/sample/sample.pdf
             build/main.log
+            build/admin/*.pdf
+            build/admin/*.xlsx
           retention-days: 30

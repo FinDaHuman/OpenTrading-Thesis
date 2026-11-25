@@ -35,4 +35,4 @@ jobs:
         run: |
           pre=""
           case "$TAG" in v0.*) pre="--prerelease" ;; esac
-          gh release create "$TAG" dist/*.pdf dist/SHA256SUMS --title "Thesis $TAG" --generate-notes --verify-tag $pre --repo "$GITHUB_REPOSITORY"
+          gh release create "$TAG" dist/*.pdf dist/*.xlsx dist/SHA256SUMS --title "Thesis $TAG" --generate-notes --verify-tag $pre --repo "$GITHUB_REPOSITORY"

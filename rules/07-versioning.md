@@ -16,15 +16,16 @@ Tag có chú thích, trên `main`, sau khi CI xanh: `git tag -a v0.2.0 -m "Revie
 - `python tools/thesis.py snapshot "ghi chú"` lưu vào `dist/drafts/` với tên chứa phiên bản, commit và giờ:
   `OpenTrading-Thesis_v0.1.0-3-gabc1234_20261126-210501_draft.pdf`.
   Hậu tố `-dirty` nghĩa là còn thay đổi chưa commit.
-- Mỗi PDF được ghi vào `dist/MANIFEST.csv` (thời gian, commit, số trang, SHA256). Không bao giờ ghi đè.
+- `python tools/thesis.py admin` lưu bản nháp time plan và biên bản theo cùng cách đặt tên.
+- Mỗi file được ghi vào `dist/MANIFEST.csv` (thời gian, commit, số trang, SHA256). Không bao giờ ghi đè.
 - Bản nháp có dấu "DRAFT <phiên bản>" giữa footer. Bản final không có gì thêm; phiên bản và commit nằm trong thuộc tính PDF.
 
 ## Nộp bài
 
 1. Mọi PR đã merge, `config/metadata.tex` đúng ngày nộp, `python tools/check.py --strict` sạch.
 2. Gắn tag trên commit đó, rồi `python tools/thesis.py submit review1.1`.
-   Lệnh dừng nếu còn thay đổi chưa commit, chưa có tag, còn `\guide`/`\todo`/`\TBC`, hoặc sai định dạng.
-3. File nộp: `dist/submissions/2026FALL_G11_Thesis_review1.1_v0.2.0.pdf`. Nộp **đúng** file này.
+   Lệnh dừng nếu còn thay đổi chưa commit, chưa có tag, còn `\guide`/`\todo`/`\TBC`/`[CẦN XÁC NHẬN]`, hoặc sai định dạng.
+3. File nộp ở `dist/submissions/<sự kiện>_<tag>/`: `2026FALL_G11_Thesis.pdf`, `2026FALL_G11.pdf` (time plan), `2026FALL_G11_Bien-ban-lam-viec.xlsx`. Nộp **đúng** các file này.
 4. Commit `SUBMISSIONS.csv` qua PR. Đây là sổ các bản đã nộp, không sửa dòng cũ.
 
 Chỉ bản build trên Windows với font Microsoft (log ghi `fontset=MS`) được nộp.
