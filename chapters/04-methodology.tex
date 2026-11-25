@@ -14,11 +14,115 @@
 \guide{Replaces sample 1 “Feature Selection and Engineering”; supervisor’s “4.1 Algorithm”. The algorithms of the solution, with pseudocode and the reasons for each choice.}
 
 \section{Model Configuration and Validation}\label{sec:validation}
-\guide{Adapts sample 1 “Model Training and Validation”; supervisor’s “4.2 Validation”. Models considered, reasons for the final choice, configuration; arms, splits, runs, isolation, gold answers, judge.}
-\guide{State what was pre-registered and what was amended after seeing results (rules/05-evidence.md).}
+The project does not train a model.
+Configuration therefore means choosing the LLM and the settings under which each harness runs it, and validation means testing whether the harness, not the model, changes the quality of the answers.
+The group validated OpenTrading with a controlled benchmark, opentrading-benchmark, which compares it with two general-purpose coding harnesses on the same financial questions.
+This section describes the design of the current study, version 4.7; its results are reported in \cref{sec:results}.
+
+\subsection{Comparison Design}\label{sec:comparison-design}
+The benchmark asks one question: given the same model, the same data and the same limits, does a harness built for financial analysis answer more questions correctly than a general-purpose one?
+Three harnesses, called arms, were compared: OpenTrading in its non-interactive machine profile, OpenCode and DeepSeek Harness (DSH).
+Everything except the harness was held fixed, as \cref{tab:bench-config} summarises.
+All three arms used the same LLM, reached the same frozen copy of the market data through the same MCP server, and answered the same tasks under the same limits.
+Each arm kept its own system prompt and tool design, since these are what a harness contributes.
+Each task was run twice per arm, so that the stability of an answer could be measured as well as its correctness.
+\begin{table}[htb]
+  \centering
+  \caption{Configuration of the version 4.7 main study, identical for the three arms}\label{tab:bench-config}
+  \begin{tabularx}{\textwidth}{@{}l X@{}}
+    \toprule
+    {Item} & {Setting}\\
+    \midrule
+    Model & DeepSeek V4.1 Flash (\texttt{deepseek-v4.1-flash-1017}), one pinned provider, temperature 0, reasoning off\\
+    Arms & OpenTrading 0.5.0 with the change of pull request \#437 (commit \texttt{ae7ec48}), machine profile; OpenCode 2.4.1; DSH 0.2.2-rc.5\\
+    Data & One frozen snapshot of the MCP data server, the same for every arm\\
+    Tasks & 200 main tasks in six groups (\cref{sec:data}); 70 holdout tasks kept back\\
+    Repetitions & 2 runs of every task in every arm, \num{1200} trials in total\\
+    Limits per trial & 24 model requests (48 for memory tasks), \num{4.6} million tokens, \qty{1800}{\second}\\
+    Calculation tool & Each harness's own shell, run in a shared sandbox without network access\\
+    Grading & Rule-based checks, an LLM judge (Claude Haiku 5.5) and a manual review\\
+    \bottomrule
+  \end{tabularx}
+  \fignote{Source: opentrading-benchmark \texttt{3be3e1b}; sealed configuration of run \texttt{main-20261124}.}
+  %% Evidence: E14, E15, E16 (rules/05-evidence.md).
+\end{table}
+
+\subsection{Fairness Between the Arms}\label{sec:fairness}
+A comparison between harnesses is only meaningful if no arm is given an advantage outside its own design.
+The group took four measures.
+First, every arm saw the same data tools; OpenTrading's extra local tools were removed and its tool search was switched off, so the benchmark does not measure those features.
+Second, every arm calculated with its own shell, but every command ran in the same isolated sandbox, which replaced an earlier command filter that followed OpenTrading's own rules and so favoured it.
+Third, the clock seen by every harness was set to the date of the data snapshot, so that no arm could confuse the snapshot with live data.
+Fourth, questions that a harness normally asks its user were answered automatically in the same way for every arm.
+The limits on requests and tokens were enforced by a shared gateway between the harnesses and the model provider, not by the harnesses themselves.
+
+\subsection{Reproducibility}\label{sec:reproducibility}
+Before the main run, the code of the benchmark, the task set and the configuration were sealed: the seal records a hash for each protected file, and a run whose files differ from the seal is refused.
+The versions of the three harnesses and of their toolchains were pinned in the same way.
+The holdout set was not run, and it will not be described as unseen data, because its answers are stored in a public repository.
+A change made during the run is recorded as a dated amendment before it takes effect.
+One such amendment, on 25 November 2026, split the second repetition of 121 tasks into a separate stream with the same code, model and limits, to finish the run within the available time.
+\todo{Add the seal commit of the benchmark repository once the run is published.}
+
+\subsection{Scoring and the Judge}\label{sec:scoring}
+A trial counts as correct only if four conditions hold.
+An LLM judge must accept the final answer as correct against the gold answer.
+Every number in the answer must lie within the tolerance of the gold value.
+On a task whose correct answer is a refusal, because the data does not exist, the answer must not contain a number.
+Finally, a manual review may reject a trial that the judge accepted, but it may never accept one that the judge rejected.
+Tasks on investment recommendations and investor scenarios have a fixed rule, written before any return was computed, and are scored by that rule alone.
+A trial that gives no final answer, for example because it reached a limit, counts as incorrect.
+The judge was Claude Haiku 5.5, used at temperature 0.
+Before the run, the group checked it on 200 controlled items: answers known to be correct, and copies of the same answers altered to be wrong in value, scale or refusal.
+The judge classified all 200 items as expected (Cohen's $\kappa = 1.0$).
+This check shows that the judge separates clearly correct from clearly wrong answers; it does not measure borderline cases such as partly correct answers, which remain a limitation.
+%% Evidence: E17.
+\todo{Cite the LLM-as-a-judge and Cohen's kappa sources after opening them.}
+
+\subsection{Pre-registered Choices and Later Amendments}\label{sec:amendments}
+The benchmark separates what was decided before the results were seen from what changed afterwards.
+\Cref{tab:amendments} lists the changes made after the earlier version 4.6 study (run or16) and before the main run of version 4.7.
+\begin{table}[htb]
+  \centering
+  \caption{Changes to the benchmark design after the earlier study and before the version 4.7 main run}\label{tab:amendments}
+  \begin{tabularx}{\textwidth}{@{}l X X@{}}
+    \toprule
+    {Item} & {Pre-registration} & {Version 4.7}\\
+    \midrule
+    Repetitions & 3 runs per task & 2 runs per task, to fit the budget\\
+    Task selection & All tasks of the earlier set & Tasks that every arm already solved were removed; the rule was written after the earlier results\\
+    Investor tasks & None & 20 tasks, scored by profit or loss under rules fixed before returns were computed\\
+    Safety tasks & Separate diagnostic group & Replaced by 16 recommendation tasks; 14 robustness tasks kept in the main score\\
+    Execution & One stream & Two streams with the same code from 25 November 2026\\
+    \bottomrule
+  \end{tabularx}
+  \fignote{Source: opentrading-benchmark \texttt{3be3e1b}, \texttt{PRE-REGISTER.md} and \texttt{audits/methodology-2026-11-16/DECISIONS.json}; run amendment of 25 November 2026.}
+\end{table}
 
 \section{Evaluation Metrics}\label{sec:metrics}
-\guide{Identify the metrics used to assess performance, with formulas, and the statistical method for uncertainty.}
+The primary metric is the share of trials answered correctly, reported for each arm, for each task group and overall.
+For an arm $a$ and a set of tasks $T$,
+\begin{equation}\label{eq:accuracy}
+  \hat{p}_a=\frac{1}{R\,|T|}\sum_{t\in T}\sum_{r=1}^{R} y_{a,t,r},
+\end{equation}
+where $R=2$ is the number of runs, $|T|$ is the number of tasks, and $y_{a,t,r}$ is 1 when run $r$ of task $t$ in arm $a$ is correct under \cref{sec:scoring} and 0 otherwise.
+Every scheduled trial stays in the denominator, including trials that ended without an answer.
+
+Three secondary metrics complete the picture.
+Stability is the number of tasks that an arm answered correctly in both runs.
+On refusal tasks, a false positive is an answer that gives a number where none exists; on answerable tasks, a false refusal is a refusal where an answer exists.
+Cost is reported as the number of model requests, the number of tokens and the amount paid; these are reported separately and never added to correctness as one score.
+
+The difference between OpenTrading and each other arm is $\Delta_b=\hat{p}_{\mathrm{OT}}-\hat{p}_b$.
+Its uncertainty is estimated with a paired bootstrap over tasks: tasks are drawn with replacement \num{2000} times, both arms keep their own trials on each drawn task, and the 2.5th and 97.5th percentiles of the resulting differences form a 95\% CI.
+Resampling tasks rather than trials keeps the two runs of a task together, because they are not independent.
+A difference is described as a difference only when its interval excludes zero, and the word significant is not used without a test.
+\todo{Cite the bootstrap source after opening it.}
+
+A baseline helps to read the recommendation tasks.
+Their answers are buy, hold or sell, and most of the 16 main tasks have sell as the correct answer, so a rule that always answers sell would score 11 of 16.
+A score on this group is therefore compared with 11/16, not with zero.
+%% Evidence: E18.
 
 \section{Implementation Plan}\label{sec:implementation-plan}
 \guide{Describe in detail how the method is implemented, and the tools or technologies used to support this process.}

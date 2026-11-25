@@ -20,6 +20,11 @@ PR thêm số mới phải thêm dòng vào bảng dưới. Ghi "đo" khi tự �
 | E11 | OpenTrading: 2,253 test trên Ubuntu, 0 lỗi | CI run 45617110999 | đo | Tại `7319264` |
 | E12 | opentrading-mcp: 175 tool đăng ký (174 khác nhau) | mcp `de956f8`, đếm bằng `list_tools` | đo | 176 khi có khóa web_search |
 | E13 | opentrading-mcp: 1,338 test qua, độ phủ 71.69% | CI run 45325615006 | đo | Tại `de956f8` |
+| E14 | v4.7 main: DeepSeek V4.1 Flash `deepseek-v4.1-flash-1017`, temperature 0, reasoning off; 3 arm; 2 lần chạy mỗi task (1,200 trial); trần 24 request (48 memory), 4.6M token, 1,800 s mỗi trial | benchmark `3be3e1b` `tools/bench_config.json`; run `main-20261124` `seal.json`, `run-entry.json` | đo | Cấu hình, không phải kết quả. Từ 25/11 chạy hai luồng (amendment) |
+| E15 | Bộ đề v4.7: main 200 (L 30, C 69, M 51, I 20, R 16, S 14), holdout 70, pilot 57 | benchmark `3be3e1b` `experiments/finance-v47-study/tasks/` | đo | Holdout chưa chạy, gold public: không gọi là unseen |
+| E16 | Arm được so: OpenTrading 0.5.0 + PR #437 (`ae7ec48`), OpenCode 2.4.1, DSH 0.2.2-rc.5 | benchmark `3be3e1b` `opentrading-runtime.SHA`, PR #36 | đo | **Không** phải v0.5.1; không ghép với E10, E11 |
+| E17 | Judge Claude Haiku 5.5: 200/200 câu kiểm soát đúng, κ = 1.0 | benchmark `3be3e1b` `audits/judge-calibration-2026-11-24/haiku-5.5-kappa.json` | đo | Câu kiểm soát, không đo ca ranh giới |
+| E18 | Nhóm R main: luôn trả lời BÁN đạt 11/16 | benchmark `3be3e1b` `audits/methodology-2026-11-16/DECISIONS.json` | đo | Mức nền khi đọc kết quả nhóm R |
 
 ## Luật riêng
 
