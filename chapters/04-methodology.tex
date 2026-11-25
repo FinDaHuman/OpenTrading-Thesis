@@ -15,25 +15,35 @@
 
 The project does not train a model.
 Its algorithms are the rules of the harness, the program around a large language model (LLM) that decides what the model sees, what it may do, and when its answer counts as finished.
-\Cref{tab:problems} lists the main model weaknesses that these rules address.
+\Cref{tab:problems} lists the difficulties that these rules address, in the order of the sections below.
+The sources report the difficulties; they do not evaluate the rules.
 
 \begin{table}[H]
   \centering
-  \caption{Weaknesses of a language model and the rules of the harness}\label{tab:problems}
+  \caption{Difficulties of language-model agents and the rules of the harness}\label{tab:problems}
   \begin{tabularx}{\textwidth}{@{}L L l@{}}
     \toprule
-    {Weakness} & {Rule of the harness} & {Described in}\\
+    {Difficulty} & {Reported by} & {Rule of the harness}\\
     \midrule
-    Stops before it has answered & Stop gate & \cref{sec:agent-loop}\\
-    Keeps calling tools that fail & Failure limits & \cref{sec:agent-loop}\\
-    States figures that no source gave & Figure tracing & \cref{sec:figure-tracing}\\
-    Makes arithmetic mistakes & Calculation by program & \cref{sec:figure-tracing}\\
-    Takes a harmful or unwanted action & Permission gate & \cref{sec:permissions}\\
-    Fills its context in a long task & Sub-agents and ultradesk & \cref{sec:multi-agent}\\
+    Stops before the task is done & \textcite{anthropic2025harnesses} & Stop gate\\
+    Keeps making a call that fails & \textcite{qin2024toolllm} & Failure limits\\
+    Invents financial facts & \textcite{kang2023deficiency} & Grounding rules, figure tracing\\
+    Makes arithmetic mistakes & \textcite{gao2023pal} & Calculation by program\\
+    Must choose among many tools & \textcite{qin2024toolllm} & Tool search\\
+    Fills in wrong arguments & \textcite{yao2024taubench} & Validation of tool inputs\\
+    Lacks long-term memory & \textcite{packer2023memgpt} & Memory\\
+    Acts beyond the user's request & \textcite{anthropic2026auto} & Permission gate\\
+    Fills its context in a long task & \textcite{anthropic2025multiagent} & Sub-agents and ultradesk\\
     \bottomrule
   \end{tabularx}
-  \fignote{Source: the group.}
+  \fignote{Source: the group, from the works cited in the table.}
 \end{table}
+
+The benchmark of \cref{sec:validation} does not measure all of these rules.
+There, OpenTrading has only the data tools, a shell, a tool that reads long results and, in memory tasks, one that reads notes.
+Tool search is off, every command runs without approval inside a sandbox, and the model interface is one on which OpenTrading sends no reminders after tool results.
+The benchmark therefore does not measure tool search, the arithmetic rule for the shell, the permission gate, skills, sub-agents, ultradesk or those reminders.
+%% Evidence: E32.
 
 \subsection{Agent Loop and Stop Gate}\label{sec:agent-loop}
 OpenTrading handles each user message in one turn.
@@ -94,11 +104,9 @@ A turn may be sent back twice.
 If a tool has already returned something to answer from, an empty answer may be sent back up to three times in total, so five recoveries are the most that a turn can have.
 If the text is still empty or only a repeat after that, the user is told that there is no answer.
 Any other answer is kept, with a warning if its figures are unsupported.
+The gate checks the form of an answer, not its truth.
 %% Evidence: E25.
 
-The gate checks the form of an answer, not its truth.
-Some of its reminders are sent only on model interfaces known to accept them; the benchmark of \cref{sec:validation} uses another interface and will not measure them.
-%% Evidence: E25, E32.
 
 \subsection{Figure Tracing and Arithmetic}\label{sec:figure-tracing}
 A financial answer cannot be trusted if its figures do not come from the data.
@@ -125,8 +133,8 @@ LLMs also make arithmetic mistakes even when their reasoning is right, and leavi
 The system prompt therefore asks the model to send calculations to the shell, the computer's command line.
 A command that contains only arithmetic normally runs without asking the user; it may use numbers, operators, a few mathematical functions and its own variables, but no files, loops or other programs.
 Since the model can still mistype an input, the harness looks for the typed numbers, apart from common constants, in what the model has read and can remind it of those it cannot find.
-The benchmark measures neither rule: it runs all commands without approval inside a sandbox, and its model interface does not carry the reminder.
-%% Evidence: E27, E32.
+On some model interfaces this reminder is not sent.
+%% Evidence: E25, E27.
 
 \subsection{Permissions and Safe Execution}\label{sec:permissions}
 An agent that can write files and run commands can also do harm.
@@ -164,8 +172,7 @@ One rule was written for finance: by default the reviewer is told to block an or
 After three blocks in a row, or when the reviewer gives no answer, the user decides.
 
 Such a reviewer makes mistakes.
-\textcite{anthropic2026auto} reported that the reviewer in their own product missed 17\% of 52 real actions that went beyond the request.
-This report gives no error rate for OpenTrading.
+\textcite{anthropic2026auto} reported that the reviewer in their own product missed 17\% of 52 real actions that went beyond the request; this rate cannot be assumed for OpenTrading.
 %% Evidence: E28.
 
 \subsection{Sub-agents and Ultradesk}\label{sec:multi-agent}
@@ -210,7 +217,6 @@ A vote that failed stays in the total but never counts as \enquote{wrong}, so a 
 
 The debate follows the bull and bear researchers of TradingAgents \parencite{xiao2024tradingagents}.
 Because ultradesk may use many requests (\cref{tab:playbooks}), it runs only when the user asks for it or approves it.
-Whether it answers better than the main agent alone is not measured in this report.
 %% Evidence: E29.
 
 \section{Model Configuration and Validation}\label{sec:validation}

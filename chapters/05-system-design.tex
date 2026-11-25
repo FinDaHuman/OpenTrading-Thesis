@@ -24,7 +24,7 @@ The earlier layers rarely change, so the provider can reuse its cache; reminders
 %% Evidence: E10.
 
 The second question is what the model can do.
-All tools, whether built in or offered by a Model Context Protocol (MCP) server, are registered in the same form.
+All tools, whether built in or offered by an MCP server, are registered in the same form.
 The permission gate decides on each call; reading tools may run in parallel, and a writing tool runs alone.
 Most calls have a time limit, and by default a result longer than \num{30000} characters is shortened.
 
@@ -72,7 +72,7 @@ When a chart is made from a labelled result, the harness reads the numbers itsel
 \Cref{fig:question-flow} follows one message through the harness.
 The user's profile and constraints are read first (step 2).
 If one of them exists but cannot be read, the turn is held, because the model would otherwise treat the user as someone without limits.
-Steps 4 to 6 are the loop of \cref{sec:algorithm}.
+Steps 4 to 6 are the loop of \cref{sec:agent-loop}.
 
 \begin{figure}[H]
   \centering
@@ -108,5 +108,5 @@ Each pull request is tested automatically on Linux and Windows.
 At version 0.5.1, \num{2249} of \num{2253} tests passed on Linux; the four others, which need macOS or Windows, were skipped.
 Instead of a paid model, the tests use a simulated one that returns prepared answers, including broken ones.
 For the stop gate the tests contain both endings that must be caught and answers that must be left alone.
-Some rules of the agent loop can also be switched off one at a time in the evaluation, so that their effect can be measured.
+These tests show that a rule does what it was designed to do; they do not show that it improves the answers.
 %% Evidence: E11, E35.

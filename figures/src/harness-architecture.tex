@@ -9,7 +9,7 @@
 \begin{document}
 \begin{tikzpicture}[
   font=\fontsize{8}{9.5}\selectfont,
-  box/.style={draw, rounded corners=1.5pt, align=center, minimum height=8.5mm, inner xsep=2pt, fill=white},
+  box/.style={draw, rounded corners=1.5pt, align=center, minimum height=8mm, inner xsep=2pt, fill=white},
   ext/.style={box, dashed},
   arr/.style={-{Stealth[length=2mm]}, thick},
   both/.style={{Stealth[length=2mm]}-{Stealth[length=2mm]}, thick},
@@ -20,7 +20,7 @@
 \node[box, minimum width=31mm, right=4mm of tui] (print) {One-shot command};
 \node[box, minimum width=31mm, right=4mm of print] (eval) {Evaluation runner};
 
-\node[box, minimum width=101mm, below=12mm of print] (loop) {Agent loop and stop gate};
+\node[box, minimum width=101mm, below=10.5mm of print] (loop) {Agent loop and stop gate};
 \node[box, minimum width=31mm, below=4mm of loop.south west, anchor=north west] (prompt) {Prompt assembly\\(prompts, skills)};
 \node[box, minimum width=31mm, below=4mm of loop.south] (sub) {Sub-agents\\and ultradesk};
 \node[box, minimum width=31mm, below=4mm of loop.south east, anchor=north east] (model) {Model layer\\(effort, retry)};
@@ -30,8 +30,8 @@
 \node[box, minimum width=31mm, below=4mm of reg.south east, anchor=north east] (mcp) {MCP client};
 \node[box, minimum width=31mm, below=4mm of mem.south east, anchor=north east] (store) {Local store: sessions,\\evidence, configuration};
 
-\node[ext, minimum width=31mm, below=12mm of local] (os) {Computer of the user,\\web};
-\node[ext, minimum width=31mm, below=12mm of mcp] (srv) {opentrading-mcp and\\other MCP servers};
+\node[ext, minimum width=31mm, below=8mm of local] (os) {Computer of the user,\\web};
+\node[ext, minimum width=31mm, below=8mm of mcp] (srv) {opentrading-mcp and\\other MCP servers};
 \node[ext, minimum width=24mm, right=8mm of model] (llm) {Language\\model\\providers};
 
 \draw[both] (tui.south) -- (tui.south |- loop.north);
@@ -57,6 +57,6 @@
   \node[group, fit=(loop)(store)(local)] (gc) {};
   \node[glabel, anchor=north east] at ([xshift=-2mm]gc.south east) {Core of OpenTrading};
 \end{scope}
-\node[anchor=west, align=left] at ([xshift=1.5mm]$(print.south)!0.45!(print.south |- loop.north)$) {message, events};
+\node[anchor=west, align=left] at ([xshift=1.5mm]$(print.south)!0.5!(print.south |- loop.north)$) {message, events};
 \end{tikzpicture}
 \end{document}
