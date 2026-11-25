@@ -125,7 +125,7 @@ def check_text():
                     err(f"{rel}:{n}", f"{env} without \\label")
                 elif body.find("\\label{") < body.find("\\caption{"):
                     err(f"{rel}:{n}", f"{env}: put \\label after \\caption")
-                cap, inc = body.find("\\caption{"), body.find("\\begin{tab")
+                cap, inc = body.find("\\caption{"), body.find("\\begin{tabular")
                 if env == "table" and 0 <= inc < cap:
                     err(f"{rel}:{n}", "table caption goes above the table")
                 img = body.find("\\includegraphics")
