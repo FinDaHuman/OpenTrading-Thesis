@@ -15,7 +15,7 @@
 
 The project does not train a model.
 Its algorithms are the rules of the harness, the program around a large language model (LLM) that decides what the model sees, what it may do, and when its answer counts as finished.
-\Cref{tab:problems} lists the main weaknesses of a model that these rules address.
+\Cref{tab:problems} lists the main model weaknesses that these rules address.
 
 \begin{table}[H]
   \centering
@@ -36,7 +36,7 @@ Its algorithms are the rules of the harness, the program around a large language
 \end{table}
 
 \subsection{Agent Loop and Stop Gate}\label{sec:agent-loop}
-OpenTrading handles each message of the user in one turn.
+OpenTrading handles each user message in one turn.
 During a turn the model reasons, calls tools and reads their results, a pattern known as ReAct \parencite{yao2023react}.
 One step of a turn is one request to the model together with the tool calls it makes.
 The basic loop comes from a library \parencite{vercelndloop}; the group added the rules shown in \cref{alg:turn}.
@@ -87,7 +87,7 @@ Its ten cases fall into four groups, shown in \cref{tab:stop-gate}.
     Unsupported figures & untraced figures (at least two, and at least half of all) given as fetched data although no tool ran & fetch the data first, or say that it is missing\\
     \bottomrule
   \end{tabularx}
-  \fignote{Note: the task list of the model does not count as a tool here. Source: OpenTrading version 0.5.1 \parencite{group2026opentrading}.}
+  \fignote{Note: the model's task list does not count as a tool here. Source: OpenTrading version 0.5.1 \parencite{group2026opentrading}.}
 \end{table}
 
 A turn may be sent back twice.
@@ -105,7 +105,7 @@ A financial answer cannot be trusted if its figures do not come from the data.
 The harness therefore compares the figures of an answer with the numbers that the model has read.
 A figure is traced if it equals one of these numbers after a change of scale and after rounding.
 Suppose that a tool returned a price-to-earnings ratio of 12.34.
-An answer of 12.3 is traced, because the difference of 0.04 is below 0.05, half a unit of the last digit written; an answer of 12.4 is not.
+An answer of 12.3 is traced, because the difference of 0.04 is below 0.05, half a unit of the last digit; an answer of 12.4 is not.
 
 In general, a figure $x$ written with $d$ decimals is traced when
 \begin{equation}\label{eq:tracing}
@@ -122,7 +122,7 @@ The harness thus cannot guarantee that every figure is correct: a figure may mat
 %% Evidence: E27.
 
 LLMs also make arithmetic mistakes even when their reasoning is right, and leaving the calculation to a program reduces them \parencite{gao2023pal}.
-The system prompt therefore asks the model to send calculations to the shell, the command line of the computer.
+The system prompt therefore asks the model to send calculations to the shell, the computer's command line.
 A command that contains only arithmetic normally runs without asking the user; it may use numbers, operators, a few mathematical functions and its own variables, but no files, loops or other programs.
 Since the model can still mistype an input, the harness looks for the typed numbers, apart from common constants, in what the model has read and can remind it of those it cannot find.
 The benchmark measures neither rule: it runs all commands without approval inside a sandbox, and its model interface does not carry the reminder.
@@ -152,13 +152,13 @@ Switchable modes \parencite{anthropicndmodes} and a second model that reviews ac
 \end{table}
 
 Some calls go to the user in every mode: reading files that hold keys, changing protected folders, writing outside the workspace, and making the same call three times in a row.
-The user may allow a key file or a repeated call for the whole session, and the temporary folder of the session is exempt.
+The user may allow a key file or a repeated call for the whole session, and the session's temporary folder is exempt.
 For shell commands this check reads only the text of the command, so it can miss some cases.
 When no user is present, a call that needs approval is refused.
 
 In the auto mode the reviewing model first answers only whether to block an action.
 It looks more closely only if this first answer is to block, or cannot be read.
-It is given the messages of the user and the actions of the agent but not the results of tools, because text planted in web pages or data could otherwise persuade it \parencite{greshake2023injection}.
+It is given the user's messages and the agent's actions but not the results of tools, because text planted in web pages or data could otherwise persuade it \parencite{greshake2023injection}.
 This protection is not complete, since reports of background agents can also reach it.
 One rule was written for finance: by default the reviewer is told to block an order or a transfer of money even if the user asks for it.
 After three blocks in a row, or when the reviewer gives no answer, the user decides.
@@ -210,7 +210,7 @@ A vote that failed stays in the total but never counts as \enquote{wrong}, so a 
 
 The debate follows the bull and bear researchers of TradingAgents \parencite{xiao2024tradingagents}.
 Because ultradesk may use many requests (\cref{tab:playbooks}), it runs only when the user asks for it or approves it.
-Whether it answers better than the main agent alone was not tested.
+Whether it answers better than the main agent alone is not measured in this report.
 %% Evidence: E29.
 
 \section{Model Configuration and Validation}\label{sec:validation}
