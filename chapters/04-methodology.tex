@@ -73,6 +73,57 @@ The rule was applied to all arms alike, so it does not favour one harness, but i
 
 \section{Algorithm Design}\label{sec:algorithm}
 \guide{Replaces sample 1 “Feature Selection and Engineering”; supervisor’s “4.1 Algorithm”. The algorithms of the solution, with pseudocode and the reasons for each choice.}
+\todo{The agent loop and the stop gate: to be written by the owner of the harness core, before the subsections below.}
+
+\subsection{Grounding Rules in the System Prompt}\label{sec:grounding-rules}
+The system prompt is the first algorithm of a harness: it sets the rules that the model applies at every step.
+The prompt of OpenTrading puts its rules in a fixed order of priority.
+Core rules come first, then the working rules of the system, then the user's own request, so that a user cannot ask the model to break a core rule.
+Two core rules target the main risk of a financial assistant, which is a confident answer with a wrong number.
+First, every figure on prices, volumes, financial statements or the economy must come from a tool result in the same conversation; when data is missing, the model must say which part is missing instead of estimating it or using a figure it remembers.
+Second, the model may not calculate in its head: every ratio, percentage or growth rate is computed by a tool, so that the arithmetic can be checked and repeated.
+Views on the future must be given as scenarios, each with its assumptions, the conditions that would prove it wrong and a likelihood.
+
+The prompt is assembled from blocks rather than written as one text.
+A line that describes a tool is included only when that tool is available, and the machine profile, used when another program rather than a person reads the answer, replaces the guidance on style with a strict answer format.
+In the first request of the benchmark tasks, the system prompt of the machine profile therefore ranged from 917 to \num{1645} words, depending on the tools and features of the task.
+%% Evidence: E22.
+The prompt has been written in English since November 2026, because the same rules take fewer tokens in English than in Vietnamese; the Vietnamese words that users type are kept where they decide which skill or tool is chosen.
+
+\subsection{Tool Search}\label{sec:tool-search}
+With 175 data tools and the harness's own tools, sending every tool definition in every request would take a large share of the model's context and would make the model choose among many similar tools.
+OpenTrading therefore defers some tools: the model receives only their names, and it loads a tool through a search tool when it needs it, as \cref{alg:tool-search} shows.
+In the default mode, rarely used local tools are always deferred, and all deferrable tools are deferred once there are more than 40 tools or once their definitions would take more than 10\% of the model's context.
+Sub-agents, which run short focused tasks, receive their tools directly.
+\begin{algorithm}[htb]
+  \caption{Ranking of deferred tools for a search query}\label{alg:tool-search}
+  \begin{algorithmic}[1]
+    \Require query $q$; deferred tools $D$, each with name, search hint, description and parameter names
+    \Ensure tools of $D$ ordered by relevance to $q$
+    \If{$q$ has the form \texttt{select:}$a,b,\dots$} \State \Return the tools named $a,b,\dots$ \EndIf
+    \State $W \gets$ words of $q$ with Vietnamese diacritics removed; words marked \texttt{+} are required
+    \State add to $W$ the English terms of every Vietnamese market phrase found in $q$, longest phrase first
+    \For{each tool $d \in D$}
+      \State $s_d \gets \sum_{w \in W}$ ( 12 if $w$ is a word of the name, else 6 if it is part of one;
+      \Statex \hspace{\algorithmicindent}\hspace{\algorithmicindent} $+4$ if in the search hint; $+2$ if in the description; $+2$ if a parameter name )
+      \If{a required word scores 0 for $d$} \State discard $d$ \EndIf
+    \EndFor
+    \State \Return tools with $s_d>0$, by decreasing $s_d$, then by name
+  \end{algorithmic}
+\end{algorithm}
+The weights favour the name of a tool because data servers name their tools by function, such as \texttt{vn\_quote\_history}.
+The table of Vietnamese phrases lets a question such as \enquote{lịch sử giá} (price history) find tools that are described in English.
+Partial matches are allowed only for words of three letters or more, because short Vietnamese words would otherwise match half of the catalogue.
+The benchmark of \cref{sec:validation} switches tool search off for every arm, so its results do not measure this feature.
+%% Evidence: E23.
+
+\subsection{Validation of Tool Inputs}\label{sec:input-validation}
+A model sometimes calls a data tool with an argument that the tool does not accept, for example a period written in the wrong form.
+If the server then returns no data, the model may conclude that the data does not exist and report it as missing, which is a false answer.
+In its grounded mode, OpenTrading checks every argument of a data tool against the schema that the server declares, before the call is sent.
+An invalid call is not executed; the model receives the reason, and an explicit statement that a rejected input is not evidence that the data is missing, so it corrects the call instead of giving up.
+A stricter optional policy, which also traces each reported figure back to the tool result it came from, exists for automated use; in the version 4.7 benchmark only the input check was enabled.
+%% Evidence: E24.
 
 \section{Model Configuration and Validation}\label{sec:validation}
 The project does not train a model.

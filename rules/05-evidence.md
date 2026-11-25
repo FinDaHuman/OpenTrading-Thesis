@@ -27,6 +27,9 @@ PR thêm số mới phải thêm dòng vào bảng dưới. Ghi "đo" khi tự �
 | E18 | Nhóm R main: luôn trả lời BÁN đạt 11/16 | benchmark `3be3e1b` `audits/methodology-2026-11-16/DECISIONS.json` | đo | Mức nền khi đọc kết quả nhóm R |
 | E19 | PRUNE2 bỏ 120 task đúng ở mọi arm trong cả hai lần chạy or16; 8 bẫy từ chối được giữ lại | benchmark `3be3e1b` `audits/taskset-revision-2026-11-24/PRUNE2.json`, `DECISIONS.json` | đo | Luật viết sau khi thấy or16: amendment |
 | E20 | Snapshot 01/11/2026, phiên cuối 30/10/2026; báo cáo tài chính bổ sung khớp 112/112 giá trị đã ghi trước đó; nhóm I, R chấm theo giá đóng cửa 23/11/2026 | benchmark `3be3e1b` `audits/snapshot-extension-2026-11-24/RECEIPT.json`, `task.toml` | đo | 8 lệch chỉ với fixture giả lập devsmoke, không với snapshot thật |
+| E22 | System prompt profile machine ở request đầu: 917 đến 1,645 từ tuỳ task | run `main-20261124`, `trials/*__opentrading_machine__*/attempts/*/provider-requests/0001-effective.json` (171 trial đã chạy tới 25/11) | đo | Runtime `ae7ec48`; đếm từ, không phải token |
+| E23 | Tool search: điểm 12/6/4/2/2 (tên, một phần tên, hint, mô tả, tham số); hoãn khi hơn 40 tool hoặc schema hơn 10% context; subagent không hoãn | OpenTrading `7319264` `src/core/tools/search.ts`, `docs/mcp.md` §7 | đo | Benchmark tắt tool search |
+| E24 | v4.7: OT chạy grounded mode (kiểm tham số tool MCP theo schema), `finance_policy` tắt | benchmark `3be3e1b` `tools/runners/ot_headless.ts`, `run_opentrading.py`; run `main-20261124` config | đo | |
 
 ## Luật riêng
 
