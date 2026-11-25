@@ -8,5 +8,6 @@
 __pycache__/
 # local reference documents
 /reference/
+/local/
 .DS_Store
 Thumbs.db

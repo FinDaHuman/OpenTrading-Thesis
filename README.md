@@ -102,6 +102,7 @@ Hai tài liệu sau đang là **bản nháp**: chữ đỏ là chỗ nhóm phả
 | `tests/` | Bản sao hai template, bộ ví dụ Harvard, trang mẫu mọi thành phần |
 | `tools/` | Build, kiểm tra, quản lý phiên bản PDF |
 | `dist/` | PDF local, không commit |
+| `local/` | File riêng trên máy mỗi người, không đẩy lên GitHub |
 
 Trang mẫu để chép cú pháp hình, bảng, thuật toán, code, công thức, trích dẫn:
 [tests/sample/sample.tex](tests/sample/sample.tex).
