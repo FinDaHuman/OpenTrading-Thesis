@@ -25,6 +25,8 @@ PR thêm số mới phải thêm dòng vào bảng dưới. Ghi "đo" khi tự �
 | E16 | Arm được so: OpenTrading 0.5.0 + PR #437 (`ae7ec48`), OpenCode 2.4.1, DSH 0.2.2-rc.5 | benchmark `3be3e1b` `opentrading-runtime.SHA`, PR #36 | đo | **Không** phải v0.5.1; không ghép với E10, E11 |
 | E17 | Judge Claude Haiku 5.5: 200/200 câu kiểm soát đúng, κ = 1.0 | benchmark `3be3e1b` `audits/judge-calibration-2026-11-24/haiku-5.5-kappa.json` | đo | Câu kiểm soát, không đo ca ranh giới |
 | E18 | Nhóm R main: luôn trả lời BÁN đạt 11/16 | benchmark `3be3e1b` `audits/methodology-2026-11-16/DECISIONS.json` | đo | Mức nền khi đọc kết quả nhóm R |
+| E19 | PRUNE2 bỏ 120 task đúng ở mọi arm trong cả hai lần chạy or16; 8 bẫy từ chối được giữ lại | benchmark `3be3e1b` `audits/taskset-revision-2026-11-24/PRUNE2.json`, `DECISIONS.json` | đo | Luật viết sau khi thấy or16: amendment |
+| E20 | Snapshot 01/11/2026, phiên cuối 30/10/2026; báo cáo tài chính bổ sung khớp 112/112 giá trị đã ghi trước đó; nhóm I, R chấm theo giá đóng cửa 23/11/2026 | benchmark `3be3e1b` `audits/snapshot-extension-2026-11-24/RECEIPT.json`, `task.toml` | đo | 8 lệch chỉ với fixture giả lập devsmoke, không với snapshot thật |
 
 ## Luật riêng
 

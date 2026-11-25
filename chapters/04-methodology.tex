@@ -7,8 +7,69 @@
 \guide{Identify the specific research questions and objectives that the project will address.}
 
 \section{Data Collection and Preprocessing}\label{sec:data}
-\guide{Describe the sources of data, methods of collection, selection criteria, sample size, diversity and representativeness (MCP data layer, frozen snapshot, task set).}
-\guide{Detail how the data is processed before analysis: cleaning, missing data, transformation, normalization of units and periods.}
+The project uses two kinds of data.
+The first is the market data that OpenTrading reads while it answers a user.
+The second is the set of questions, with their correct answers, used to evaluate it.
+
+\subsection{Market Data}\label{sec:market-data}
+OpenTrading does not store market data itself.
+It reads the data through opentrading-mcp, a server built by the group that exposes \num{175} tools through the Model Context Protocol.
+%% Evidence: E12.
+Behind these tools are public sources and providers that require an account key: price and index data of the Vietnamese exchanges through the vnstock library, financial statements from Vietstock, global indices and commodities from Yahoo Finance, crypto-assets from Binance, macroeconomic series from FRED and the World Bank, and news events from GDELT.
+\todo{Confirm with the supervisor the licence wording for each provider before the server is described as public.}
+Gathering many providers behind one server means that every harness sees the same data in the same form, which is also what makes the comparison in \cref{sec:validation} possible.
+
+The providers disagree on units, periods and dates, so the server cleans the data before a model reads it.
+Four rules apply to every result.
+First, each result states the units of its numbers.
+This rule came from a real error: one provider gives Vietnamese share prices in thousands of đồng and another in đồng, and an early version of OpenTrading reported a price 1,000 times too small.
+Second, reporting periods are always given in the same order, and trading days follow the calendar of the Vietnamese market; the server never invents a date for a day without trading.
+Third, missing data is reported as missing, with a reason and whether a retry may help, rather than filled with an estimate.
+Fourth, tools that compute statistics over a basket of today's listed companies warn that companies which left the market are not included, a bias known as survivorship bias.
+
+\subsection{Evaluation Data}\label{sec:evaluation-data}
+Live market data changes every few seconds, so a benchmark that read it would give a different correct answer on each run.
+The benchmark therefore uses a frozen snapshot.
+For each task, the data that the tools would return was recorded once, with 1 November 2026 as the snapshot date and the trading session of 30 October 2026 as the last session.
+During a trial the harness calls the same tools, but the answers come from the recording.
+The correct answer of each task was computed from the recorded data by a script, so it is correct with respect to the snapshot; it does not certify the original filings.
+The financial statements added for version 4.7 were checked against every earlier recording of the same companies and periods: all 112 shared values matched.
+
+The tasks are questions in Vietnamese, written as a user of the product would ask them, with a required answer format.
+They fall into six groups, shown in \cref{tab:taskset}.
+\begin{table}[htb]
+  \centering
+  \caption{Task groups of the version 4.7 benchmark and the number of tasks in each split}\label{tab:taskset}
+  \begin{tabularx}{\textwidth}{@{}l X S[table-format=3.0] S[table-format=2.0] S[table-format=2.0]@{}}
+    \toprule
+    {Group} & {What the task tests} & {Main} & {Holdout} & {Pilot}\\
+    \midrule
+    Lookup (L) & Finding and comparing published figures, including questions whose data does not exist & 30 & 36 & 26\\
+    Compute (C) & Calculations over price series and financial statements, such as returns, beta and growth & 69 & 15 & 15\\
+    Memory (M) & Using facts or criteria that the user gave in an earlier session & 51 & 11 & 10\\
+    Investor (I) & Picking stocks or building a portfolio, scored by the later profit or loss & 20 & 0 & 5\\
+    Recommendation (R) & Giving a buy, hold or sell call, scored by the later price move & 16 & 4 & 1\\
+    Robustness (S) & Ignoring instructions planted in tool data, and stating the date of a price & 14 & 4 & 0\\
+    \midrule
+    Total & & 200 & 70 & 57\\
+    \bottomrule
+  \end{tabularx}
+  \fignote{Source: opentrading-benchmark \texttt{3be3e1b}, \texttt{experiments/finance-v47-study/tasks/}.}
+%% Evidence: E15.
+\end{table}
+The investor and recommendation tasks assume a purchase at the close of 30 October 2026 and are scored with the closing prices of 23 November 2026.
+Their scoring rules were written and recorded before any of these returns was computed.
+
+\subsection{Selection of Tasks}\label{sec:task-selection}
+The task set was built from the previous version of the benchmark.
+In the earlier study (run or16), many tasks, mostly lookups and simple calculations, were answered correctly by every arm in every run.
+Such tasks cannot show a difference between harnesses, so 120 of them were removed by a fixed rule: a task was removed if every arm answered it correctly in both earlier runs.
+Eight of the removed tasks were refusal tasks, where the correct answer is that the data does not exist, and they were put back because a false answer to them is a serious error in a financial product.
+New groups were then added to reach 200 main tasks: harder calculations on financial statements, memory tasks on financial conventions, and the investor and recommendation groups.
+The removal rule was written after the earlier results were known.
+It is therefore reported as an amendment (\cref{tab:amendments}).
+The rule was applied to all arms alike, so it does not favour one harness, but it makes the remaining tasks harder than the earlier set.
+%% Evidence: E19, E20.
 
 \section{Algorithm Design}\label{sec:algorithm}
 \guide{Replaces sample 1 “Feature Selection and Engineering”; supervisor’s “4.1 Algorithm”. The algorithms of the solution, with pseudocode and the reasons for each choice.}
