@@ -26,7 +26,7 @@ The earlier layers rarely change, so the provider can reuse its cache; reminders
 The second question is what the model can do.
 All tools, whether built in or offered by a Model Context Protocol (MCP) server, are registered in the same form.
 The permission gate decides on each call; reading tools may run in parallel, and a writing tool runs alone.
-Calls have a time limit, and by default a result longer than \num{30000} characters is shortened.
+Most calls have a time limit, and by default a result longer than \num{30000} characters is shortened.
 
 The third question is what remains as evidence.
 During a session the results of MCP tools are normally kept in full in a file of up to \qty{64}{\mebi\byte}, so a figure can still be traced after the conversation has been shortened.
