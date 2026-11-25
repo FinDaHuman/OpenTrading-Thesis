@@ -48,7 +48,22 @@ The user works in a Vietnamese terminal interface.
 Besides the answer, it shows information that does not depend on the model: the permission mode, the share of the context in use, the running tools and sub-agents, and the data tools whose source failed.
 Charts are drawn in the terminal as well.
 When a chart is made from a labelled result, the harness reads the numbers itself and the model receives only a short summary.
+\Cref{fig:tui} shows two parts of the screen during a real question about a share price.
 %% Evidence: E33.
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}{\textwidth}
+    \includegraphics[width=\textwidth]{tui-call}
+    \caption{A call to the data server, the label and units of its result, and the source line of the answer}
+  \end{subfigure}
+  \begin{subfigure}{\textwidth}
+    \includegraphics[width=\textwidth]{tui-status}
+    \caption{The input line, the permission mode, the model with its effort, and the connected data server}
+  \end{subfigure}
+  \caption{Parts of the terminal interface}\label{fig:tui}
+  \fignote{Note: the question was \enquote{Phân tích giá cổ phiếu FPT gần đây} (analyse the recent price of FPT shares), asked on 26 November 2026. Source: screenshots of OpenTrading version 0.5.1 \parencite{group2026opentrading}.}
+\end{figure}
 
 \section{Data Flow and Processing}\label{sec:dataflow}
 \guide{Illustrate and describe the data flow through the system, from data collection, processing, to data analysis and result presentation.}
