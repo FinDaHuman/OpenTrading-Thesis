@@ -18,7 +18,7 @@ It produces a stream of events, and every interface reads the same events, so th
 
 The design follows three questions.
 The first is what the model sees.
-The system prompt is built in layers: the core rules and working rules, then the profile and constraints of the user, then the style and the list of skills.
+The system prompt is built in layers: the core rules and working rules, then the user's profile and constraints, then the style and the list of skills.
 A skill is a written method of analysis; of the 43 in OpenTrading, only those that the model loads or the user switches on are added in full.
 The earlier layers rarely change, so the provider can reuse its cache; reminders such as the time of the market are sent with the messages.
 %% Evidence: E10.
@@ -35,7 +35,7 @@ A JSON result that holds numbers also receives a label; for many kinds of chart 
 
 \subsection{Model Layer}\label{sec:model-layer}
 The harness is not tied to one model.
-It reads the context size and the abilities of each model from a public catalogue \parencite{modelsdevndcatalogue} and connects through 14 provider packages, or through any interface compatible with that of OpenAI.
+It reads each model's context size and abilities from a public catalogue \parencite{modelsdevndcatalogue} and connects through 14 provider packages, or through any interface compatible with that of OpenAI.
 The user chooses the reasoning effort in five levels, which the harness translates for the models it knows.
 
 Failed requests are treated by cause.
@@ -55,7 +55,7 @@ When a chart is made from a labelled result, the harness reads the numbers itsel
 
 \subsection{From a Question to an Answer}\label{sec:question-flow}
 \Cref{fig:question-flow} follows one message through the harness.
-The profile and constraints of the user are read first (step 2).
+The user's profile and constraints are read first (step 2).
 If one of them exists but cannot be read, the turn is held, because the model would otherwise treat the user as someone without limits.
 Steps 4 to 6 are the loop of \cref{sec:algorithm}.
 
@@ -66,10 +66,10 @@ Steps 4 to 6 are the loop of \cref{sec:algorithm}.
   \fignote{Source: the group, based on OpenTrading version 0.5.1 \parencite{group2026opentrading}.}
 \end{figure}
 
-Results from the web or from an MCP server carry a line that names their origin and states that instructions inside the data are not words of the user (step 5d).
+Results from the web or from an MCP server carry a line that names their origin and states that instructions inside the data are not the user's words (step 5d).
 After an accepted answer, the tools whose source failed are listed (step 7).
 
-A long conversation would not fit into the context of the model.
+A long conversation would not fit into the model's context.
 Near the limit, old tool results are first replaced by short notes that, for MCP data, point to the stored evidence.
 If that is not enough, the model writes a summary of the older turns, and the latest turns are kept (step 8).
 %% Evidence: E34.
@@ -78,11 +78,11 @@ If that is not enough, the model writes a summary of the older turns, and the la
 \guide{Detail how the system is deployed, including the deployment environment and deployment procedures.}
 
 \subsection{Release and Update of the Harness}\label{sec:release}
-OpenTrading runs on the computer of the user.
+OpenTrading runs on the user's computer.
 An automated workflow builds program files for Windows, macOS and Linux, each with its own runtime, and publishes them on GitHub and npm.
 After publication, the release is installed on six test machines; for version 0.5.1, published on 25 November 2026, all six installations passed.
 An update of a script installation is checked against its checksum and started once before it replaces the old version.
-The files do not carry the certificate of a publisher yet, so the operating system may show a warning.
+The files do not carry a publisher's certificate yet, so the operating system may show a warning.
 %% Evidence: E31.
 
 \section{Scalability and Maintenance}\label{sec:scalability}
