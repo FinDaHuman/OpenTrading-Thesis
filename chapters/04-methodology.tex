@@ -87,6 +87,13 @@ Everything except the harness was held fixed, as \cref{tab:bench-config} summari
 All three arms used the same LLM, reached the same frozen copy of the market data through the same MCP server, and answered the same tasks under the same limits.
 Each arm kept its own system prompt and tool design, since these are what a harness contributes.
 Each task was run twice per arm, so that the stability of an answer could be measured as well as its correctness.
+\Cref{fig:bench-pipeline} shows how one task passes through the benchmark, from the sealed task set to the analysis.
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=\textwidth]{benchmark-pipeline}
+  \caption{Path of a task through the version 4.7 benchmark}\label{fig:bench-pipeline}
+  \fignote{Source: the group, drawn from opentrading-benchmark \texttt{3be3e1b} and the sealed configuration of run \texttt{main-20261124}; diagram source \texttt{figures/src/benchmark-pipeline.tex}.}
+\end{figure}
 \begin{table}[htb]
   \centering
   \caption{Configuration of the version 4.7 main study, identical for the three arms}\label{tab:bench-config}
