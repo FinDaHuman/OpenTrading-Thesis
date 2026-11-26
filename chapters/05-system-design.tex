@@ -4,11 +4,109 @@
 \section{AI Model Integration}\label{sec:integration}
 \guide{Describe how the AI model is integrated into the larger system, including the interface and data exchange between the AI model and other system components.}
 
+\subsection{Overall Architecture}\label{sec:architecture}
+\Cref{fig:architecture} shows the parts of the harness and the programs it talks to.
+The agent loop connects them.
+It produces a stream of events, and every interface reads the same events, so the terminal and the evaluation run the same loop.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics{harness-architecture}
+  \caption{Architecture of the OpenTrading harness}\label{fig:architecture}
+  \fignote{Note: dashed boxes are outside the harness. Source: the group, based on OpenTrading version 0.5.1 \parencite{group2026opentrading}.}
+\end{figure}
+
+The design follows three questions.
+The first is what the model sees.
+The system prompt is built in layers: the core rules and working rules, then the user's profile and constraints, then the style and the list of skills.
+A skill is a written method of analysis; of the 43 in OpenTrading, only those that the model loads or the user switches on are added in full.
+The earlier layers rarely change, so the provider can reuse its cache; reminders such as the time of the market are sent with the messages.
+%% Evidence: E10.
+
+The second question is what the model can do.
+All tools, whether built in or offered by an MCP server, are registered in the same form.
+The permission gate decides on each call; reading tools may run in parallel, and a writing tool runs alone.
+Most calls have a time limit, and by default a result longer than \num{30000} characters is shortened.
+
+The third question is what remains as evidence.
+During a session the results of MCP tools are normally kept in full in a file of up to \qty{64}{\mebi\byte}, so a figure can still be traced after the conversation has been shortened.
+A JSON result that holds numbers also receives a label; for many kinds of chart the model can pass this label instead of copying the numbers.
+%% Evidence: E34.
+
+\subsection{Model Layer}\label{sec:model-layer}
+The harness is not tied to one model.
+It reads each model's context size and abilities from a public catalogue \parencite{modelsdevndcatalogue} and connects through 14 provider packages, or through any interface compatible with that of OpenAI.
+The user chooses the reasoning effort in five levels, which the harness translates for the models it knows.
+
+Failed requests are treated by cause.
+An exhausted daily quota or a wrong key is reported at once, a rate limit is tried again up to twice, and an overloaded service or a network error up to four times.
+A request that stays silent for five minutes is cut and reported as an error.
+%% Evidence: E30.
+
+\subsection{Interface and Charts}\label{sec:interface}
+The user works in a Vietnamese terminal interface.
+Besides the answer, it shows information that does not depend on the model: the permission mode, the share of the context in use, the running tools and sub-agents, and the data tools whose source failed.
+Charts are drawn in the terminal as well.
+When a chart is made from a labelled result, the harness reads the numbers itself and the model receives only a short summary.
+\Cref{fig:tui} shows two parts of the screen during a real question about a share price.
+%% Evidence: E33.
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}{\textwidth}
+    \includegraphics[width=\textwidth]{tui-call}
+    \caption{A call to the data server, the label and units of its result, and the source line of the answer}
+  \end{subfigure}
+  \begin{subfigure}{\textwidth}
+    \includegraphics[width=\textwidth]{tui-status}
+    \caption{The input line, the permission mode, the model with its effort, and the connected data server}
+  \end{subfigure}
+  \caption{Parts of the terminal interface}\label{fig:tui}
+  \fignote{Note: the question was \enquote{Phân tích giá cổ phiếu FPT gần đây} (analyse the recent price of FPT shares), asked on 26 November 2026. Source: screenshots of OpenTrading version 0.5.1 \parencite{group2026opentrading}.}
+\end{figure}
+
 \section{Data Flow and Processing}\label{sec:dataflow}
 \guide{Illustrate and describe the data flow through the system, from data collection, processing, to data analysis and result presentation.}
+
+\subsection{From a Question to an Answer}\label{sec:question-flow}
+\Cref{fig:question-flow} follows one message through the harness.
+The user's profile and constraints are read first (step 2).
+If one of them exists but cannot be read, the turn is held, because the model would otherwise treat the user as someone without limits.
+Steps 4 to 6 are the loop of \cref{sec:agent-loop}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics{question-flow}
+  \caption{Path of one question through the harness}\label{fig:question-flow}
+  \fignote{Source: the group, based on OpenTrading version 0.5.1 \parencite{group2026opentrading}.}
+\end{figure}
+
+Results from the web or from an MCP server carry a line that names their origin and states that instructions inside the data are not the user's words (step 5d).
+After an accepted answer, the tools whose source failed are listed (step 7).
+
+A long conversation would not fit into the model's context.
+Near the limit, old tool results are first replaced by short notes that, for MCP data, point to the stored evidence.
+If that is not enough, the model writes a summary of the older turns, and the latest turns are kept (step 8).
+%% Evidence: E34.
 
 \section{Deployment Strategy}\label{sec:deployment}
 \guide{Detail how the system is deployed, including the deployment environment and deployment procedures.}
 
+\subsection{Release and Update of the Harness}\label{sec:release}
+OpenTrading runs on the user's computer.
+An automated workflow builds program files for Windows, macOS and Linux, each with its own runtime, and publishes them on GitHub and npm.
+After publication, the release is installed on six test machines; for version 0.5.1, published on 25 November 2026, all six installations passed.
+An update of a script installation is checked against its checksum and started once before it replaces the old version.
+The files do not carry a publisher's certificate yet, so the operating system may show a warning.
+%% Evidence: E31.
+
 \section{Scalability and Maintenance}\label{sec:scalability}
 \guide{Discuss how the system is designed to handle growth and future maintenance, including system updates, scalability, and version management.}
+
+\subsection{Testing and Maintenance of the Harness}\label{sec:testing}
+Each pull request is tested automatically on Linux and Windows.
+At version 0.5.1, \num{2249} of \num{2253} tests passed on Linux; the four others, which need macOS or Windows, were skipped.
+Instead of a paid model, the tests use a simulated one that returns prepared answers, including broken ones.
+For the stop gate the tests contain both endings that must be caught and answers that must be left alone.
+These tests show that a rule does what it was designed to do; they do not show that it improves the answers.
+%% Evidence: E11, E35.
