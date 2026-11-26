@@ -7,7 +7,7 @@ PR thêm số mới phải thêm dòng vào bảng dưới. Ghi "đo" khi tự �
 
 | ID | Phát biểu được phép | Nguồn | Loại | Giới hạn bắt buộc ghi kèm |
 |---|---|---|---|---|
-| E01 | or16: OpenTrading 385/400 (96.25%), DSH 362/400 (90.50%), OpenCode 352/400 (88.00%) | benchmark `3be3e1b`, or16 MAIN-REPORT.md | báo cáo, đã đối chiếu JSONL | Bản OT đo là `38f8adb` (v0.4.0 + 36 commit), **không phải** bản hiện tại |
+| E01 | or16: OpenTrading 385/400 (96.25%), DSH 362/400 (90.50%), OpenCode 352/400 (88.00%) | benchmark `3be3e1b`, or16 MAIN-REPORT.md | báo cáo, đã đối chiếu JSONL | Bản OT đo là `38f8adb` (v0.4.0 + 36 commit), **không phải** bản hiện tại; trong bài viết "a development build after version 0.4.0", không ghi mã |
 | E02 | Chênh lệch so với OT: OpenCode −8.25 pp [−12.75, −4.25]; DSH −5.75 pp [−9.25, −2.75] | như trên | báo cáo | Bootstrap ghép cặp theo bài, 2000 lần, CI 95% |
 | E03 | Core 272/271/271 trên 280 (OT/OpenCode/DSH) | như trên | báo cáo | Ba harness **ngang nhau** ở phần core |
 | E04 | Compute 53/54/43 trên 60 (OT/OpenCode/DSH) | như trên | báo cáo | OT còn `calculate`/`compute`; shell của hai đối thủ tắt |
@@ -34,6 +34,7 @@ PR thêm số mới phải thêm dòng vào bảng dưới. Ghi "đo" khi tự �
 
 ## Luật riêng
 
+- Mã commit và đường dẫn file chỉ nằm trong sổ này; trong bài ghi tên phiên bản và trích dẫn phần mềm.
 - Ghi phiên bản được đo ngay cạnh kết quả. Không gán kết quả v0.4.0 cho v0.5.x.
 - Nêu cả kết quả kém và hòa, không chỉ chỗ thắng.
 - Phân biệt: đăng ký trước, sửa đổi sau khi thấy kết quả, và phân tích thăm dò.
