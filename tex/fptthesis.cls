@@ -393,7 +393,7 @@
   \renewcommand\arraystretch{1.45}\parskip0pt
   \begin{longtable}{|>{\centering\arraybackslash}m{70.7bp-2\tabcolsep}|m{\dimexpr\textwidth-70.7bp-2\tabcolsep-3\arrayrulewidth}|}
   \hline\rowcolor{fpthead}\textbf{Acronym}&\multicolumn{1}{c|}{\cellcolor{fpthead}\textbf{Definition}}\\\hline\endhead
-}{\end{longtable}}
+}{\end{longtable}\addtocounter{table}{-1}}
 \newcommand\acro[2]{#1 & #2\\\hline}
 
 %% ---- Appendices -------------------------------------------------------------

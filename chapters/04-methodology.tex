@@ -59,12 +59,6 @@ The project does not train a model, so its algorithms are the rules of the harne
   \fignote{Source: the group, from the works cited in the table.}
 \end{table}
 
-The benchmark of \cref{sec:validation} does not measure all of these rules.
-There, OpenTrading has only the data tools, a shell, its tool for reading a stored result and, in memory tasks, its read-only memory tool.
-Tool search is off, every command runs without approval inside a sandbox, and on this model interface OpenTrading sends no reminders after tool results.
-The benchmark therefore does not measure tool search, the filter that lets arithmetic commands run without approval, the permission gate, skills, sub-agents, ultradesk or those reminders.
-%% Evidence: E32.
-
 \label{sec:agent-loop}
 OpenTrading handles each user message in one turn.
 During a turn the model reasons, calls tools and reads their results, a pattern known as ReAct \parencite{yao2023react}.
@@ -123,7 +117,7 @@ Its ten cases fall into four groups, shown in \cref{tab:stop-gate}.
   \fignote{Note: the model's task list does not count as a tool here. Source: OpenTrading version 0.5.1 \parencite{group2026opentrading}.}
 \end{table}
 
-A turn may be sent back twice for any case.
+A turn may be sent back at most twice in total, whatever the cases.
 If a tool has already returned something to answer from, an empty answer has an extra allowance of up to three in total, so a turn has at most five recoveries.
 If the text is still empty or only a repeat after that, the user is told that there is no answer.
 Any other answer is kept, with a warning if its figures are unsupported.
@@ -142,8 +136,6 @@ Views on the future must be given as scenarios, each with its assumptions, the c
 The prompt is assembled from blocks rather than written as one text.
 Lines about some tools, such as the shell, are included only when that tool is available.
 The machine profile, used when another program rather than a person reads the answer, drops the guidance on style and follows the answer format that the calling program gives.
-In the first request of the benchmark tasks, the system prompt of the machine profile therefore ranged from 917 to \num{1645} words, depending on the tools and features of the task.
-%% Evidence: E22.
 
 \label{sec:figure-tracing}
 A financial answer cannot be trusted if its figures do not come from the data, so figure tracing compares the figures of an answer with the numbers that the model has read.
@@ -202,10 +194,10 @@ Partial matches are allowed only for words of three letters or more, because sho
 
 Checking tool inputs comes next: once a tool is chosen, its arguments can still be wrong, for example a period written in the wrong form \parencite{yao2024taubench}.
 If the server then returns no data, the model may conclude that the data does not exist and report it as missing, which is a false answer.
-The harness core has a grounded mode, which the benchmark runner switches on and which is not a user setting.
+The harness core has a grounded mode for automated use, which is not a user setting.
 In this mode OpenTrading checks every argument of a data tool against the schema that the server declares, before the call is sent.
 An invalid call is not executed; the model receives the reason, and an explicit statement that a rejected input is not evidence that the data is missing, so it corrects the call instead of giving up.
-A stricter optional policy for automated use adds one round of correction and checks of the answer format; in the benchmark only the input check was enabled.
+A stricter optional policy adds one round of correction and checks of the answer format.
 %% Evidence: E24.
 
 \label{sec:memory}
@@ -280,7 +272,7 @@ The memory budget of line 10 depends on the context size of the model: \num{1000
 An entry that does not fit is left out whole or replaced by a pointer, so nothing is cut.
 %% Evidence: E49.
 
-Edits to constraints, theses and lessons are checked against the version that the form read, so an outdated form cannot overwrite a newer one, and deletion is logical (\cref{sec:ethics}).
+Edits to constraints, theses and lessons are checked against the version that the form read, so an outdated form cannot overwrite a newer one; a deleted entry is only marked as deleted, so the interface does not promise that it is erased.
 
 \label{sec:permissions}
 Permissions matter because an agent that can write files and run commands can also do harm.
@@ -324,7 +316,7 @@ The sub-agent does not see the conversation; it receives a form with the purpose
 It cannot start further sub-agents, and many types of sub-agent can only read.
 In this arrangement the model decides how to divide the work.
 
-Ultradesk handles four recurring tasks, for which the group wrote the division into code instead, following the distinction between agents and predefined workflows \parencite{anthropic2024agents}.
+Ultradesk is a set of four multi-agent workflows for recurring tasks, in which the division of the work is written in code instead of being left to the model, following the distinction between agents and predefined workflows \parencite{anthropic2024agents}.
 It resembles an orchestrator--worker system \parencite{anthropic2025multiagent}, except that its steps are fixed in code.
 Its four tasks are screening, with one scorecard per company ranked in code; a fact check, with one vote per claim; a debate between bull and bear analysts with a referee, following the researchers of TradingAgents \parencite{xiao2024tradingagents}; and a sector review.
 Their planned budgets range from 22 to 40 model requests in a small run and reach 276 in a large one; these are limits, not measurements.
@@ -377,7 +369,8 @@ Each harness kept its own system prompt and tool design, since these are what a 
 The environment was set up to give no harness an advantage outside its design:
 \begin{enumerate}
   \item The same model, DeepSeek V4.1 Flash with temperature 0 and no reasoning requested, answered in every harness; OpenTrading 0.5.0 with the change that allows buy and sell recommendations ran with its machine profile.
-  \item Every harness saw the same data tools and a shell; the other settings of OpenTrading are given in \cref{sec:algorithm}.
+  \item Every harness saw the same data tools and a shell. OpenTrading also had its tool for reading a stored result and, in memory tasks, its read-only memory tool; its tool search was off, every command ran without approval inside a sandbox, no reminders were sent after tool results, and of its grounded mode only the input check was on (\cref{sec:algorithm}).
+%% Evidence: E24, E32.
   \item The clock of every harness was set to the snapshot date, so that the snapshot looked current to each harness.
   \item Questions that a harness normally asks its user, such as a request for permission, were answered automatically in the same way.
 \end{enumerate}
@@ -485,7 +478,7 @@ On privacy, the data of the harness, including API keys, sessions, configuration
 Where the operating system allows, only its owner can read the file of API keys.
 Shell commands run by the agent receive an environment from which variables whose names mark them as keys or tokens have been removed, and reading a key file asks the user in every mode, or is refused when no user is present (\cref{sec:permissions}).
 Some data does leave the machine: the question, the tool results and the memory placed in the prompt go to the model provider that the user has chosen, and data requests go to the data server.
-Web searches go to DuckDuckGo or to a search service whose key the user has set, either of which can learn which tickers interest the user.
+Web searches go to DuckDuckGo, to a search service whose key the user has set or, if the user turns them on, to two hosted search services, and each of them can learn which tickers interest the user.
 The memory store rejects text that has the form of a known key (\cref{sec:memory-flow}), and the investor's decisions are not sent to the model.
 
 The group built both OpenTrading and the benchmark that compares it with other harnesses, which creates a risk of bias.
