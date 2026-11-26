@@ -415,6 +415,8 @@ Investor tasks assume a purchase at the close of 30 October 2026 and are scored 
 
 \subsection{A Controlled Environment}\label{sec:bench-design}
 All 300 tasks were run in each of the three harnesses (\cref{tab:bench-config}).
+For 119 of them, the answers of OpenCode and DSH were taken from an earlier run of the same tasks with the same model and data snapshot but older versions of these two harnesses (\cref{sec:threats}).
+%% Evidence: E16, E45.
 Each harness kept its own system prompt and tool design, since these are what a harness contributes.
 The environment was set up so that no harness had an advantage outside its design:
 \begin{enumerate}
@@ -628,7 +630,7 @@ Backups and content already sent to a provider are out of the harness's reach, s
 
 \subsection{Fairness of the Comparison}
 The group built both OpenTrading and the benchmark that compares it with other harnesses, which creates a risk of bias.
-To limit it, the three harnesses are run with the same model, the same data and the same scoring (\cref{sec:rq}), following the design of \cref{sec:validation}; for 119 tasks, however, the answers of the other two harnesses come from an earlier run with older versions of those harnesses.
+To limit it, the three harnesses are run with the same model, the same data and the same scoring (\cref{sec:rq}), following the design of \cref{sec:validation}; for 119 tasks, however, the answers of the other two harnesses come from an earlier run with older versions of those harnesses (\cref{sec:threats}).
 %% Evidence: E15, E16.
 The memory group was designed around what OpenTrading can do: OpenTrading received the user's rules from its memory store, while OpenCode could only resume the earlier session and DSH could resume it and search past sessions, so the results of this group favour OpenTrading and are reported with that limitation (\cref{sec:threats}).
 The results include ties and losses as well as wins: on compute, lookup and robustness tasks the three harnesses were within three tasks of each other, and each of the other harnesses answered six tasks that OpenTrading did not (\cref{sec:accuracy}).

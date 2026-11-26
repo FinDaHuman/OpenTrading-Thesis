@@ -198,7 +198,7 @@ Once every harness had the same data tools and a shell for arithmetic, fetching 
 
 The difference came from the memory group, where OpenTrading answered 58 of 59 tasks against 50 for DSH and 30 for OpenCode.
 These tasks depend on what the user said in an earlier session, which a model cannot recover from the data.
-In OpenTrading memory is part of the harness: at the start of every turn the user's constraints are placed in the system part of the prompt (\cref{sec:memory-flow}), so the model does not need to search for them.
+In OpenTrading memory is part of the harness: at the start of every turn the user's constraints are placed in the system part of the prompt (\cref{sec:memory,sec:memory-flow}), so the model does not need to search for them.
 This group therefore favours OpenTrading by design: the benchmark's controller saved each rule through the same path as the user's form, in the user's exact words, while OpenCode could only resume the earlier session and DSH could resume it and search past sessions.
 The other harnesses had to find the rules in the earlier session; they spent 15 to 20 requests on a typical memory task, against 4 for OpenTrading, and still often kept an outdated rule or refused because they found none.
 The same difference explains most of OpenTrading's lead in speed and cost: fewer requests meant a shorter wait in the slowest trials and about half the cost per correct answer.
@@ -222,15 +222,17 @@ Finally, \textcite{kapoor2024agents} argued that evaluations of agents should ho
 
 
 \subsection{Threats to Validity}\label{sec:threats}
-Five limits apply to these results:
+Seven limits apply to these results:
 \begin{enumerate}
   \item Every task ran once in each harness, so the results do not show how stable the answers are across runs.
   \item The memory tasks, where most of the difference lies, were written by the group that built OpenTrading's memory, and their form may suit its design.
   \item The investor tasks cover one falling market over three weeks, so they are a signal about this period, not about investment skill.
   \item The judge was checked only on clearly correct and clearly wrong answers.
+  \item For 119 tasks, the answers of OpenCode and DSH come from an earlier run with the same model and data but older versions of these harnesses; most of these tasks are lookups on which the three harnesses scored almost the same.
+  \item The model was served by two hosting providers, and the trials are not split evenly between them.
   \item The harness measured was OpenTrading 0.5.0 with an early revision of a change released in version 0.5.1, not the version 0.5.1 described in \cref{ch:methodology,ch:design}.
 \end{enumerate}
-%% Evidence: E17.
+%% Evidence: E15, E16, E17, E37.
 
 \section{Recommendations}\label{sec:recommendations}
 The results lead to five recommendations for the harness and its evaluation.
