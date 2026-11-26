@@ -44,14 +44,12 @@ A request that stays silent for five minutes is cut and reported as an error.
 %% Evidence: E30.
 
 \subsection{Connection to the Data Server}\label{sec:tool-exposure}
-OpenTrading reads market data through MCP, an open standard for connecting models to tools and data \parencite{modelcontextprotocol2025specification}.
+OpenTrading reads market data through MCP (\cref{sec:data}), whose specification defines how tools are listed and called \parencite{modelcontextprotocol2025specification}.
 Its MCP client connects to the group's data server, which offers \num{175} tools and 6 prepared analysis workflows \parencite{group2026opentradingmcp}, and gives the model these tools next to its own, prefixed with the server's name so that two servers cannot clash.
 Above a threshold the model receives only the tool names and loads tools through the search of \cref{sec:tool-search}, and the workflows appear to the user as commands.
 %% Evidence: E12, E21.
 Every answer of the server uses the same envelope, which states whether the data is available, the units and source of each number and, when data is missing, the reason and whether a retry may help.
 OpenTrading relies on this envelope: the model can choose its next step instead of stopping or guessing, and the final answer can cite where each number came from.
-
-\subsection{Control Over Actions}\label{sec:action-control}
 Each tool of the data server declares whether it only reads data or also writes, for example to save a watch list.
 The harness runs reading tools at once and passes writing tools to the permission gate of \cref{sec:permissions}.
 When the user allows a tool permanently, the permission is tied to the exact server, so a different server that offers a tool with the same name is asked again.
