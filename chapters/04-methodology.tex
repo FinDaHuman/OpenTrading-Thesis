@@ -11,11 +11,13 @@ OpenTrading does not store market data itself; it reads the data through the gro
 %% Evidence: E12.
 The data comes from public sources and from paid data services bought by the author: prices and indices of the Vietnamese exchanges through the \enquote{vnstock} library, financial statements from \enquote{Vietstock}, global indices and commodities from \enquote{Yahoo Finance}, crypto-assets from \enquote{Binance}, macroeconomic series from \enquote{FRED} and the \enquote{World Bank}, and news events from \enquote{GDELT}.
 
-The providers disagree on units, periods and dates, so the data is cleaned before the model reads it, by four rules.
-First, each result states the units of its numbers; one provider gives Vietnamese share prices in thousands of đồng and another in đồng, and an early version of OpenTrading reported a price \num{1000} times too small.
-Second, reporting periods are given in one order, and trading days follow the calendar of the Vietnamese market, so no date is invented for a day without trading.
-Third, missing data is reported as missing, with a reason, rather than filled with an estimate.
-Fourth, statistics over today's listed companies warn that companies which left the market are not included, a bias known as survivorship bias.
+The providers disagree on units, periods and dates, so the data is cleaned by four rules before the model reads it:
+\begin{enumerate}
+  \item Each result states the units of its numbers. One provider gives Vietnamese share prices in thousands of đồng and another in đồng, and an early version of OpenTrading reported a price \num{1000} times too small.
+  \item Reporting periods are given in one order, and trading days follow the calendar of the Vietnamese market, so no date is invented for a day without trading.
+  \item Missing data is reported as missing, with a reason, rather than filled with an estimate.
+  \item Statistics over today's listed companies warn that companies which left the market are not included, a bias known as survivorship bias.
+\end{enumerate}
 
 \section{Algorithm Design}\label{sec:algorithm}
 The project does not train a model.
