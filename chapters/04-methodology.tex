@@ -7,26 +7,17 @@
 \guide{Identify the specific research questions and objectives that the project will address.}
 
 \section{Data Collection and Preprocessing}\label{sec:data}
-OpenTrading does not store market data itself.
-It reads the data through opentrading-mcp, a server built by the group that offers \num{175} tools through the Model Context Protocol (MCP) \parencite{group2026opentradingmcp}.
+OpenTrading does not store market data itself; it reads the data through the group's data server, which offers \num{175} tools to the harness \parencite{group2026opentradingmcp}.
 %% Evidence: E12.
-Behind these tools are public sources and providers that require an account key: price and index data of the Vietnamese exchanges through the vnstock library, financial statements from Vietstock, global indices and commodities from Yahoo Finance, crypto-assets from Binance, macroeconomic series from FRED and the World Bank, and news events from GDELT.
-Gathering the providers behind one server means that every harness sees the same data in the same form.
-\todo{Confirm with the supervisor the licence wording for each provider before the server is described as public.}
+The data comes from public sources and from paid data services bought by the author: prices and indices of the Vietnamese exchanges through the \enquote{vnstock} library, financial statements from \enquote{Vietstock}, global indices and commodities from \enquote{Yahoo Finance}, crypto-assets from \enquote{Binance}, macroeconomic series from \enquote{FRED} and the \enquote{World Bank}, and news events from \enquote{GDELT}.
 
-The providers disagree on units, periods and dates, so the server cleans the data before a model reads it.
-Four rules apply to every result.
-First, each result states the units of its numbers.
-This rule came from a real error: one provider gives Vietnamese share prices in thousands of đồng and another in đồng, and an early version of OpenTrading reported a price \num{1000} times too small.
-Second, reporting periods are always given in the same order, and trading days follow the calendar of the Vietnamese market; the server never invents a date for a day without trading.
-Third, missing data is reported as missing, with a reason and whether a retry may help, rather than filled with an estimate.
-Fourth, tools that compute statistics over a basket of today's listed companies warn that companies which left the market are not included, a bias known as survivorship bias.
-
-The data used to evaluate the harness, a frozen copy of the same server's answers and a set of questions with known answers, is described with the benchmark in \cref{sec:bench-tasks}.
+The providers disagree on units, periods and dates, so the data is cleaned before the model reads it, by four rules.
+First, each result states the units of its numbers; one provider gives Vietnamese share prices in thousands of đồng and another in đồng, and an early version of OpenTrading reported a price \num{1000} times too small.
+Second, reporting periods are given in one order, and trading days follow the calendar of the Vietnamese market, so no date is invented for a day without trading.
+Third, missing data is reported as missing, with a reason, rather than filled with an estimate.
+Fourth, statistics over today's listed companies warn that companies which left the market are not included, a bias known as survivorship bias.
 
 \section{Algorithm Design}\label{sec:algorithm}
-\guide{Replaces sample 1 “Feature Selection and Engineering”; supervisor’s “4.1 Algorithm”. The algorithms of the solution, with pseudocode and the reasons for each choice.}
-
 The project does not train a model.
 Its algorithms are the rules of the harness, the program around a large language model (LLM) that decides what the model sees, what it may do, and when its answer counts as finished.
 \Cref{tab:problems} lists the difficulties that these rules address, in the order of the sections below.
@@ -282,43 +273,17 @@ The debate follows the bull and bear researchers of TradingAgents \parencite{xia
 Because ultradesk may use many requests (\cref{tab:playbooks}), it runs only when the user asks for it or approves it.
 %% Evidence: E29.
 
-\subsection{Financial Methods in the Data Server}\label{sec:financial-methods}
-A model that receives a finished ratio cannot check how it was computed, so the data server computes its financial measures with published methods and states what it could not compute.
-Three principles apply to every method.
-Each measure follows a named source, and the server keeps the source's definitions rather than a simplified version.
-Inputs come from the same kind of statement for every company, by default the annual statements, and a line missing in the source is left out and reported, never replaced by zero; a ratio that is truly zero is kept as zero.
-When a measure cannot be computed, the result says which input is missing instead of returning a partial score.
-\Cref{tab:financial-methods} lists the main methods.
-
-\begin{table}[H]
-  \centering
-  \caption{Main financial methods of the data server}\label{tab:financial-methods}
-  \begin{tabularx}{\textwidth}{@{}l L L@{}}
-    \toprule
-    {Method} & {Question it answers} & {Rule kept from the source}\\
-    \midrule
-    Beneish M-score & Are the earnings likely to be manipulated? & Eight variables; total accruals from operating cash flow\\
-    Piotroski F-score & Is the company's financial strength improving? & Nine signals; returns and turnover on assets at the start of the year\\
-    Distribution days & Are large investors selling the market? & A fall of at least 0.2\% on higher volume, counted over 25 sessions\\
-    Follow-through day & Has a market rally been confirmed? & From the fourth day of a rally, a rise of at least 1.25\% on higher volume\\
-    Cycle statistics & Where is a sector in its price cycle? & Computed over today's listed companies, with a survivorship warning\\
-    \bottomrule
-  \end{tabularx}
-  \fignote{Source: opentrading-mcp \parencite{group2026opentradingmcp}, after the sources cited in the text.}
-\end{table}
-
-The two accounting scores follow Beneish, Lee and Nichols (2013) and Piotroski (2000).
-The two market-timing rules follow the method of William O'Neil: a distribution day stops counting after 25 sessions or once the index has risen 5\% above its close, and the first follow-through day becomes the reference for counting new distribution days.
-These rules let the model answer questions such as whether the market is in a confirmed uptrend with a result that a reader can recompute, instead of a judgement the model forms on its own.
+\subsection{Financial Methods Behind the Data Tools}\label{sec:financial-methods}
+A model that receives a finished ratio cannot check how it was computed, so the financial measures that OpenTrading reads are computed by published methods rather than by the model.
+These include the Beneish M-score for earnings manipulation, the Piotroski F-score for financial strength, and the distribution days and follow-through days of William O'Neil for the state of the market.
+Inputs missing in the source are reported and never replaced by zero, so that the model can say what could not be computed instead of giving a partial score.
 %% Evidence: E36.
 \todo{Add the three sources after opening them: Beneish, Lee and Nichols (2013), Piotroski (2000), O'Neil.}
 
 \section{Model Configuration and Validation}\label{sec:validation}
-The project does not train a model, so validation tests whether the harness, not the model, changes the quality of the answers.
-The group validated OpenTrading with a controlled benchmark, opentrading-benchmark \parencite{group2026opentradingbenchmark}, which compares it with two general-purpose harnesses, OpenCode and DeepSeek Harness (DSH).
-All three used the same language model, DeepSeek V4.1 Flash, the same frozen copy of the data server and the same limits, so that only the harness differed.
-Each of 300 tasks was run once in each harness, \num{900} trials in total.
-The design is reported with its results in \cref{ch:results}: the tasks in \cref{sec:bench-tasks}, the comparison in \cref{sec:bench-design}, reproducibility in \cref{sec:bench-repro} and scoring in \cref{sec:bench-scoring}.
+The project does not train a model, so validation tests whether the harness, not the model, improves the answers.
+OpenTrading was compared with two general-purpose harnesses on 300 financial tasks, with the same model, DeepSeek V4.1 Flash, the same frozen data and the same limits, so that only the harness differed.
+The setup and results are given in \cref{sec:bench-setup}.
 %% Evidence: E14, E37.
 
 \section{Evaluation Metrics}\label{sec:metrics}
@@ -326,7 +291,7 @@ The primary metric is accuracy, the share of tasks that a harness $a$ answered c
 \begin{equation}\label{eq:accuracy}
   \hat{p}_a=\frac{1}{|T|}\sum_{t\in T} y_{a,t},
 \end{equation}
-where $T$ is a set of tasks and $y_{a,t}$ is 1 when the trial of task $t$ in harness $a$ is correct under the rules of \cref{sec:bench-scoring} and 0 otherwise.
+where $T$ is a set of tasks and $y_{a,t}$ is 1 when the trial of task $t$ in harness $a$ is correct under the rules of \cref{sec:bench-setup} and 0 otherwise.
 A trial that ended without an answer counts as incorrect.
 
 Two harnesses are compared on the same tasks.
@@ -337,7 +302,7 @@ If the two harnesses were equally good, each of these $n$ tasks would be equally
 \end{equation}
 Tasks that both harnesses answered correctly, or both incorrectly, carry no information about the difference and are left out.
 
-Secondary metrics describe how an answer was reached: false refusals on answerable tasks, numbers given on tasks whose correct answer is a refusal, trials without an answer, answers rejected because a number lay outside the tolerance, and the cost, tokens and time of a trial.
+Secondary metrics describe how an answer was reached: false refusals, numbers given where the correct answer is a refusal, trials without an answer, numbers outside the tolerance, and cost.
 They are reported separately and never added to accuracy as one score.
 \todo{Cite a statistics reference for the sign test after opening it.}
 

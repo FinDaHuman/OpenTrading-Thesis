@@ -1,5 +1,5 @@
 %% Source of figures/benchmark-accuracy.pdf (rules/04-figures-tables.md).
-%% Data: figures/src/data/benchmark-v47-block-a-ci.dat, written by figures/src/benchmark-accuracy.py.
+%% Data: figures/src/data/benchmark-v47-ci.dat, written by figures/src/benchmark-accuracy.py.
 %% Build: python figures/src/benchmark-accuracy.py
 %%        xelatex -output-directory=figures figures/src/benchmark-accuracy.tex   (run from the repository root)
 \documentclass[border=2pt]{standalone}
@@ -17,7 +17,7 @@
   yticklabel={\pgfmathprintnumber[assume math mode=true]{\tick}},
   symbolic x coords={Compute,Investor,Lookup,Memory,Robustness,Overall},
   xtick=data,
-  xticklabels={Compute (69),Investor (36),Lookup (30),Memory (51),Robustness (14),Overall (200)},
+  xticklabels={Compute (79),Investor (36),Lookup (112),Memory (59),Robustness (14),Overall (300)},
   tick label style={font=\fontsize{8}{9}\selectfont},
   label style={font=\fontsize{8}{9}\selectfont},
   legend style={font=\fontsize{8}{9}\selectfont, at={(0.5,1.02)}, anchor=south, legend columns=3, draw=none},
@@ -26,9 +26,9 @@
   error bars/error bar style={black, line width=0.5pt},
   ymajorgrids, grid style={gray!25},
 ]
-\addplot[fill=black!80, draw=black] table[x=group, y=opentrading, y error minus=opentrading_lo, y error plus=opentrading_hi] {figures/src/data/benchmark-v47-block-a-ci.dat};
-\addplot[fill=black!35, draw=black] table[x=group, y=opencode, y error minus=opencode_lo, y error plus=opencode_hi] {figures/src/data/benchmark-v47-block-a-ci.dat};
-\addplot[fill=white, draw=black, postaction={pattern=north east lines}] table[x=group, y=dsh, y error minus=dsh_lo, y error plus=dsh_hi] {figures/src/data/benchmark-v47-block-a-ci.dat};
+\addplot[fill=black!80, draw=black] table[x=group, y=opentrading, y error minus=opentrading_lo, y error plus=opentrading_hi] {figures/src/data/benchmark-v47-ci.dat};
+\addplot[fill=black!35, draw=black] table[x=group, y=opencode, y error minus=opencode_lo, y error plus=opencode_hi] {figures/src/data/benchmark-v47-ci.dat};
+\addplot[fill=white, draw=black, postaction={pattern=north east lines}] table[x=group, y=dsh, y error minus=dsh_lo, y error plus=dsh_hi] {figures/src/data/benchmark-v47-ci.dat};
 \legend{OpenTrading, OpenCode, DSH}
 \end{axis}
 \end{tikzpicture}
