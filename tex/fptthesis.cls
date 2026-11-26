@@ -192,6 +192,10 @@
 \setlength\textfloatsep{18bp plus 2bp minus 2bp}
 \setlength\floatsep{18bp plus 2bp minus 2bp}
 \setlength\intextsep{18bp plus 2bp minus 2bp}
+% [H]: same gap above and below; the paragraph after the float adds \parskip itself
+\renewcommand\float@endH{\@endfloatbox\vskip\intextsep
+  \if@flstyle\setbox\@currbox\float@makebox\columnwidth\fi
+  \box\@currbox\vskip\glueexpr\intextsep-\parskip\relax}
 \renewcommand\topfraction{.85}\renewcommand\bottomfraction{.7}
 \renewcommand\textfraction{.1}\renewcommand\floatpagefraction{.75}
 
@@ -278,7 +282,8 @@
 \newcounter{fpt@members}
 % \ThesisMember{full name}{roll number}{student code}
 \newcommand\ThesisMember[3]{\stepcounter{fpt@members}%
-  \csgdef{fpt@member@\arabic{fpt@members}}{#1 #2 #3}%
+  \csgdef{fpt@memberroll@\arabic{fpt@members}}{#2}%
+  \csgdef{fpt@membercode@\arabic{fpt@members}}{#3}%
   \csgdef{fpt@membername@\arabic{fpt@members}}{#1}}
 % value that the group still has to confirm: red in drafts, build error in final mode
 \newcommand\TBC[1]{\ifthesisfinal
@@ -305,6 +310,7 @@
 \newcommand\fpt@vline[3]{\put(#1,-#2){\rule{0.48bp}{#3bp}}}
 \newcommand\SchoolCover{%
   \clearpage\thispagestyle{empty}\null
+  \begingroup\fpt@cal{11}{\fpt@measuremembers}\endgroup
   \AddToShipoutPictureBG*{\AtPageUpperLeft{\setlength\unitlength{1bp}%
     \begin{picture}(0,0)
       \fpt@left{97.72}{137.68}{\includegraphics[width=110.75bp,height=43.19bp]{\fpt@logoschool}}
@@ -331,7 +337,15 @@
       \fpt@center{307.05}{748.2}{\fpt@cal{14}{- Hanoi, \fpt@get{coverdate} -}}
     \end{picture}}}%
   \clearpage}
-\newcommand\fpt@memberline[1]{\ifcsdef{fpt@member@#1}{\csuse{fpt@member@#1}}{}}
+% members in three columns: name, roll number, student code (the template only has one line per member)
+\newlength\fpt@namewd\newlength\fpt@rollwd
+\newcommand\fpt@widest[2]{\settowidth\fpt@w{\csuse{#2}}\ifdim\fpt@w>#1\global#1=\fpt@w\fi}
+\newcommand\fpt@measuremembers{%
+  \@for\fpt@i:=1,2,3,4\do{%
+    \fpt@widest\fpt@namewd{fpt@membername@\fpt@i}\fpt@widest\fpt@rollwd{fpt@memberroll@\fpt@i}}}
+\newcommand\fpt@memberline[1]{\ifcsdef{fpt@membername@#1}{%
+  \makebox[\fpt@namewd][l]{\csuse{fpt@membername@#1}}\hspace{16bp}%
+  \makebox[\fpt@rollwd][l]{\csuse{fpt@memberroll@#1}}\hspace{16bp}\csuse{fpt@membercode@#1}}{}}
 \newcommand\fpt@logoschool{logos/fpt-education.png}
 \newcommand\fpt@logoteacher{logos/fpt-university.png}
 
