@@ -21,7 +21,6 @@ This section gives the basic information of the project and an overview of its p
     Supervisor & \ThesisGet{supervisor}\\
     Members & Đoàn Duy Long (HE190352, leader), Đoàn Minh Hiếu (HE190214), Trần Huy Tuấn (HE190554), Hoàng Hiếu Trung (HE191136)\\
     Keywords & \ThesisGet{keywords}\\
-    Products & OpenTrading (harness), opentrading-mcp (market-data server), opentrading-benchmark (evaluation)\\
     \bottomrule
   \end{tabularx}
   \fignote{Source: the group.}
@@ -31,26 +30,21 @@ This section gives the basic information of the project and an overview of its p
 OpenTrading is a harness for financial analysis and market research on Vietnamese equities.
 A harness is the program around a large language model (LLM) that decides what the model sees, what it may do, and when its answer counts as finished.
 The group does not train a model; the user connects a model from a provider of their choice.
-
 The project consists of three products.
 OpenTrading is the harness: a terminal program that runs the agent loop, the tools and the checks on figures.
 opentrading-mcp is a market-data server that offers its data tools through the Model Context Protocol (MCP), an open standard for connecting models to tools and data \parencite{anthropic2024introducing}.
 opentrading-benchmark compares OpenTrading with two general-purpose harnesses on the same model, data and scoring.
 
-\Cref{ch:management} describes how the work was managed, and \cref{ch:existing} reviews existing studies and systems.
-\Cref{ch:methodology} explains the methods, \cref{ch:design} the design and implementation, and \cref{ch:results} the results.
-\Cref{ch:conclusion} concludes the report.
+The report then covers the management of the work (\cref{ch:management}), existing systems (\cref{ch:existing}), the methods (\cref{ch:methodology}), the design (\cref{ch:design}), the results (\cref{ch:results}) and the conclusion (\cref{ch:conclusion}).
 
 \section{Project Background}\label{sec:background}
 Large language models have moved from answering questions to taking actions.
 An agent plans, calls tools, reads their results and decides the next step in a loop \parencite{xi2025rise,sapkota2026agents}.
 Harnesses for software engineering have shown that the program around the model shapes what an agent can achieve \parencite{yang2024sweagent,wang2025openhands}.
-
 Finance has followed with models trained on financial text \parencite{wu2023bloomberggpt,yang2023fingpt} and with surveys of their use \parencite{li2023large}.
 Financial analysis, however, rests on figures.
 A price, a ratio or a growth rate is either right or wrong, and the reader must be able to trace it to a source.
 Studies report that language models still invent financial figures \parencite{kang2023deficiency} and fall short of human experts in multi-step reasoning over financial reports \parencite{chen2021finqa,zhu2021tatqa}.
-
 Vietnamese financial data follows local accounting standards that general tools do not handle well \parencite{nguyen2025finstat2sql}.
 The group chose this topic because it lies where these trends meet: an agent that reads Vietnamese market data and answers only with figures it has fetched.
 
@@ -65,42 +59,20 @@ It has three objectives, ordered by weight.
   \item Evaluation: compare the harness with two general-purpose harnesses on the same model, data and scoring.
   Measure: a comparison on the same tasks whose differences are tested with an exact sign test and reported with time and cost.
 \end{enumerate}
-\Cref{ch:results} reports how far each objective was met.
 
 \section{Problem Statement}\label{sec:problem}
 A general agent is not enough for financial analysis, for three reasons.
-
-First, models invent figures.
-With a retrieval system, a strong model answered wrongly or refused \qty{81}{\percent} of questions on public company filings \parencite{islam2023financebench}, and hallucination remains serious in financial tasks \parencite{kang2023deficiency,huang2025hallucination}.
-
-Second, models calculate poorly when they reason in words.
-Writing the computation as a program gives more reliable results \parencite{chen2023program}.
-
-Third, data sources fail, and a general agent cannot tell a failure from a valid result.
-An outage, an expired data library or a stale price returns something that looks like data; the group met each of these during the project (\cref{sec:risk}).
-
-The impact is direct: an investor who acts on an invented price or a wrong ratio can lose money.
-The challenge is therefore not a stronger model but a harness that traces every figure to a tool result, runs arithmetic as commands and reports missing data as missing.
+First, models invent figures: with a retrieval system, a strong model answered wrongly or refused \qty{81}{\percent} of questions on public company filings \parencite{islam2023financebench}, and hallucination remains serious in financial tasks \parencite{kang2023deficiency,huang2025hallucination}.
+Second, models calculate poorly when they reason in words, and writing the computation as a program gives more reliable results \parencite{chen2023program}.
+Third, data sources fail, and a general agent cannot tell a failure from a valid result; the group met outages, an expired data library and stale prices during the project (\cref{sec:risk}).
+An investor who acts on a wrong figure can lose money, so the challenge is not a stronger model but a harness that traces every figure to a tool result, runs arithmetic as commands and reports missing data as missing.
 
 \section{Significance of the Project}\label{sec:significance}
-In theory, the project gives a controlled comparison in which only the harness changes, while the model, the data snapshot and the scoring stay the same.
-Such a comparison shows which parts of an agent's result come from the harness rather than from the model; \cref{ch:results} reports what it found, including where the harnesses tied.
-
-In practice, the project gives Vietnamese retail investors a research assistant whose figures can be checked against their sources.
-The harness is released under the Apache 2.0 licence and works with free model tiers.
+In theory, the project gives a controlled comparison in which the model, the data snapshot and the scoring stay the same, which shows which parts of an agent's result come from the harness (\cref{ch:results}).
+In practice, it gives Vietnamese retail investors a research assistant whose figures can be checked against their sources, released under the Apache 2.0 licence and usable with free model tiers.
 
 \section{Project Scope \& Limitations}\label{sec:scope}
-The project covers a research assistant that runs in a terminal for one user on one machine.
-It analyses Vietnamese equities, with selected global market and macroeconomic data.
-Its tools only read data unless the user allows more.
-
-The project does not place orders: no built-in tool can trade.
-It does not manage portfolios, train models, offer a web interface or serve many users.
-When the user asks for one, OpenTrading may give a buy, hold or sell recommendation based on the figures of its tools; it places no order, the user makes the decision, and its README states that it is not an investment advisory service.
-
-The project has four limitations.
-It depends on external data providers and on a data server hosted on a free plan.
-Free model tiers allow few requests per day.
-On Windows, shell commands are not isolated from the rest of the system.
+The project covers a research assistant that runs in a terminal for one user on one machine and analyses Vietnamese equities, with selected global market and macroeconomic data; its tools only read data unless the user allows more, and none can place an order.
+It does not manage portfolios, train models or serve many users; when asked, it may give a buy, hold or sell recommendation from the figures of its tools, and the user decides (\cref{sec:ethics}).
+Its limitations are that it depends on external data providers and a free-plan data server, free model tiers allow few requests per day, shell commands are not isolated on Windows, and each benchmark task ran once per harness.
 %% Evidence: E37.
-Finally, each harness ran every task of the benchmark only once, so the stability of its answers is not measured (\cref{ch:results}).

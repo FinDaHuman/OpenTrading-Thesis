@@ -6,13 +6,7 @@ The objectives in \cref{sec:objective} are turned here into three research quest
 Each RQ states what is measured and where it is answered, so that \cref{sec:summary} can answer them one by one.
 \begin{description}
   \item[RQ1.~] Which parts must a harness add around a language model so that its financial analysis stays grounded in tool data, follows the constraints that the investor has stated and keeps actions under the user's control?
-  Each part of the design in \cref{sec:algorithm} and \cref{ch:design} serves one of these aims.
-  The grounding rules ask the model to take every figure from a tool, and figure tracing compares the figures of an answer with the numbers that the model has read.
-  Memory brings the investor's constraints into every turn, for the main agent and for every sub-agent.
-  The permission gate decides which actions need the user's approval.
-  The automated tests check that each of these rules does the job it was designed for (\cref{sec:testing}).
-  The benchmark measures the first aim: the secondary metrics of \cref{sec:metrics} count answers rejected for a figure outside the tolerance, figures given on tasks that should have been refused, and trials that end without an answer.
-  Its memory group, run with the notebook of OpenTrading switched on, also measures the second aim: whether an answer follows the rules that the user gave in an earlier session (\cref{sec:harness-difference}).
+  The parts are the rules of \cref{sec:algorithm}, checked by automated tests (\cref{sec:testing}); the benchmark measures the first two aims through its secondary metrics and its memory group (\cref{sec:metrics}).
   \item[RQ2.~] How should a market-data server return its results so that the agent knows the unit, the source and the availability of each figure?
   The measure is whether every tool of the data server replies in one shape that states whether the data is available and where and when it was taken.
   A contract check calls the tools of the server with live data and checks this shape, and a test checks that a listed set of tools that return prices or amounts of money state their units.
@@ -21,10 +15,7 @@ Each RQ states what is measured and where it is answered, so that \cref{sec:summ
   The measures are accuracy with confidence intervals, a sign test on paired results for the same tasks, and the time and cost of each trial (\cref{sec:metrics}).
   The answer is given in \cref{sec:results}.
 \end{description}
-RQ1 is the main question, as it matches the objective with the largest weight.
-Tests show that a rule does what it was designed to do, but they do not show that the rule improves the answers.
-RQ3 checks this second point by comparing the answers of OpenTrading with those of the other harnesses.
-The questions do not ask whether the analysis leads to profitable trades.
+RQ1 is the main question, as it matches the objective with the largest weight; RQ3 checks what tests cannot, whether the rules improve the answers.
 The harness is judged on whether its figures and conclusions match the data, not on market returns.
 
 \section{Data Collection and Preprocessing}\label{sec:data}
@@ -218,10 +209,7 @@ A stricter optional policy for automated use adds one round of correction and ch
 \subsection{Memory}\label{sec:memory}
 An assistant for investment analysis has to keep what the investor has said across sessions: their rules, such as not trading on margin, their view on a subject and the lessons they have drawn.
 The model keeps nothing from one session to the next, so the harness has to supply this text again.
-Several systems in the literature let the agent write its own memory.
-MemGPT moves text between tiers of memory in the way an operating system pages memory \parencite{packer2023memgpt}, and Generative Agents record every experience as a memory entry and later combine entries into reflections \parencite{park2023generative}.
-Reflexion stores verbal reflections in an episodic memory \parencite{shinn2023reflexion}, and A-MEM lets the agent organise and link its own notes \parencite{xu2025amem}.
-\textcite{sumers2024cognitive} separate working memory from long-term memory, and \textcite{zhang2025survey} survey the memory mechanisms of agents built on LLMs.
+Several systems in the literature let the agent write its own memory, from tiers of memory paged like an operating system \parencite{packer2023memgpt} to stored experiences and reflections \parencite{park2023generative,shinn2023reflexion} and notes that the agent links itself \parencite{xu2025amem}; surveys separate working from long-term memory \parencite{sumers2024cognitive,zhang2025survey}.
 OpenTrading makes the opposite choice: only the user can make a memory entry take effect, and the model can only propose one.
 A rule in memory steers the answers that follow, so if the agent could write memory, text from a web page, a tool result or a sub-agent could become a rule.
 A quotation of the user on a suggestion card only proves that the user typed something; it does not prove that a rule worded by the model is theirs.
@@ -286,18 +274,9 @@ The index marks a thesis that is refuted or closed, so that it is not taken as s
 \end{algorithm}
 %% Evidence: E49.
 
-In line 7, a subject can also be marked so that it matches only when the message writes its name in capitals.
-The memory budget depends on the model tier: \num{1000}, \num{700} or \num{300} tokens for a context of at least \num{200000} tokens, from \num{64000} to below \num{200000}, or below \num{64000} (tiers A, B and C).
-The index and the recalled lines are sized to this budget at about four characters per token, with a common ceiling of \num{4000} characters; an index entry that does not fit is left out whole and a recalled line that does not fit is replaced by a pointer, so nothing is cut.
+The memory budget of line 10 depends on the context size of the model: \num{1000}, \num{700} or \num{300} tokens for at least \num{200000} tokens, at least \num{64000}, or less; an entry that does not fit is left out whole or replaced by a pointer, so nothing is cut.
 %% Evidence: E49.
-Constraints have no budget and are never cut; if the model is too small to hold all of them with room for an answer, the harness does not send the request, which is line 3 of \cref{alg:memory-turn}.
-Suggestion cards are switched off for models of tier C.
-
-Constraints, theses and lessons have immutable versions, and an edit is compared with the version that the form read (compare-and-swap), so an edit made from an outdated form does not overwrite a newer version.
-The version number of a thesis never decreases, even when the thesis is deleted and written again, so that an old reference never points to new content.
-A decision can record the version of the thesis that it relied on, and it always records which set of constraints was in force.
-Deletion is logical: the content is cleared and the identifier is never reused, and the harness does not promise physical deletion, because backups and text already sent to the model provider are out of its reach.
-The harness reports an entry as deleted only when the store can show that it is, and the masking step of \cref{sec:memory-flow} then hides it in the conversation history.
+Edits are checked against the version that the form read, so an outdated form cannot overwrite a newer entry, and deletion is logical (\cref{sec:ethics}).
 
 \subsection{Permissions and Safe Execution}\label{sec:permissions}
 An agent that can write files and run commands can also do harm.
@@ -327,12 +306,8 @@ The user may allow a key file or a repeated call for the whole session, and the 
 For shell commands this check reads only the text of the command, so it can miss some cases.
 When no user is present, a call that needs approval is refused.
 
-In the auto mode the reviewing model first answers only whether to block an action.
-It looks more closely only if this first answer is to block, or cannot be read.
-It is given the user's messages and the agent's actions but not the results of tools, because text planted in web pages or data could otherwise persuade it \parencite{greshake2023injection}.
-This protection is not complete, since reports of background agents can also reach it.
-One rule was written for finance: by default the reviewer is told to block an order or a transfer of money even if the user asks for it.
-After three blocks in a row, or when the reviewer gives no answer, the user decides.
+In the auto mode the reviewing model sees the user's messages and the agent's actions but not the results of tools, because text planted in web pages or data could otherwise persuade it \parencite{greshake2023injection}.
+By default it blocks an order or a transfer of money even if the user asks for it, and after three blocks in a row, or when it gives no answer, the user decides.
 
 Such a reviewer makes mistakes.
 \textcite{anthropic2026auto} reported that the reviewer in their own product missed 17\% of 52 real actions that went beyond the request; this rate cannot be assumed for OpenTrading.
@@ -372,13 +347,9 @@ Reports pass from one agent to the next as evidence to weigh, not as instruction
 
 Two results are computed in code.
 In the screening and sector tasks, agents give each company four scores from 0 to 10, for quality, valuation, growth and financial health, and the company starts from their mean, in which a criterion stressed by the user counts twice.
-Scores of 8, 6, 7 and 9 with a stress on valuation, for example, give $(8+2\cdot 6+7+9)/5=7.2$.
-With more than ten companies this value is averaged with one computed from seven financial ratios, and in larger screening runs agents that challenge the ranking can move a leader by up to three points.
+With more than ten companies this value is averaged with one computed from seven financial ratios.
 
-In the fact check, a claim counts as correct or wrong only if more than half of all votes say so.
-A vote that failed stays in the total but never counts as \enquote{wrong}, so a failed agent alone cannot make a claim wrong.
-
-The debate follows the bull and bear researchers of TradingAgents \parencite{xiao2024tradingagents}.
+In the fact check, a claim counts as correct or wrong only if more than half of all votes say so, and a failed vote never counts as \enquote{wrong}; the debate follows the bull and bear researchers of TradingAgents \parencite{xiao2024tradingagents}.
 Because ultradesk may use many requests (\cref{tab:playbooks}), it runs only when the user asks for it or approves it.
 %% Evidence: E29.
 
@@ -508,61 +479,24 @@ This section describes the technologies behind each program, the stages in which
   \fignote{Source: the group, based on OpenTrading version 0.5.1 \parencite{group2026opentrading} and the source code of opentrading-mcp and opentrading-benchmark.}
 \end{table}
 
-The harness started on 12 September 2026 as a Python scaffold.
-A planning document had recommended Rust for the core and the terminal interface.
-On 27 September the group chose TypeScript on Bun for both instead, so that the part that runs on every turn, namely the agent loop, the model providers and the interface, stays in one language.
-OpenTUI ships prebuilt binaries for Windows, macOS and Linux, and the AI SDK provides packages for many model providers.
+The harness started on 12 September 2026 as a Python scaffold, and a planning document had recommended Rust; on 27 September the group chose TypeScript on Bun instead, so that the agent loop, the model providers and the interface stay in one language, with prebuilt terminal binaries for three operating systems.
 Quantitative libraries and Vietnamese market data are available mainly in Python, so they live in the data server, whose tools the harness calls through MCP.
 %% Evidence: E50.
 
 \subsection{Stages of the Harness}\label{sec:stages}
-The harness was built in the stages shown in \cref{tab:releases}, each closed by a release.
-
-\begin{table}[H]
-  \centering
-  \caption{Releases of OpenTrading and what each added to the method}\label{tab:releases}
-  \begin{tabularx}{\textwidth}{@{}l l L@{}}
-    \toprule
-    {Version} & {Date (2026)} & {Added to the method}\\
-    \midrule
-    0.1.0 & 22 October & Rewrite in TypeScript, not published: agent loop with tool search and compaction, MCP client, skills, investor profile, a first memory, sub-agents and ultradesk, permission modes\\
-    \addlinespace[2pt]
-    0.2.1 & 23 October & First public release, installable without Bun\\
-    \addlinespace[2pt]
-    0.3.0 & 31 October & Checks so that a turn ends with an answer or a statement that there is none; auto mode reviewed end to end\\
-    \addlinespace[2pt]
-    0.3.1 & 3 November & Fixes from the group's test reports\\
-    \addlinespace[2pt]
-    0.4.0 & 8 November & Mode without a user for the benchmark; calculation tool that checks units; the notebook memory\\
-    \addlinespace[2pt]
-    0.5.0 & 24 November & Text for the model in English and shorter requests; arithmetic through the shell instead of the calculation tool; data results as files; a stricter auto mode\\
-    \addlinespace[2pt]
-    0.5.1 & 25 November & The model may recommend buying, holding or selling when asked, with the reasoning based on tool figures; no order is ever placed and the user decides; the version described in this report\\
-    \bottomrule
-  \end{tabularx}
-  \fignote{Source: the group, based on the release notes of OpenTrading \parencite{group2026opentrading}.}
-\end{table}
+The harness was built in stages, each closed by a release.
+Version 0.1.0 (22 October 2026, not published) rewrote the harness in TypeScript with the agent loop, tool search, compaction, the MCP client, skills, a first memory, sub-agents, ultradesk and the permission modes.
+Version 0.2.1 (23 October) was the first public release, and version 0.3.0 (31 October) added the checks that make a turn end with an answer or a statement that there is none.
+Version 0.4.0 (8 November) added the mode without a user for the benchmark and the notebook memory, and version 0.5.0 (24 November) shortened the requests and replaced the calculation tool with arithmetic in the shell (\cref{sec:figure-tracing}).
+Version 0.5.1 (25 November), the version described in this report, lets the model recommend buying, holding or selling when asked.
 %% Evidence: E50.
-
-The order follows the method.
-The loop, the access to data and the permissions came first, because the other rules run inside them.
-Rules prompted by real use came next, such as the checks that make a turn end with an answer or a statement that there is none.
-The mode without a user came before the benchmark, so that the benchmark drives the same agent loop as the terminal.
-The last stage reduced the cost of each request and replaced the calculation tool with arithmetic in the shell (\cref{sec:figure-tracing}).
+The loop, the access to data and the permissions came first, because the other rules run inside them; the mode without a user came before the benchmark, so that the benchmark drives the same agent loop as the terminal.
 
 \subsection{From a Problem to a Release}\label{sec:workflow}
-A rule of \cref{sec:algorithm} typically goes through the following steps.
-Since 14 November 2026, problems found in use or in test reports have been opened as issues on GitHub.
-Choices with lasting effect are written as short decision records with their reason, such as the accepted choice of language and the proposed rules of memory.
+Since 14 November 2026, problems found in use or in test reports have been opened as issues on GitHub, and choices with lasting effect are written as short decision records with their reason.
 %% Evidence: E50.
-The rule is then written as code in the harness core, which does not depend on the interface, so the terminal and the benchmark run the same loop (\cref{sec:architecture}).
-The rules are covered by tests in which a simulated model returns scripted answers, including broken ones.
-Changes normally reach the main branch through pull requests that pass the automated checks on Ubuntu and Windows and a scan for secrets (\cref{sec:quality,sec:testing}).
-A release workflow then builds the installable versions and checks that they install (\cref{sec:release}).
-The data server follows its own cycle, because the harness depends on it only through MCP.
-
+A rule is then written as code in the harness core, which does not depend on the interface (\cref{sec:architecture}), covered by tests with a simulated model, and merged through a pull request that passes the automated checks (\cref{sec:quality,sec:testing}); a release workflow then builds and checks the installable versions (\cref{sec:release}).
 The method as a whole is checked in the two steps set out in \cref{sec:rq}: tests for each rule, and the benchmark for the answers.
-The benchmark of \cref{ch:results} measures a fixed build of the harness on a frozen copy of the data.
 
 \section{Ethical Considerations}\label{sec:ethics}
 OpenTrading produces analysis that a user may act on with real money, so its main ethical risks are a recommendation that is wrong or misread, the exposure of private data, and a biased comparison with other harnesses.
@@ -571,33 +505,10 @@ The six subsections below take these issues in turn.
 \subsection{Financial Recommendations}
 Since version 0.5.1, the harness may give a buy, hold or sell recommendation when a question calls for one; this replaced an earlier ban on recommendations.
 The system prompt states that the user always makes the final decision.
-When the user asks it to choose, a neutral comparison does not answer the question, so the system prompt tells the model to give the choice itself, together with the reason, the main risks and what would make the call wrong.
-\Cref{tab:recommendation-rules} summarises how the system prompt treats the situations that arise.
-
-\begin{table}[H]
-  \centering
-  \caption{How the system prompt handles recommendations}\label{tab:recommendation-rules}
-  \begin{tabularx}{\textwidth}{@{}L L@{}}
-    \toprule
-    {Situation} & {What OpenTrading does}\\
-    \midrule
-    The question calls for a call & Gives buy, hold or sell with the reason, the main risks and what would make it wrong\\
-    \addlinespace[2pt]
-    The user asks it to choose (one ticker, yes or no, what it would do in the user's place, portfolio picks) & Fetches the data, then gives the choice itself, within the user's risk tolerance, horizon and constraints\\
-    \addlinespace[2pt]
-    Data is missing or too thin & Says so instead of picking\\
-    \addlinespace[2pt]
-    The user has ruled out recommendations in a profile or constraint & Gives none\\
-    \addlinespace[2pt]
-    Target price, buy or sell zone, entry point or stop-loss & Derives it only from tool figures of the conversation, with the method and what would invalidate it, otherwise gives none; a brokerage's target is quoted with its source\\
-    \addlinespace[2pt]
-    Views on future prices & Gives scenarios with their assumptions, the conditions that make them wrong, the risks, and a high, medium or low likelihood with a reason\\
-    \addlinespace[2pt]
-    Requests to place an order, manipulate prices, trade on inside information, spread rumours or evade regulations & Refuses; no order is placed\\
-    \bottomrule
-  \end{tabularx}
-  \fignote{Note: summarised from the system prompt of the harness. Source: the group, based on OpenTrading version 0.5.1 \parencite{group2026opentrading}.}
-\end{table}
+When the user asks it to choose, the system prompt tells the model to fetch the data and give the choice itself, within the user's risk tolerance, horizon and constraints, together with the reason, the main risks and what would make the call wrong.
+It says so instead of picking when data is missing or too thin, and gives no call when the user has ruled out recommendations.
+A target price, a buy or sell zone or a stop-loss is derived only from tool figures of the conversation, with the method, and views on future prices are given as scenarios with a likelihood (\cref{sec:grounding-rules}).
+Requests to place an order, manipulate prices, trade on inside information, spread rumours or evade regulations are refused.
 
 These rules are instructions to a model, not guarantees, and a model may fail to follow them.
 Two safeguards do not depend on the model: the harness has no tool that places an order, and every tool call passes the permission gate of \cref{sec:permissions}.
@@ -607,10 +518,7 @@ The README of the harness states that it is research software, not an investment
 OpenTrading therefore offers analysis to support a decision, and the user remains responsible for the decision.
 
 \subsection{Accuracy}
-The grounding rules of \cref{sec:grounding-rules} tell the model to take every figure from a tool result in the same conversation and, when data is missing, to say which part is missing instead of estimating it, because a wrong number can cost the user real money.
-Data such as regulations, trading calendars and financial statements can be out of date, so the prompt asks the model to state the date of the data and to suggest checking the official source.
-Figure tracing checks the numbers in an answer against the numbers the model has read (\cref{sec:figure-tracing}).
-This check confirms that a figure matches the data, not that the data is right: a data provider can still supply a wrong value.
+The grounding rules (\cref{sec:grounding-rules}) and figure tracing (\cref{sec:figure-tracing}) check that a figure matches the data, not that the data is right: a data provider can still supply a wrong value, so the prompt asks the model to state the date of data that may be out of date and to suggest checking the official source.
 The benchmark also shows that the harness still answers part of its tasks wrongly (\cref{ch:results}).
 
 \subsection{Privacy and Security}
@@ -623,18 +531,14 @@ The question, the tool results and the part of memory placed in the prompt are s
 Web searches go to an outside search service: DuckDuckGo by default, or a search service whose key the user has set; sending them to two further hosted search servers is switched off by default.
 A query can reveal to these services which tickers the user is interested in.
 
-The memory store, whose flow is described in \cref{sec:memory-flow}, rejects text that has the shape of a known API key or a private key.
-Its error message does not repeat the text the user has just typed, a write command leaves only its name in the input history, and the investor's decisions are not sent to the model.
-Deleting a memory entry is a logical delete that only reduces the traces on disk.
-Backups and content already sent to a provider are out of the harness's reach, so the interface does not promise physical deletion.
+The memory store rejects text that has the form of a known key (\cref{sec:memory-flow}), and the investor's decisions are not sent to the model.
+Deleting a memory entry is a logical delete; backups and content already sent to a provider are out of the harness's reach, so the interface does not promise physical deletion.
 
 \subsection{Fairness of the Comparison}
 The group built both OpenTrading and the benchmark that compares it with other harnesses, which creates a risk of bias.
-To limit it, the three harnesses are run with the same model, the same data and the same scoring (\cref{sec:rq}), following the design of \cref{sec:validation}; for 119 tasks, however, the answers of the other two harnesses come from an earlier run with older versions of those harnesses (\cref{sec:threats}).
-%% Evidence: E15, E16.
-The memory group was designed around what OpenTrading can do: OpenTrading received the user's rules from its memory store, while OpenCode could only resume the earlier session and DSH could resume it and search past sessions, so the results of this group favour OpenTrading and are reported with that limitation (\cref{sec:threats}).
-The results include ties and losses as well as wins: on compute, lookup and robustness tasks the three harnesses were within three tasks of each other, and each of the other harnesses answered six tasks that OpenTrading did not (\cref{sec:accuracy}).
-%% Evidence: E45.
+To limit it, the three harnesses were run with the same model, the same data and the same scoring (\cref{sec:validation}), and the results report ties and losses as well as wins (\cref{sec:accuracy}).
+The memory group was designed around what OpenTrading can do, and 119 answers of the other two harnesses come from an earlier run; both limits are discussed in \cref{sec:threats}.
+%% Evidence: E15, E16, E45.
 
 \subsection{Data Licences}
 The harness is released under the Apache 2.0 licence and the data server under the MIT licence.
@@ -650,6 +554,4 @@ The group used AI tools, namely Claude Code from Anthropic and OpenAI Codex and 
 People checked this code through pull requests: in the harness repository, the main branch requires a pull request with one approval and passing continuous integration, which runs the automated tests and a scan for secrets (\cref{sec:implementation-plan}).
 Administrators can bypass these rules.
 %% Evidence: E35.
-Errors that were found were tracked as issues and fixed.
-These tools are distinct from the models that OpenTrading itself runs, which are the subject of the study rather than aids to it.
 The group is responsible for all code and text in the project.
