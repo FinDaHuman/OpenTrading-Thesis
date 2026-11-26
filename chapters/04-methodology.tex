@@ -564,4 +564,91 @@ The method as a whole is checked in the two steps set out in \cref{sec:rq}: test
 The benchmark of \cref{ch:results} measures a fixed build of the harness on a frozen copy of the data.
 
 \section{Ethical Considerations}\label{sec:ethics}
-\guide{Discuss ethical issues: data privacy, accuracy, fairness, data licences, responsible use of financial recommendations, and the use of AI tools in the project.}
+OpenTrading produces analysis that a user may act on with real money, so its main ethical risks are a recommendation that is wrong or misread, the exposure of private data, and a biased comparison with other harnesses.
+The six subsections below take these issues in turn.
+
+\subsection{Financial Recommendations}
+Since version 0.5.1, the harness may give a buy, hold or sell recommendation when a question calls for one; this replaced an earlier ban on recommendations.
+The system prompt states that the user always makes the final decision.
+When the user asks it to choose, a neutral comparison does not answer the question, so the system prompt tells the model to give the choice itself, together with the reason, the main risks and what would make the call wrong.
+\Cref{tab:recommendation-rules} summarises how the system prompt treats the situations that arise.
+
+\begin{table}[H]
+  \centering
+  \caption{How the system prompt handles recommendations}\label{tab:recommendation-rules}
+  \begin{tabularx}{\textwidth}{@{}L L@{}}
+    \toprule
+    {Situation} & {What OpenTrading does}\\
+    \midrule
+    The question calls for a call & Gives buy, hold or sell with the reason, the main risks and what would make it wrong\\
+    \addlinespace[2pt]
+    The user asks it to choose (one ticker, yes or no, what it would do in the user's place, portfolio picks) & Fetches the data, then gives the choice itself, within the user's risk tolerance, horizon and constraints\\
+    \addlinespace[2pt]
+    Data is missing or too thin & Says so instead of picking\\
+    \addlinespace[2pt]
+    The user has ruled out recommendations in a profile or constraint & Gives none\\
+    \addlinespace[2pt]
+    Target price, buy or sell zone, entry point or stop-loss & Derives it only from tool figures of the conversation, with the method and what would invalidate it, otherwise gives none; a brokerage's target is quoted with its source\\
+    \addlinespace[2pt]
+    Views on future prices & Gives scenarios with their assumptions, the conditions that make them wrong, the risks, and a high, medium or low likelihood with a reason\\
+    \addlinespace[2pt]
+    Requests to place an order, manipulate prices, trade on inside information, spread rumours or evade regulations & Refuses; no order is placed\\
+    \bottomrule
+  \end{tabularx}
+  \fignote{Note: summarised from the system prompt of the harness. Source: the group, based on OpenTrading version 0.5.1 \parencite{group2026opentrading}.}
+\end{table}
+
+These rules are instructions to a model, not guarantees, and a model may fail to follow them.
+Two safeguards do not depend on the model: the harness has no tool that places an order, and every tool call passes the permission gate of \cref{sec:permissions}.
+The evaluation set of the harness also holds ten red-team questions that grade these rules, such as forced choices, thin data, a ticker that does not exist, price manipulation, an order request and a target price.
+%% Evidence: E51.
+The README of the harness states that it is research software, not an investment advisory service, that its answers are written by AI models and may be wrong or out of date, and that the user alone is responsible for investment decisions.
+OpenTrading therefore offers analysis to support a decision, and the user remains responsible for the decision.
+
+\subsection{Accuracy}
+The grounding rules of \cref{sec:grounding-rules} tell the model to take every figure from a tool result in the same conversation and, when data is missing, to say which part is missing instead of estimating it, because a wrong number can cost the user real money.
+Data such as regulations, trading calendars and financial statements can be out of date, so the prompt asks the model to state the date of the data and to suggest checking the official source.
+Figure tracing checks the numbers in an answer against the numbers the model has read (\cref{sec:figure-tracing}).
+This check confirms that a figure matches the data, not that the data is right: a data provider can still supply a wrong value.
+The benchmark also shows that the harness still answers part of its tasks wrongly (\cref{ch:results}).
+
+\subsection{Privacy and Security}
+The data of the harness, including API keys, sessions, configuration and the memory store, is stored on the user's machine in its data folder.
+Where the operating system supports file permissions, the file of API keys is written so that only its owner can read it.
+Shell commands run by the agent receive an environment from which variables whose names mark them as keys or tokens have been removed, and reading a key file asks the user in every mode, or is refused when no user is present (\cref{sec:permissions}).
+
+Some data does leave the machine.
+The question, the tool results and the part of memory placed in the prompt are sent to the model provider that the user has chosen, and data requests go to the data server.
+Web searches go to an outside search service: DuckDuckGo by default, or a search service whose key the user has set; sending them to two further hosted search servers is switched off by default.
+A query can reveal to these services which tickers the user is interested in.
+
+The memory store, whose flow is described in \cref{sec:memory-flow}, rejects text that has the shape of a known API key or a private key.
+Its error message does not repeat the text the user has just typed, a write command leaves only its name in the input history, and the investor's decisions are not sent to the model.
+Deleting a memory entry is a logical delete that only reduces the traces on disk.
+Backups and content already sent to a provider are out of the harness's reach, so the interface does not promise physical deletion.
+
+\subsection{Fairness of the Comparison}
+The group built both OpenTrading and the benchmark that compares it with other harnesses, which creates a risk of bias.
+To limit it, the three harnesses are run with the same model, the same data and the same scoring (\cref{sec:rq}), following the design of \cref{sec:validation}; for 119 tasks, however, the answers of the other two harnesses come from an earlier run with older versions of those harnesses.
+%% Evidence: E15, E16.
+The memory group was designed around what OpenTrading can do: OpenTrading received the user's rules from its memory store, while OpenCode could only resume the earlier session and DSH could resume it and search past sessions, so the results of this group favour OpenTrading and are reported with that limitation (\cref{sec:threats}).
+The results include ties and losses as well as wins: on compute, lookup and robustness tasks the three harnesses were within three tasks of each other, and each of the other harnesses answered six tasks that OpenTrading did not (\cref{sec:accuracy}).
+%% Evidence: E45.
+
+\subsection{Data Licences}
+The harness is released under the Apache 2.0 licence and the data server under the MIT licence.
+Market data comes from third parties.
+Prices and indices of the Vietnamese exchanges come through the free tier of the vnstock library, which is downloaded from its provider's own package index rather than PyPI.
+Financial statements come from Vietstock through a paid API key.
+The other sources are public: Yahoo Finance through the yfinance library, DNSE and Binance for market prices, FRED and the World Bank for macroeconomic series, and GDELT for news events.
+The terms of each source govern how its data may be used, and the software licences give no right to the data itself.
+The group uses the data only to answer analysis questions and to build the frozen copy used by the benchmark, for research and study, and the system prompt asks the model to cite the source of its figures.
+
+\subsection{Use of AI Tools}
+The group used AI tools, namely Claude Code from Anthropic and OpenAI Codex and ChatGPT, mainly to write and fix the code of the harness, the data server and the benchmark.
+People checked this code through pull requests: in the harness repository, the main branch requires a pull request with one approval and passing continuous integration, which runs the automated tests and a scan for secrets (\cref{sec:implementation-plan}).
+Administrators can bypass these rules.
+%% Evidence: E35.
+Errors that were found were tracked as issues and fixed.
+These tools are distinct from the models that OpenTrading itself runs, which are the subject of the study rather than aids to it.
+The group is responsible for all code and text in the project.
