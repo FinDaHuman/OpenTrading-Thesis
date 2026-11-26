@@ -2,80 +2,45 @@
 \chapter{Methodology}\label{ch:methodology}
 
 \section{Research Questions and Objectives}\label{sec:rq}
-The objectives in \cref{sec:objective} are turned here into three research questions (RQs).
-Each RQ states what is measured and where it is answered, so that \cref{sec:rq-answers} can answer them one by one.
+The objectives in \cref{sec:objective} are turned into three research questions (RQs), each with its measure; \cref{sec:rq-answers} answers them.
 \begin{description}
   \item[RQ1.~] Which parts must a harness add around a language model so that its financial analysis stays grounded in tool data, follows the constraints that the investor has stated and keeps actions under the user's control?
   The parts are the rules of \cref{sec:algorithm}, checked by automated tests (\cref{sec:testing}); the benchmark measures the first two aims through its reliability measures (\cref{sec:metrics}) and its memory group (\cref{sec:validation}).
   \item[RQ2.~] How should a market-data server return its results so that the agent knows the unit, the source and the availability of each figure?
-  The measure is whether every tool of the data server replies in one shape that states whether the data is available and where and when it was taken.
-  A contract check calls the tools of the server with live data and checks this shape, and a test checks that each tool on a list of tools returning prices or amounts of money states its units.
-  The answer is given in \cref{sec:tool-exposure}.
+  The measure is whether every tool replies in one shape that states availability, source and time, as checked by a contract check with live data and by a test of the stated units of price tools; the answer is in \cref{sec:tool-exposure}.
   \item[RQ3.~] With the same model and the same data, does OpenTrading answer more financial tasks correctly than two general-purpose harnesses, OpenCode and DeepSeek Harness, and at what cost?
-  The measures are accuracy with confidence intervals, a sign test on paired results for the same tasks, and the time and cost of each trial (\cref{sec:metrics}).
-  The answer is given in \cref{sec:results}.
+  The measures are accuracy with confidence intervals, a sign test on paired results, and time and cost (\cref{sec:metrics}); the answer is in \cref{sec:results}.
 \end{description}
 RQ1 is the main question, as it matches the objective with the largest weight; RQ3 checks what tests cannot, whether the rules improve the answers.
 The harness is judged on whether its figures and conclusions match the data, not on market returns.
 
 \section{Data Collection and Preprocessing}\label{sec:data}
-OpenTrading does not store market data itself.
-It reads the data through MCP (\cref{sec:project-overview}) from the group's data server \enquote{opentrading-mcp}, which offers \num{175} tools \parencite{group2026opentradingmcp}.
+OpenTrading does not store market data; it reads it through MCP (\cref{sec:project-overview}) from the group's data server \enquote{opentrading-mcp}, which offers \num{175} tools \parencite{group2026opentradingmcp}.
 %% Evidence: E12.
 The data comes from the following sources: prices and indices of the Vietnamese exchanges through the free tier of the \enquote{vnstock} library, financial statements from \enquote{Vietstock} through a paid API key, global indices and commodities from \enquote{Yahoo Finance}, market data from \enquote{DNSE}, crypto-assets from \enquote{Binance}, macroeconomic series from \enquote{FRED} and the \enquote{World Bank}, and news events from \enquote{GDELT}.
 
 The providers disagree on units, periods and dates, so the data is cleaned by four rules before the model reads it:
 \begin{enumerate}
-  \item Results of price tools state the units of their numbers, where the units have been checked.
-  One provider gives Vietnamese share prices in thousands of đồng and another in đồng, and an early version of OpenTrading labelled a price in thousands of đồng as đồng, a reading \num{1000} times too small.
+  \item Results of price tools state the units of their numbers, where the units have been checked, since one provider gives Vietnamese share prices in thousands of đồng and another in đồng; an early version of OpenTrading read such a price \num{1000} times too small.
 %% Evidence: E64.
   \item Reporting periods are given in one order, from oldest to newest, and a price bar without a date is dropped, so no date is invented.
   \item Missing data is reported as missing, with a reason, rather than filled with an estimate.
-  \item Statistics of sector cycles, which are computed over today's listed companies, warn that companies which left the market are not included, a bias known as survivorship bias.
+  \item Statistics of sector cycles warn that companies which left the market are not included (survivorship bias).
 \end{enumerate}
 
 \section{Algorithm Design}\label{sec:algorithm}
-The project does not train a model, so its algorithms are the rules of the harness.
-\Cref{tab:problems} lists the difficulties that these rules address, in the order in which they are described below; the sources report the difficulties but do not evaluate the rules.
-
-\begin{table}[H]
-  \centering
-  \caption{Difficulties of language-model agents and the rules of the harness}\label{tab:problems}
-  \begin{tabularx}{\textwidth}{@{}L L l@{}}
-    \toprule
-    {Difficulty} & {Reported by} & {Rule of the harness}\\
-    \midrule
-    Keeps making a call that fails & \textcite{qin2024toolllm} & Failure limits\\
-    Stops before the task is done & \textcite{anthropic2025harnesses} & Stop gate\\
-    Invents financial facts & \textcite{kang2023deficiency} & Grounding rules, figure tracing\\
-    Makes arithmetic mistakes & \textcite{gao2023pal} & Calculation by program\\
-    Must choose among many tools & \textcite{qin2024toolllm} & Tool search\\
-    Fills in wrong arguments & \textcite{yao2024taubench} & Validation of tool inputs\\
-    Lacks long-term memory & \textcite{packer2023memgpt} & Memory\\
-    Acts beyond the user's request & \textcite{anthropic2026auto} & Permission gate\\
-    Fills its context in a long task & \textcite{anthropic2025multiagent} & Sub-agents and ultradesk\\
-    \bottomrule
-  \end{tabularx}
-  \fignote{Source: the group, from the works cited in the table.}
-\end{table}
+The project does not train a model, so its algorithms are the rules of the harness, described below in the order in which they act in a turn.
+The works cited report the difficulties that the rules address; they do not evaluate the rules.
 
 \label{sec:agent-loop}
-OpenTrading handles each user message in one turn.
-During a turn the model reasons, calls tools and reads their results, a pattern known as ReAct \parencite{yao2023react}.
-One step of a turn is one request to the model together with the tool calls it makes.
-The basic loop comes from a library \parencite{vercelndloop}; the group added the rules shown in \cref{alg:turn}.
+OpenTrading handles each user message in one turn, in which the model reasons, calls tools and reads their results \parencite{yao2023react}; one step is one request to the model with the tool calls it makes, and the group added the rules of \cref{alg:turn} to a basic loop from a library \parencite{vercelndloop}.
 
-By default the main agent has no limit on steps, because a research question may need many tool calls.
-Three rules keep it from going round in circles.
-When four steps in a row contain failed calls and no successful one, the model is reminded of the failures, on the model interfaces that accept such reminders; after eight such steps, the tools are switched off for a step, so the model has to answer with what it has.
-When the model makes the same call with the same arguments three times in a row, the user is asked whether to go on.
-A data server whose connection fails three times in a row is not called for a minute, after which one call tests it; a failed tool or a timeout does not count, because it comes from a server that still works.
+By default the main agent has no limit on steps, because a research question may need many tool calls, so three limits stop a model that keeps making a failing call \parencite{qin2024toolllm}.
+After four steps in a row with only failed calls the model is reminded of the failures, and after eight the tools are switched off for one step, so the model has to answer with what it has; the same call made three times in a row goes to the user; and a data server whose connection fails three times in a row is not called for a minute.
+These thresholds are not user settings, and a small sweep on free models, run with OpenTrading's own test runner rather than the benchmark, gave no reason to change them.
 %% Evidence: E25, E26, E69.
-These thresholds of four, eight and three are not user settings; they can be changed only in OpenTrading's own test runner, which is separate from the benchmark of \cref{sec:validation} and records when each of them fires.
-In a small sweep on free models, the models gave up after at most three failed steps and an earlier reminder did not change their answers, so the thresholds were kept.
-%% Evidence: E69.
 
-\begin{algorithm}[H]
+\begin{algorithm}[htb]
   \caption{One turn of the agent loop}\label{alg:turn}
   \begin{algorithmic}[1]
     \Require message $m$; history $H$; tools; optional cap on steps or requests
@@ -93,12 +58,11 @@ In a small sweep on free models, the models gave up after at most three failed s
   \end{algorithmic}
 \end{algorithm}
 
-A model that stops calling tools has not always answered, and the stop gate looks for such endings.
-In one run recorded during development, a small model wrote a price-to-earnings ratio and a revenue under a source line although no tool had run.
-The stop gate consists of rules in code and asks no second model, so accepting an answer costs no extra request.
-Its ten cases fall into four groups, shown in \cref{tab:stop-gate}.
+A model that stops calling tools has not always answered \parencite{anthropic2025harnesses}, and the stop gate looks for such endings.
+In one run recorded during development, a small model wrote a price-to-earnings (P/E) ratio and a revenue under a source line although no tool had run.
+The stop gate consists of rules in code and asks no second model, so accepting an answer costs no extra request; its ten cases fall into the four groups of \cref{tab:stop-gate}.
 
-\begin{table}[H]
+\begin{table}[htb]
   \centering
   \caption{Cases of the stop gate}\label{tab:stop-gate}
   \begin{tabularx}{\textwidth}{@{}l L L@{}}
@@ -117,30 +81,23 @@ Its ten cases fall into four groups, shown in \cref{tab:stop-gate}.
   \fignote{Note: the model's task list does not count as a tool here. Source: OpenTrading version 0.5.1 \parencite{group2026opentrading}.}
 \end{table}
 
-A turn may be sent back at most twice in total, whatever the cases.
-If a tool has already returned something to answer from, an empty answer has an extra allowance of up to three in total, so a turn has at most five recoveries.
-If the text is still empty or only a repeat after that, the user is told that there is no answer.
-Any other answer is kept, with a warning if its figures are unsupported.
+A turn may be sent back at most twice in total, with up to three extra retries of an empty answer once a tool has returned data; after that the user is told that there is no answer, and any other answer is kept, with a warning if its figures are unsupported.
 The gate checks the form of an answer, not its truth.
 %% Evidence: E25.
 
 \label{sec:grounding-rules}
-The system prompt sets the grounding rules and the other rules that the model applies at every step, and OpenTrading puts them in a fixed order of priority.
-Core rules come first, then the working rules of the system, then the user's own request, and after it the default presentation, the investor profile, the active skill and memory.
-This order is an instruction in the prompt, not a check in the code: the prompt tells the model that a request of the user does not override a core rule.
+The system prompt sets the grounding rules in a fixed order of priority: core rules, then the working rules of the system, then the user's own request, then the default presentation, the investor profile, the active skill and memory; this order is an instruction to the model, not a check in the code.
 Two rules target the main risk of a financial assistant, a confident answer with a wrong number \parencite{kang2023deficiency}.
 First, every figure on prices, volumes, financial statements or the economy must come from a tool result in the same conversation; when data is missing, the model must say which part is missing instead of estimating it or using a figure it remembers.
 Second, a working rule tells the model not to calculate in its head but to run each calculation in the shell, as explained below.
 Views on the future must be given as scenarios, each with its assumptions, the conditions that would prove it wrong and a likelihood.
 
-The prompt is assembled from blocks rather than written as one text.
-Lines about some tools, such as the shell, are included only when that tool is available.
-The machine profile, used when another program rather than a person reads the answer, drops the guidance on style and follows the answer format that the calling program gives.
+The prompt is assembled from blocks, so lines about a tool appear only when that tool is available, and the machine profile, used when another program reads the answer, drops the guidance on style and follows the answer format that the program gives.
 
 \label{sec:figure-tracing}
 A financial answer cannot be trusted if its figures do not come from the data, so figure tracing compares the figures of an answer with the numbers that the model has read.
 A figure is traced if it equals one of these numbers after a change of scale and after rounding.
-Suppose that a tool returned a price-to-earnings ratio of 12.34.
+Suppose that a tool returned a P/E ratio of 12.34.
 An answer of 12.3 is traced, because the difference of 0.04 is below 0.05, half a unit of the last digit; an answer of 12.4 is not.
 
 In general, a figure $x$ written with $d$ decimals is traced when
@@ -149,55 +106,24 @@ In general, a figure $x$ written with $d$ decimals is traced when
   \qquad K=\{1,10^{\pm2},10^{\pm3},10^{\pm6},10^{\pm9}\}.
 \end{equation}
 Here $S$ is the set of numbers in the question, the memory notes and skills in use, the tool results and the earlier messages, and $K$ holds the scales for percentages, thousands, millions and billions.
-A figure that can be read in two ways, such as 16.800 in Vietnamese and in English notation, is traced if either reading is; amounts in \enquote{nghìn tỷ} (thousand billion) are converted to billions, together with the tolerance.
-Dates, whole numbers without a unit or separator, and figures marked as the model's own calculation are left out.
+A figure that can be read in two ways, such as 16.800 in Vietnamese and in English notation, is traced if either reading is, and dates, plain whole numbers and figures marked as the model's own calculation are left out.
 
-The result is used carefully, because a false alarm can spoil a correct answer.
-If no tool ran, untraced figures can make the stop gate send the answer back (\cref{tab:stop-gate}); if tools ran, they are only recorded.
-The harness thus cannot guarantee that every figure is correct: a figure may match by chance, and a correct figure may be used wrongly.
+Because a false alarm can spoil a correct answer, untraced figures make the stop gate send an answer back only if no tool ran (\cref{tab:stop-gate}); if tools ran, they are only recorded.
+Tracing cannot guarantee that a figure is correct: a figure may match by chance, and a correct figure may be used wrongly.
 %% Evidence: E27.
 
 Calculation by program is the next rule: LLMs make arithmetic mistakes even when their reasoning is right, and leaving the calculation to a program reduces them \parencite{gao2023pal}.
-The system prompt therefore asks the model to send calculations to the shell, the computer's command line.
-A command that contains only arithmetic normally runs without asking the user; it may use numbers, operators, a few mathematical functions and its own variables, but no files, loops or other programs.
-Since the model can still mistype an input, the harness looks for the typed numbers, apart from common constants, in what the model has read and can remind it of those it cannot find.
-On some model interfaces this reminder is not sent.
+The system prompt therefore asks the model to send calculations to the shell, where a command that contains only arithmetic (numbers, operators, a few functions and its own variables, but no files, loops or other programs) runs without asking the user; the harness also looks for the typed numbers in what the model has read and can remind it of those it cannot find.
 %% Evidence: E25, E27.
 
 \label{sec:tool-search}
-Tool search is needed because, with \num{175} data tools and the harness's own tools, sending every definition in every request would take a large share of the model's context and would make the model choose among many similar tools \parencite{qin2024toolllm}.
-OpenTrading therefore defers some tools: the model receives only their names, and it loads a tool through a search tool when it needs it, as \cref{alg:tool-search} shows.
-In the default mode, rarely used local tools are always deferred, and all deferrable tools are deferred once there are more than 40 tools or once their definitions would take more than \qty{10}{\percent} of the model's context.
-For sub-agents the rarely used local tools are not deferred, but the limits of 40 tools and \qty{10}{\percent} of the context still apply.
-
-\begin{algorithm}[H]
-  \caption{Ranking of deferred tools for a search query}\label{alg:tool-search}
-  \begin{algorithmic}[1]
-    \Require query $q$; deferred tools $D$, each with name, search hint, description and parameter names
-    \Ensure tools of $D$ ordered by relevance to $q$
-    \If{$q$ has the form \texttt{select:}$a,b,\dots$} \State \Return the tools named $a,b,\dots$ \EndIf
-    \State $W \gets$ words of $q$ with Vietnamese diacritics removed; words marked \texttt{+} are required
-    \State add to $W$ the English terms of every Vietnamese market phrase found in $q$, longest phrase first
-    \For{each tool $d \in D$}
-      \State $s_d \gets \sum_{w \in W}$ ( 12 if $w$ is a word of the name, else 6 if it is part of one;
-      \Statex \hspace{\algorithmicindent}\hspace{\algorithmicindent} $+4$ if in the search hint; $+2$ if in the description; $+2$ if a parameter name )
-      \If{a required word scores 0 for $d$} \State discard $d$ \EndIf
-    \EndFor
-    \State \Return at most 5 tools (by default) with $s_d>0$ and $s_d \ge \tfrac{1}{2}\max_{e\in D} s_e$, by decreasing $s_d$, then by name
-  \end{algorithmic}
-\end{algorithm}
-
-The weights favour the name of a tool because data servers name their tools by function, such as \texttt{vn\_quote\_history}.
-The table of Vietnamese phrases lets a question such as \enquote{lịch sử giá} (price history) find tools that are described in English.
-Partial matches are allowed only for words of three letters or more, because short Vietnamese words would otherwise match half of the catalogue.
+With \num{175} data tools and the harness's own tools, sending every definition in every request would take a large share of the model's context and make the model choose among many similar tools \parencite{qin2024toolllm}.
+OpenTrading therefore defers tools once there are more than 40 or once their definitions would take more than \qty{10}{\percent} of the context: the model then receives only their names and loads a tool through a search tool when it needs it.
+The search ranks tools by the words of the query, giving most weight to the tool's name and translating Vietnamese market phrases into the English terms of the tool descriptions (\cref{alg:tool-search} in \cref{sec:app-code}).
 %% Evidence: E23.
 
-Checking tool inputs comes next: once a tool is chosen, its arguments can still be wrong, for example a period written in the wrong form \parencite{yao2024taubench}.
-If the server then returns no data, the model may conclude that the data does not exist and report it as missing, which is a false answer.
-The harness core has a grounded mode for automated use, which is not a user setting.
-In this mode OpenTrading checks every argument of a data tool against the schema that the server declares, before the call is sent.
-An invalid call is not executed; the model receives the reason, and an explicit statement that a rejected input is not evidence that the data is missing, so it corrects the call instead of giving up.
-A stricter optional policy adds one round of correction and checks of the answer format.
+Once a tool is chosen, its arguments can still be wrong, for example a period written in the wrong form \parencite{yao2024taubench}, and an empty result may then be reported as missing data.
+In its grounded mode for automated use, OpenTrading checks every argument of a data tool against the schema that the server declares before the call is sent; an invalid call is not executed, and the model is told why and that a rejected input is not evidence that the data is missing.
 %% Evidence: E24.
 
 \label{sec:memory}
@@ -207,13 +133,10 @@ Several systems in the literature let the agent write its own memory, from tiers
 OpenTrading makes the opposite choice: only the user can make a memory entry take effect, and the model can only propose one.
 A rule in memory steers the answers that follow, so if the agent could write memory, text from a web page, a tool result or a sub-agent could become a rule.
 A suggestion card that quotes the user proves only that the user typed the quoted words, not that a rule worded by the model is theirs.
-The paths by which entries are written and read are described in \cref{fig:memory-flow}; the rules behind them follow here.
 
-\Cref{tab:memory-kinds} lists the five kinds of entry.
-Each kind has size limits, and the code records a reason for each limit.
-Text over a limit is refused when it is saved and is never cut.
+\Cref{tab:memory-kinds} lists the five kinds of entry; text over a size limit is refused when it is saved, never cut.
 
-\begin{table}[H]
+\begin{table}[htb]
   \centering
   \caption{Kinds of memory entry, their size limits and the agents that receive them}\label{tab:memory-kinds}
   \begin{tabularx}{\textwidth}{@{}l L L L@{}}
@@ -224,31 +147,24 @@ Text over a limit is refused when it is saved and is never cut.
     \addlinespace[2pt]
     Presentation style & how answers should look & \num{1000} in total & main agent, every turn\\
     \addlinespace[2pt]
-    Investment thesis & view on one subject; state (watching, refuted, closed); up to \num{8} invalidation conditions; review date & \num{350} line; \num{160} per condition; \num{4000} detail & main agent: name in the index, with the state when not watching; line, conditions and review date when the subject is in focus; detail on request\\
+    Investment thesis & view on one subject, its state, up to \num{8} invalidation conditions and a review date & \num{350} line; \num{160} per condition; \num{4000} detail & main agent: name in the index; line when the subject is in focus; detail on request\\
     \addlinespace[2pt]
     Lesson & title, summary, exceptions, detail & \num{120} title; \num{320} summary; \num{320} exceptions; \num{4000} detail & main agent: title in the index; text on request\\
     \addlinespace[2pt]
-    Decision & what was done, reason, expectation, what would change the mind; never edited, only added or deleted & \num{120} action; \num{2000} each for the other three & never sent\\
+    Decision & what was done and why, the expectation and what would change the mind & \num{120} action; \num{2000} each other part & never sent\\
     \bottomrule
   \end{tabularx}
   \fignote{Note: limits count characters after Unicode normalisation; presentation styles, theses and lessons are sent only when the user has turned on the notebook, the memory provider of \cref{sec:memory-flow}. Source: the group, based on OpenTrading version 0.5.1 \parencite{group2026opentrading}.}
 \end{table}
 %% Evidence: E49.
 
-Constraints are sent on every turn of the main agent and of each sub-agent, and are never cut, so they are kept small.
-A thesis line is inserted when its subject comes into focus, while the detail is read only when the model asks for it, so the line is short and the detail can be long.
-A thesis has at most eight invalidation conditions, because the model checks each one in turn when it answers.
+Constraints are sent on every turn and never cut, so they are kept small; a thesis line is sent only when its subject comes into focus, and its detail only on request.
 %% Evidence: E49.
 
-Every path that sends memory to a model consults one policy table, keyed by role, which allows only what it lists.
-The design uses a single allow-only table because a code review found that, with a check missing in one place, sub-agents could read earlier sessions.
-The main agent can only propose constraints, presentation styles and lessons through a suggestion card, and a sub-agent only receives constraints.
-Decisions have no read entry in the table, so the harness never sends them to the model: they hold the user's own reasoning and stay on the user's machine.
-The index marks a thesis that is refuted or closed, so that it is not taken as still valid.
+Every path that sends memory to a model consults one allow-only policy table, keyed by role, adopted after a code review found that a check missing in one place let sub-agents read earlier sessions; decisions have no read entry, so they never reach the model.
+\Cref{alg:memory-turn} gives the memory steps that run before the agent loop of \cref{alg:turn}.
 
-\Cref{alg:memory-turn} gives the memory steps of one turn, which run before the agent loop of \cref{alg:turn}.
-
-\begin{algorithm}[H]
+\begin{algorithm}[htb]
   \caption{Memory steps before the agent loop of one turn}\label{alg:memory-turn}
   \begin{algorithmic}[1]
     \Require typed message $m$; role $r$ (main agent or sub-agent); model with context size $C$ and tier $t$
@@ -268,18 +184,16 @@ The index marks a thesis that is refuted or closed, so that it is not taken as s
 \end{algorithm}
 %% Evidence: E49.
 
-The memory budget of line 10 depends on the context size of the model: \num{1000}, \num{700} or \num{300} tokens for at least \num{200000} tokens, at least \num{64000}, or less.
-An entry that does not fit is left out whole or replaced by a pointer, so nothing is cut.
+The memory budget of line 10 is \num{1000}, \num{700} or \num{300} tokens for a context of at least \num{200000} tokens, at least \num{64000}, or less, and an entry that does not fit is replaced by a pointer rather than cut.
+Edits are checked against the version that the form read, so an outdated form cannot overwrite a newer one, and deletion is logical (\cref{sec:ethics}).
 %% Evidence: E49.
-
-Edits to constraints, theses and lessons are checked against the version that the form read, so an outdated form cannot overwrite a newer one, and deletion is logical (\cref{sec:ethics}).
 
 \label{sec:permissions}
 Permissions matter because an agent that can write files and run commands can also do harm.
 OpenTrading has no built-in tool that places an order, and every tool call passes a permission gate with the four modes of \cref{tab:permission-modes}.
 Switchable modes \parencite{anthropicndmodes} and a second model that reviews actions \parencite{anthropic2026auto} are ideas taken from Claude Code.
 
-\begin{table}[H]
+\begin{table}[htb]
   \centering
   \caption{Permission modes and who decides}\label{tab:permission-modes}
   \begin{tabularx}{\textwidth}{@{}l L L@{}}
@@ -297,53 +211,28 @@ Switchable modes \parencite{anthropicndmodes} and a second model that reviews ac
   \fignote{Note: arithmetic commands and simple folder listings are allowed in every mode. Source: OpenTrading version 0.5.1 \parencite{group2026opentrading}.}
 \end{table}
 
-Some calls go to the user in every mode: reading files that hold keys, changing protected folders, writing outside the workspace, and making the same call three times in a row.
-The user may allow a key file or a repeated call for the whole session, and the session's temporary folder is exempt.
-For shell commands this check reads only the text of the command, so it can miss some cases.
-When no user is present, a call that needs approval is refused.
-
-In the auto mode the reviewing model sees the user's messages and the agent's actions but not the results of tools, because text planted in web pages or data could otherwise persuade it \parencite{greshake2023injection}, although reports of background agents can still reach it.
-By default it is told to block an order or a transfer of money even if the user asks for it, and after three blocks in a row, or when it gives no answer, the user decides.
-
-The reviewing model makes mistakes.
-\textcite{anthropic2026auto} reported that the reviewing model of their own product missed \qty{17}{\percent} of 52 real actions that went beyond the request; this rate cannot be assumed for OpenTrading.
+Some calls go to the user in every mode, such as reading files that hold keys, writing outside the workspace or making the same call three times in a row, and when no user is present a call that needs approval is refused.
+In the auto mode the reviewing model sees the user's messages and the agent's actions but not tool results, so that text planted in web pages or data cannot persuade it \parencite{greshake2023injection}; it is told to block an order or a transfer of money even if the user asks, and after three blocks in a row the user decides.
+Such a reviewer makes mistakes: \textcite{anthropic2026auto} reported that theirs missed \qty{17}{\percent} of 52 real actions that went beyond the request, a rate that cannot be assumed for OpenTrading.
 %% Evidence: E28.
 
 \label{sec:multi-agent}
-Sub-agents exist because a long task fills the context of a single agent with intermediate data.
-The main agent can hand part of the task to a sub-agent.
-The sub-agent does not see the conversation; it receives a form with the purpose, the known facts and the questions, and returns a report.
-It cannot start further sub-agents, and many types of sub-agent can only read.
-In this arrangement the model decides how to divide the work.
-
-Ultradesk is a set of four multi-agent workflows for recurring tasks, in which the division of the work is written in code instead of being left to the model, following the distinction between agents and predefined workflows \parencite{anthropic2024agents}.
-It resembles an orchestrator--worker system \parencite{anthropic2025multiagent}, except that its steps are fixed in code.
-Its four tasks are screening, with one scorecard per company ranked in code; a fact check, with one vote per claim; a debate between bull and bear analysts with a referee, following the researchers of TradingAgents \parencite{xiao2024tradingagents}; and a sector review.
-Their planned budgets range from 22 to 40 model requests in a small run and reach 276 in a large one; these are limits, not measurements.
-Reports pass from one agent to the next as evidence to weigh, not as instructions, and the agents get only tools declared as read only.
-
-Two results are computed in code.
-In the screening and sector tasks, agents give each company four scores from 0 to 10, for quality, valuation, growth and financial health.
-Each company's score is the mean of the four, with a criterion stressed by the user counting twice.
-With more than ten companies this value is averaged with one computed from seven financial ratios.
-
-In the fact check, a claim counts as correct or wrong only if more than half of all votes say so, and a failed vote never counts as \enquote{wrong}.
-Because ultradesk may use many requests, it runs only when the user asks for it or approves it.
+A long task fills the context of a single agent with intermediate data \parencite{anthropic2025multiagent}, so the main agent can hand part of it to a sub-agent, which receives a form with the purpose, the known facts and the questions, returns a report and cannot start further sub-agents.
+Ultradesk is a set of four multi-agent workflows for recurring tasks (screening, a fact check, a bull-and-bear debate with a referee after TradingAgents \parencite{xiao2024tradingagents}, and a sector review), in which the division of the work is written in code instead of being left to the model \parencite{anthropic2024agents}.
+Its agents get only read-only tools, pass reports to each other as evidence rather than instructions, and combine scores and votes in code; because a run may use many requests, it starts only when the user asks for it or approves it.
 %% Evidence: E29.
 
 \section{Model Configuration and Validation}\label{sec:validation}
-The project does not train a model, so validation asks whether the harness, not the model, improves the answers.
-For a financial assistant two qualities matter most: the answer must be correct, both in its calculation and in its conclusion, and it must arrive quickly.
-These two criteria shaped the benchmark with which OpenTrading was compared with two general-purpose harnesses, OpenCode and DeepSeek Harness \parencite{group2026opentradingbenchmark}; its tasks, design and scoring are described below.
+The project does not train a model, so validation asks whether the harness, not the model, improves the answers, judged first by correctness and then by time and cost, in the benchmark with which OpenTrading was compared with two general-purpose harnesses, OpenCode and DeepSeek Harness \parencite{group2026opentradingbenchmark}; its tasks, design and scoring are described below.
 
 \label{sec:bench-tasks}
 The benchmark holds 300 tasks, questions in Vietnamese written as a user would ask them, each with a required answer format.
-They fall into the five groups of \cref{tab:taskset}, so that the result does not depend on one kind of question.
+They fall into the five groups of \cref{tab:taskset}.
 To keep the correct answers fixed, the data tools answer from a frozen snapshot recorded on 1 November 2026, with 30 October 2026 as the last trading session, and every correct answer was computed from that snapshot by a script.
 Investor tasks assume a purchase at the close of 30 October 2026 and are scored with the closing prices of 23 November 2026.
 %% Evidence: E15, E20, E45.
 
-\begin{table}[H]
+\begin{table}[htb]
   \centering
   \caption{Task groups of the benchmark}\label{tab:taskset}
   \begin{tabularx}{\textwidth}{@{}l L S[table-format=3.0]@{}}
@@ -363,16 +252,14 @@ Investor tasks assume a purchase at the close of 30 October 2026 and are scored 
 \end{table}
 
 \label{sec:bench-design}
-Each harness was run once on all 300 tasks.
+Each harness was run once on all 300 tasks and kept its own system prompt and tool design, since these are what a harness contributes.
 %% Evidence: E37, E45.
-Each harness kept its own system prompt and tool design, since these are what a harness contributes.
 The environment was set up to give no harness an advantage outside its design:
 \begin{enumerate}
   \item The same model, DeepSeek V4.1 Flash with temperature 0 and no reasoning requested, answered in every harness; OpenTrading 0.5.0 with the change that allows buy and sell recommendations ran with its machine profile.
   \item Every harness saw the same data tools and a shell. OpenTrading also had its tool for reading the full stored result of an earlier data call (\cref{sec:architecture}) and, in memory tasks, its read-only memory tool; its tool search was off, every command ran without approval inside a sandbox, no reminders were sent after tool results, and of its grounded mode only the input check was on (\cref{sec:tool-search}).
 %% Evidence: E24, E32.
-  \item The clock of every harness was set to the snapshot date, so that the snapshot looked current to each harness.
-  \item Questions that a harness normally asks its user, such as a request for permission, were answered automatically in the same way.
+  \item The clock of every harness was set to the snapshot date, and questions that a harness normally asks its user, such as a request for permission, were answered automatically in the same way.
 \end{enumerate}
 
 %% Evidence: E14, E16, E24.
@@ -388,8 +275,7 @@ A trial counts as correct only if all four conditions hold:
 Investor tasks are scored by a fixed rule on the later prices, and a trial without a final answer counts as incorrect.
 Trials that failed for infrastructure reasons, such as a broken network connection, were run again, and judge replies that could not be read were judged again.
 Both corrections applied the same rule to every harness and were made after the results had been seen.
-The judge, Claude Haiku 5.5, graded all 900 trials.
-Before the run, it was tested on 200 controlled answers, correct ones and copies made wrong in value, scale or refusal, and classified all of them as expected (Cohen's $\kappa = 1.0$).
+The judge, Claude Haiku 5.5, graded all 900 trials; before the run, it was tested on 200 controlled answers, correct ones and copies made wrong in value, scale or refusal, and classified all of them as expected (Cohen's $\kappa = 1.0$).
 %% Evidence: E17, E37, E43, E71.
 
 \section{Evaluation Metrics}\label{sec:metrics}
@@ -410,82 +296,54 @@ If the two harnesses were equally good, each of these $n$ tasks would be equally
 Tasks that both harnesses answered correctly, or both incorrectly, carry no information about the difference and are left out.
 This is the exact form of McNemar's test, which compares two systems on the same test items through the items on which they disagree \parencite{dietterich1998approximate}.
 
-Speed and cost are measured for every trial and reported separately, never added to accuracy as one score:
-\begin{enumerate}
-  \item Time per trial, from the question to the final answer, given as the median and the 90th percentile, because a few slow trials matter to a user even when the typical trial is fast.
-  \item Model requests and data-tool calls per trial, which show how much work a harness needs to reach an answer.
-  \item Cost, as the total over all trials and as the cost per correct answer.
-\end{enumerate}
+Speed and cost are reported separately, never added to accuracy as one score: the time per trial as the median and the 90th percentile, because a few slow trials matter to a user; the model requests and data-tool calls per trial; and the cost in total and per correct answer.
 Reliability is described by the trials without an answer, false refusals of answerable tasks, numbers given where the correct answer is a refusal, and numbers outside the tolerance.
 
 \section{Implementation Plan}\label{sec:implementation-plan}
-The method was implemented in three phases, one for each research question of \cref{sec:rq}, so that each phase delivers a program checked on its own before the next relies on it.
-\Cref{tab:plan} gives the work, the output and the acceptance check of each phase.
+The method was implemented in three phases, one for each research question of \cref{sec:rq}; \cref{tab:plan} gives the work, output and acceptance check of each.
 \label{sec:stages}
 
-\begin{table}[H]
+\begin{table}[htb]
   \centering
   \caption{Phases of the implementation plan}\label{tab:plan}
-  \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.15\textwidth} L >{\raggedright\arraybackslash}p{0.19\textwidth} L@{}}
+  \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.2\textwidth} L L@{}}
     \toprule
-    {Phase} & {Work} & {Output} & {Acceptance check}\\
+    {Phase} & {Work and output} & {Acceptance check}\\
     \midrule
-    1. Data foundation (RQ2) & A data server whose results state availability, source and time & opentrading-mcp & Automated tests; a contract check with live data (\cref{sec:testing})\\
+    1. Data (RQ2) & opentrading-mcp, whose results state availability, source and time & Automated tests; a contract check with live data (\cref{sec:testing})\\
     \addlinespace[2pt]
-    2. Harness rules (RQ1) & Agent loop and stop gate, grounding rules and figure tracing, tool search, memory, permissions, sub-agents & OpenTrading, in tagged releases & Automated tests with a simulated model, on Ubuntu and Windows\\
+    2. Harness rules (RQ1) & OpenTrading in tagged releases: agent loop, stop gate, grounding rules, figure tracing, tool search, memory, permissions, sub-agents & Automated tests with a simulated model, on Ubuntu and Windows\\
     \addlinespace[2pt]
-    3. Evaluation (RQ3) & A mode without a user, then a benchmark of three harnesses with the same model and data & opentrading-benchmark and its results & Accuracy, cost and reliability (\cref{sec:metrics})\\
+    3. Evaluation (RQ3) & A mode without a user, then opentrading-benchmark, comparing three harnesses with the same model and data & Accuracy, cost and reliability (\cref{sec:metrics})\\
     \bottomrule
   \end{tabularx}
   \fignote{Source: the group.}
 \end{table}
 
-The phases overlapped in time (\cref{tab:milestones}), but each depended on the one before.
-The harness rules needed real figures from the data server before they could be tried in use, and the benchmark needed a harness that runs without a user, so that it drives the same agent loop as the terminal.
-Keeping the data server behind MCP also let the two programs be built and tested separately, and let the other harnesses of the benchmark use the same data tools.
+The phases overlapped in time (\cref{sec:milestones}), but each relied on the one before: the harness rules needed real figures from the data server, and the benchmark needed a harness that runs without a user; keeping the data server behind MCP let the programs be built and tested separately.
 
 \label{sec:stack}
-The languages follow the same split.
-The harness is written in TypeScript on Bun, chosen on 27 September 2026 after a first scaffold in Python, so that the agent loop, the model providers and the terminal interface share one language.
-It uses the Vercel AI SDK for model providers and OpenTUI for the interface.
-The data server is written in Python, where the quantitative libraries and the sources of Vietnamese market data are available, and uses the vnstock libraries and pandas.
+The harness is written in TypeScript on Bun, chosen on 27 September 2026 after a first scaffold in Python, with the Vercel AI SDK for model providers and OpenTUI for the interface; the data server is written in Python, where the quantitative libraries and the sources of Vietnamese market data are, with the vnstock libraries and pandas.
 %% Evidence: E50.
-
-The plan was adjusted as the work showed what was needed.
-The change of language was one such adjustment.
-Version 0.5.0 replaced the calculation tools with arithmetic in the shell (\cref{sec:figure-tracing}), and version 0.5.1 replaced the earlier ban on recommendations with rules for giving them (\cref{sec:ethics}).
-From week 11, a change to a prompt or a tool also needed a small measurement before and after it (\cref{sec:quality}).
-
-\label{sec:workflow}
-From week 10, a problem typically became an issue, was fixed by a rule written as code and tested, and reached the main branch through a pull request that passes the automated checks (\cref{sec:quality}); a release workflow then builds the installable versions (\cref{sec:release}).
+The plan was adjusted as the work went on: besides the change of language, version 0.5.0 replaced the calculation tools with arithmetic in the shell (\cref{sec:figure-tracing}), and version 0.5.1 replaced the earlier ban on recommendations with rules for giving them (\cref{sec:ethics}).
 
 \section{Ethical Considerations}\label{sec:ethics}
 OpenTrading produces analysis that a user may act on with real money, so its main ethical risks are a wrong or misread recommendation, the exposure of private data and a biased comparison with other harnesses.
-Each risk is set out below with the safeguard that the group chose and the limit of that safeguard.
 
-The first risk is harm from a recommendation: a user may lose money by acting on a wrong call, or trust a model's call more than it deserves.
-Since version 0.5.1 the harness may recommend buying, holding or selling, so the group kept the decision with the user.
-The model is told to give the reasons for the call, its main risks and what would prove it wrong, and the harness has no built-in tool that places orders.
-Requests to manipulate prices, trade on inside information or spread rumours are refused, so that the harness does not help to harm other investors.
-Its documentation states that it is research software, not an investment advisory service.
+The first risk is harm from a recommendation: a user may lose money by trusting a wrong call.
+Since version 0.5.1 the harness may recommend buying, holding or selling, but the decision stays with the user: the model must give the reasons, the main risks and what would prove the call wrong, no built-in tool places orders, requests to manipulate prices, trade on inside information or spread rumours are refused, and the documentation states that it is research software, not an investment advisory service.
 These safeguards rest partly on instructions that a model may not follow (\cref{sec:grounding-rules}), so they reduce the risk rather than remove it.
 
-The same holds for figures: a figure can look verified and still be wrong.
-The harness is designed so that the figures of an answer come from tool results (\cref{sec:figure-tracing}), but a figure that matches its source is still wrong if the source is wrong.
-The model is therefore told to date figures that may be out of date and to point the user to the official source, and the user remains responsible for checking a figure before acting on it.
+The same holds for figures: a figure that matches its tool result (\cref{sec:figure-tracing}) is still wrong if the source is wrong, so the model is told to date figures that may be out of date and to point the user to the official source, and the user remains responsible for checking a figure before acting on it.
 
-The second risk is the exposure of private data, since investment questions reveal what a person owns and plans.
+The second risk is the exposure of private data, such as what a person owns and plans.
 Keys, sessions and memory stay on the user's machine, the user chooses the model provider, and only the user decides what memory holds; the investor's decisions are never sent to the model (\cref{sec:memory-flow}).
 Deleting a memory entry is logical: the entry is cleared in the store, but backups and text already sent to a provider are out of the harness's reach, so the interface does not promise physical deletion.
 The limit is that the question, the tool results and the memory placed in the prompt must still go to the chosen provider, and a web search can reveal which tickers interest the user.
 
 The third risk is a biased comparison, because the group built both OpenTrading and the benchmark that judges it.
-To limit it, the three harnesses used the same model and the same data, and the results report ties and losses as well as wins (\cref{sec:validation,sec:accuracy}).
-The memory group was still designed around what OpenTrading can do, so its results favour OpenTrading, and this limit is stated with the results (\cref{sec:threats}).
+To limit it, the three harnesses used the same model and data and the results report ties and losses as well as wins (\cref{sec:validation,sec:accuracy}), but the memory group was designed around what OpenTrading can do, a limit stated with the results (\cref{sec:threats}).
 %% Evidence: E15, E45.
 
-Finally, the harness is released under the Apache 2.0 licence and the data server under the MIT licence.
-These licences give no right to market data, whose use follows the terms of each provider (\cref{sec:data}), and the group used the data only for research and study.
-The group used AI tools, namely Claude Code, OpenAI Codex and ChatGPT, mainly to write and fix code.
-This code reached the main branch through pull requests that need one approval, although administrators can bypass this rule (\cref{sec:quality}), and the group is responsible for all code and text.
+Finally, the harness is released under the Apache 2.0 licence and the data server under the MIT licence; these licences give no right to market data, whose use follows the terms of each provider (\cref{sec:data}), and the group used the data only for research and study; it also used AI tools (Claude Code, OpenAI Codex and ChatGPT), mainly to write and fix code that reached the main branch through PRs needing one approval, although administrators can bypass this rule (\cref{sec:quality}); the group is responsible for all code and text.
 %% Evidence: E35.
