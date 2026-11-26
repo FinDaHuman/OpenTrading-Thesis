@@ -40,7 +40,7 @@ The difference came mostly from memory: OpenTrading applied the rules that a use
 On the investor tasks all three were weak, near one half.
 
 The memory group shows when memory in the harness matters (\cref{tab:memory-kinds-results}).
-When the user's rules were given in the same session, or the user returned to the session in which a portfolio had been given, the three harnesses scored the same, because the rules were still in the conversation that each of them could read.
+When the user's rules were given in the same session, or the user returned to the session in which a portfolio had been given, the three harnesses scored within one task of each other, because the rules were still in the conversation that each of them could read.
 The difference appeared when a rule had to outlast its session: criteria split over two sessions or updated later, a stored criterion that the user did not repeat, a criterion that the user had withdrawn or a price that had gone out of date, and a convention of calculation, such as return on equity over the last four quarters rather than the last financial year, whose thresholds were later changed or removed.
 These are the conditions of an investor who keeps a set of screening rules and revises them over weeks, and on these 46 tasks OpenTrading answered all correctly, against 37 for DeepSeek Harness and 17 for OpenCode.
 
@@ -66,7 +66,7 @@ These are the conditions of an investor who keeps a set of screening rules and r
 %% Evidence: E72.
 
 The cause lies in where the current version of a rule comes from.
-OpenTrading reads each constraint from its store at the start of every turn and places it in the system part of the prompt, and entries that the user has deleted are masked (\cref{fig:memory-flow}), so the model never has to decide which version of a rule is still valid.
+OpenTrading reads each constraint from its store at the start of every turn and places it in the system part of the prompt, and entries that the user has deleted are masked (\cref{fig:memory-flow}), so the model does not have to decide which version of a rule is still valid.
 OpenCode and DeepSeek Harness had to find the rules in the record of an earlier session and judge which statement was the latest, and they failed mostly at that step: they kept a replaced rule, applied a withdrawn one or found none (\cref{tab:memory-errors}).
 The search also cost work: on memory tasks they made a median of 15 and 20 model requests, against 4 for OpenTrading, and called the data tools about twice as often (7.0 and 6.5 calls against 3.3).
 %% Evidence: E46, E72.
@@ -103,7 +103,7 @@ OpenTrading also needed fewer model requests, 3.8 per trial against about 7 for 
 
 Speed depends on the kind of task (\cref{tab:speed-group}), and the work per request shows where OpenTrading gains and loses time.
 It lost time on short lookups, with a median of 29 seconds against 17 and 18.
-Its system prompt and tool set are larger, so a lookup trial read a median of about \num{17000} input tokens against \num{9000} and \num{7500}, and each request took about 10 seconds against 8 and 9; it also typically made one more request (3 against 2), often to run a calculation in the shell, as its rules require.
+Its system prompt and tool set are larger, so a lookup trial read a median of about \num{17000} input tokens against \num{9000} and \num{7500}, and each request took about 10 seconds against 8 and 9; it also typically made one more request (3 against 2).
 On compute tasks all three made a median of 3 requests, and OpenTrading was slower than DeepSeek Harness (37 against 33 seconds) only because each of its requests took longer.
 It gained time on tasks with many steps.
 On memory tasks it needed a median of 4 requests against 15 for OpenCode and 20 for DeepSeek Harness, because the rules were already in its prompt, and on investor tasks it read fewer input tokens (a median of \num{163000} against \num{231000} and \num{208000}) and was as fast as DeepSeek Harness.
@@ -134,7 +134,7 @@ OpenCode refused ten answerable tasks, all in the memory group, and gave 15 numb
 No harness gave a number on a task whose correct answer is a refusal, so none of them invented data on these 11 tasks.
 Most failures of the other two harnesses again came from the memory group: 12 of the 15 numbers of OpenCode outside the tolerance, all its false refusals and all six trials of DeepSeek Harness without an answer.
 Outside that group, each harness had between one and three numbers outside the tolerance, so on calculation and lookup the harnesses were about equally reliable.
-Answers in an invalid format came mostly from investor tasks, six each for OpenCode and DeepSeek Harness, where the answer is long; OpenTrading's machine profile follows the format that the calling program gives (\cref{sec:grounding-rules}), and its one invalid answer was the memory trial without an answer.
+Answers in an invalid format came mostly from investor and memory tasks, where the answer is long (6 and 5 for OpenCode, 6 and 6 for DeepSeek Harness); OpenTrading's machine profile follows the format that the calling program gives (\cref{sec:grounding-rules}), and its one invalid answer was the memory trial without an answer.
 %% Evidence: E73.
 
 \begin{table}[H]
