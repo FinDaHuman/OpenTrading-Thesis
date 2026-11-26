@@ -9,16 +9,9 @@ In finance, work has moved from models trained on financial text to agents that 
 The third line studies the harness itself, the program that gives the model its tools, context and rules \parencite{yang2024sweagent}; OpenTrading belongs to this line, applied to finance.
 
 \section{Historical Context}\label{sec:history}
-The path to today's agents took about four years.
-In 2022, prompting a model to write its reasoning step by step improved arithmetic and logic tasks \parencite{wei2022chain}.
-In 2023, models learned to interleave reasoning with actions \parencite{yao2023react}, to decide when to call a tool \parencite{schick2023toolformer}, to search over several lines of reasoning \parencite{yao2023tree} and to learn from their own failures \parencite{shinn2023reflexion}.
-The same year brought systems of several agents that split roles or debate an answer \parencite{hong2024metagpt,wu2024autogen,du2024improving}.
-From 2024, research harnesses for software tasks showed that the design of the interface between model and tools changes how well an agent performs \parencite{yang2024sweagent}, and open platforms for such agents followed \parencite{wang2025openhands}.
-In November 2024, the Model Context Protocol gave tools a common way to reach any model \parencite{anthropic2024introducing}.
-Finance followed a parallel path.
-Benchmarks of numerical reasoning over financial reports appeared in 2021 \parencite{chen2021finqa,zhu2021tatqa}.
-Models trained for finance followed in 2023 \parencite{wu2023bloomberggpt,yang2023fingpt}, together with benchmarks to compare them \parencite{xie2023pixiu,xie2024finben}.
-From 2024, research moved to financial agents with tools, memory and several roles \parencite{zhang2024finagent,yu2024fincon,yang2024finrobot}.
+In 2022, prompting a model to reason step by step improved arithmetic and logic tasks \parencite{wei2022chain}; in 2023, models learned to interleave reasoning with actions \parencite{yao2023react}, to call tools \parencite{schick2023toolformer}, to search over several lines of reasoning \parencite{yao2023tree} and to learn from their failures \parencite{shinn2023reflexion}, and several agents began to split roles or debate an answer \parencite{hong2024metagpt,wu2024autogen,du2024improving}.
+From 2024, research harnesses showed that the interface between model and tools changes how well an agent performs \parencite{yang2024sweagent,wang2025openhands}, and in November 2024 the Model Context Protocol gave tools a common way to reach any model \parencite{anthropic2024introducing}.
+Finance followed a parallel path, from benchmarks of numerical reasoning over financial reports in 2021 \parencite{chen2021finqa,zhu2021tatqa} to models and benchmarks for finance in 2023 \parencite{wu2023bloomberggpt,yang2023fingpt,xie2023pixiu,xie2024finben} and financial agents with tools, memory and several roles from 2024 \parencite{zhang2024finagent,yu2024fincon,yang2024finrobot}.
 
 \section{Key Studies and Theories}\label{sec:studies}
 \Cref{tab:key-studies} summarises the studies closest to this project; together with the other works cited here, they point to three lessons.
@@ -33,14 +26,11 @@ Third, in finance the main weakness is wrong figures, invented or not found in t
     \toprule
     {Study} & {Technique} & {Data} & {Main result} & {Limitation stated by the authors}\\
     \midrule
-    \textcite{yao2023tree} & Search over several reasoning paths & Game of 24, creative writing, crosswords & Game of 24 solved in \qty{74}{\percent} of cases, against \qty{4}{\percent} with chain of thought & Only three simple tasks; search costs more than sampling\\
     \textcite{schick2023toolformer} & Model learns when to call tools, a calculator among them & Self-labelled tool calls & Better zero-shot results on many tasks & Cannot chain tools or use them interactively\\
-    \textcite{zhou2024webarena} & Realistic web environment for agents & Web tasks & Best agent \qty{14.41}{\percent} success, humans \qty{78.24}{\percent} & No limitations section; calls for more robust agents\\
     \textcite{zhu2021tatqa} & Question answering over tables and text & Financial reports & Best model F1 \qty{58.0}{\percent}, experts \qty{90.8}{\percent} & Most errors come from evidence not found in the table or text\\
     \textcite{islam2023financebench} & Open-book financial question answering & Public company filings & Model with retrieval wrong or refused on \qty{81}{\percent} of questions & Single-turn questions on one listed company; some questions simple or ambiguous\\
     \textcite{kang2023deficiency} & Measurement of hallucination & Financial tasks & Off-the-shelf models hallucinate seriously & Tasks do not cover all of finance; mitigations are task-specific\\
     \textcite{chen2023program} & Computation written as a program & Math and financial question sets & About \qty{12}{\percent} average gain over chain of thought & Running generated code carries risk; weak on complex algebra\\
-    \textcite{zhang2024finagent} & Multimodal trading agent with tools & Six stock and crypto datasets & Over \qty{36}{\percent} average profit gain over nine baselines & No limitation stated; portfolio management left for future work\\
     \textcite{nguyen2025finstat2sql} & Multi-agent text-to-SQL under Vietnamese accounting standards & Synthetic questions on financial statements & Fine-tuned 7B model \qty{61.33}{\percent} accuracy & Only VN30 and HNX30 firms; closed models costly to deploy\\
     \bottomrule
   \end{tabularx}
@@ -87,8 +77,5 @@ Third, benchmarks of agents usually compare models, not harnesses \parencite{liu
 Fourth, the Vietnamese market, with its local accounting standards, is little covered \parencite{nguyen2025finstat2sql}.
 
 \section{Justification for the Project}\label{sec:justification}
-OpenTrading addresses each gap: the harness compares the figures of an answer with tool results and sends the model back when an answer claims data it never fetched (\cref{sec:figure-tracing}).
-The data server returns its results with their source and time and says when a source has failed.
-The benchmark reports cost as well as accuracy, and skills cover the Vietnamese market.
-Beyond these gaps, its built-in tools cannot place orders, which limits the risks of agents acting alone \parencite{chan2023harms}.
+OpenTrading addresses each gap in turn: the harness compares the figures of an answer with tool results and sends the model back when an answer claims data it never fetched (\cref{sec:figure-tracing}); the data server says when a source has failed; the benchmark compares harnesses and reports cost; and skills cover the Vietnamese market.
 A prompt can ask for cited figures but cannot check them, so OpenTrading moves part of these rules into code.
