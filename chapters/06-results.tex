@@ -3,78 +3,15 @@
 \chapter{Results and Discussion}\label{ch:results}
 
 \section{Results and Analysis}\label{sec:results}
-OpenTrading was evaluated with version 4.7 of opentrading-benchmark \parencite{group2026opentradingbenchmark}, which compares it with two general-purpose harnesses, OpenCode and DeepSeek Harness (DSH), on the same model and the same data.
-
-\subsection{Benchmark Setup}\label{sec:bench-setup}
-The benchmark holds 300 tasks, questions in Vietnamese written as a user would ask them, with a required answer format.
-They fall into five groups (\cref{tab:taskset}).
-To keep the correct answers fixed, the data tools answer from a frozen snapshot recorded on 1 November 2026, with 30 October 2026 as the last trading session, and every correct answer was computed from that snapshot by a script.
-Investor tasks assume a purchase at the close of 30 October 2026 and are scored with the closing prices of 23 November 2026, a period in which the market fell.
-%% Evidence: E15, E20, E45.
-
-\begin{table}[H]
-  \centering
-  \caption{Task groups of the benchmark}\label{tab:taskset}
-  \begin{tabularx}{\textwidth}{@{}l L c@{}}
-    \toprule
-    {Group} & {What the task tests} & {Tasks}\\
-    \midrule
-    Compute & Calculations over price series and financial statements, such as returns, beta and growth & 79\\
-    Investor & Picking stocks, building a portfolio, or a buy, hold or sell call, scored by the later price & 36\\
-    Lookup & Finding and comparing published figures, including questions whose data does not exist & 112\\
-    Memory & Applying facts or rules that the user gave in an earlier session, including updated or withdrawn ones & 59\\
-    Robustness & Ignoring instructions planted in tool data, and stating the date of a price & 14\\
-    \midrule
-    Total & & 300\\
-    \bottomrule
-  \end{tabularx}
-  \fignote{Note: the investor group holds 20 portfolio tasks and 16 buy, hold or sell calls. Source: the group.}
-\end{table}
-
-Each task was run once in each harness, \num{900} trials in total, under the shared configuration of \cref{tab:bench-config}.
-Each harness kept its own system prompt and tool design, since these are what a harness contributes.
-To give no harness an advantage outside its design, all three:
-\begin{enumerate}
-  \item saw only the same data tools, with OpenTrading's tool search switched off;
-  \item ran their commands in the same isolated sandbox;
-  \item saw a clock set to the snapshot date;
-  \item had their questions to the user answered automatically in the same way.
-\end{enumerate}
-
-\begin{table}[H]
-  \centering
-  \caption{Configuration shared by the three harnesses}\label{tab:bench-config}
-  \begin{tabularx}{\textwidth}{@{}l L@{}}
-    \toprule
-    {Item} & {Setting}\\
-    \midrule
-    Model & DeepSeek V4.1 Flash, temperature 0, reasoning off\\
-    Harnesses & OpenTrading 0.5.0 with the change that allows buy and sell recommendations, machine profile; OpenCode 2.4.1; DSH 0.2.2-rc.5\\
-    Limits per trial & 24 model requests (48 for memory tasks), \num{4.6} million tokens, \qty{1800}{\second}\\
-    Grading & Rule-based checks, a language-model judge (Claude Haiku 5.5) and a manual review\\
-    \bottomrule
-  \end{tabularx}
-  \fignote{Note: for 119 tasks, the OpenCode and DSH answers come from the previous release of each harness (OpenCode 2.1.2, DSH 0.2.1-rc.2); see \cref{sec:threats}. Source: the group.}
-\end{table}
-%% Evidence: E14, E16, E24.
-
-A trial counts as correct only if all four conditions hold:
-\begin{enumerate}
-  \item the judge accepts the answer against the gold answer;
-  \item every number lies within the tolerance of the gold value;
-  \item a task whose correct answer is a refusal receives no number;
-  \item a manual review does not reject it (the review may reject a trial but never accept one).
-\end{enumerate}
-Investor tasks are scored by a fixed rule on the later prices, and a trial without a final answer counts as incorrect.
-Trials that failed for infrastructure reasons, such as a broken network connection, were run again, and judge replies that could not be read were judged again.
-Before the run, the judge classified 200 controlled answers, correct ones and copies made wrong in value, scale or refusal, all as expected (Cohen's $\kappa = 1.0$).
-%% Evidence: E17, E37, E43.
+This section reports the comparison described in \cref{sec:validation}: OpenTrading 0.5.0 against OpenCode 2.4.1 and DSH 0.2.2-rc.5, on 300 tasks with the same model and data.
+Accuracy comes first, then speed and cost, reliability, and an analysis of the errors.
 
 \subsection{Accuracy}\label{sec:accuracy}
 OpenTrading answered 279 of the 300 tasks correctly (93.0\%), DSH 266 (88.7\%) and OpenCode 245 (81.7\%), as \cref{tab:accuracy} and \cref{fig:accuracy} show.
 
 \begin{table}[H]
   \centering
+  \renewcommand{\arraystretch}{1.3}
   \caption{Tasks answered correctly by each harness}\label{tab:accuracy}
   \begin{tabularx}{\textwidth}{@{}L S[table-format=3.0] S[table-format=3.0] S[table-format=3.0] S[table-format=3.0]@{}}
     \toprule
@@ -100,7 +37,7 @@ OpenTrading answered 279 of the 300 tasks correctly (93.0\%), DSH 266 (88.7\%) a
   \fignote{Note: number of tasks in brackets. Source: the group.}
 \end{figure}
 
-On compute, lookup and robustness tasks the three harnesses were within three tasks of each other.
+On compute, lookup and robustness tasks the three harnesses were within three tasks of each other, so plain calculation and retrieval did not separate them.
 The difference came from memory: OpenTrading applied the rules that a user had given in an earlier session, including rules later updated or withdrawn, in 58 of 59 tasks, against 50 for DSH and 30 for OpenCode.
 On the investor tasks all three were weak, near one half.
 
@@ -108,39 +45,126 @@ Compared on the same tasks with the sign test of \cref{eq:sign-test}, OpenTradin
 Both differences are unlikely if the harnesses were equally good.
 %% Evidence: E45.
 
-\subsection{Reliability and Cost}\label{sec:stability-cost}
-OpenTrading returned an answer in a valid format in 299 of 300 trials, never refused a task that had an answer, and had one answer rejected for a number outside the tolerance, against 15 for OpenCode and 5 for DSH (\cref{tab:reliability}).
-No harness gave a number on a task whose correct answer is a refusal.
-OpenTrading also cost about half as much as the other two.
+\subsection{Speed and Cost}\label{sec:speed-cost}
+\Cref{tab:speed} reports how long a trial took and how much work and money it needed.
+A typical trial took about half a minute in every harness: the median was 36 seconds for OpenTrading, 47 for OpenCode and 31 for DSH.
+The harnesses differed in their slow trials.
+The slowest tenth of OpenTrading's trials took more than 97 seconds, against 228 for DSH and 300 for OpenCode, and only one OpenTrading trial took more than five minutes, against 17 for DSH and 30 for OpenCode.
+OpenTrading also needed fewer model requests, 3.8 per trial against about 7 for the others, and it cost less than half as much per correct answer.
 
 \begin{table}[H]
   \centering
-  \caption{Reliability and cost of each harness over the 300 tasks}\label{tab:reliability}
-  \begin{tabularx}{\textwidth}{@{}L S[table-format=3.0] S[table-format=3.0] S[table-format=3.0]@{}}
+  \renewcommand{\arraystretch}{1.3}
+  \caption{Time, work and cost per trial over the 300 tasks}\label{tab:speed}
+  \begin{tabularx}{\textwidth}{@{}L S[table-format=3.4] S[table-format=3.4] S[table-format=3.4]@{}}
     \toprule
     {Measure} & {OpenTrading} & {OpenCode} & {DSH}\\
     \midrule
-    Valid answer format & 299 & 288 & 285\\
-    Trials without an answer & 1 & 6 & 6\\
-    False refusals (of 289 answerable) & 0 & 10 & 0\\
-    Numbers on refusal tasks (of 11) & 0 & 0 & 0\\
-    Rejected for a number outside the tolerance & 1 & 15 & 5\\
-    Total cost (USD) & {0.68} & {1.29} & {1.23}\\
+    Time per trial, median (s) & 36 & 47 & 31\\
+    Time per trial, 90th percentile (s) & 97 & 300 & 228\\
+    Trials longer than five minutes & 1 & 30 & 17\\
+    Model requests per trial (mean) & 3.8 & 6.8 & 7.2\\
+    Data-tool calls per trial (mean) & 3.4 & 4.6 & 4.2\\
+    Total cost (USD) & 0.68 & 1.29 & 1.23\\
     Cost per correct answer (USD) & {0.0024} & {0.0053} & {0.0046}\\
     \bottomrule
   \end{tabularx}
   \fignote{Note: cost as reported by the model provider for each request; for 100 tasks the OpenCode and DSH costs are estimated from token counts at the same prices. Source: the group.}
 \end{table}
-%% Evidence: E42, E45.
+%% Evidence: E42, E45, E46.
+
+The picture depends on the kind of task (\cref{tab:speed-group}).
+On short lookups OpenTrading was the slowest, with a median of 29 seconds against 17 and 18, because its system prompt and tool descriptions are larger and every request carries them.
+On memory tasks it was the fastest by far, 69 seconds against 165 for DSH and 226 for OpenCode, because it needed a median of 4 model requests there, against 15 for OpenCode and 20 for DSH.
+Its advantage in time therefore appears on long tasks with many steps, which are also the tasks where a user waits longest.
+
+\begin{table}[H]
+  \centering
+  \renewcommand{\arraystretch}{1.3}
+  \caption{Median time per trial by task group, in seconds}\label{tab:speed-group}
+  \begin{tabularx}{\textwidth}{@{}L S[table-format=3.0] S[table-format=3.0] S[table-format=3.0]@{}}
+    \toprule
+    {Group} & {OpenTrading} & {OpenCode} & {DSH}\\
+    \midrule
+    Compute & 37 & 54 & 33\\
+    Investor & 106 & 166 & 105\\
+    Lookup & 29 & 17 & 18\\
+    Memory & 69 & 226 & 165\\
+    Robustness & 29 & 38 & 24\\
+    \bottomrule
+  \end{tabularx}
+  \fignote{Source: the group.}
+\end{table}
+%% Evidence: E46.
+
+\subsection{Reliability}\label{sec:stability-cost}
+OpenTrading returned an answer in a valid format in 299 of 300 trials and never refused a task that had an answer (\cref{tab:reliability}).
+OpenCode refused ten answerable tasks, all in the memory group, and gave 15 numbers outside the tolerance, against one for OpenTrading.
+No harness gave a number on a task whose correct answer is a refusal, so none of them invented data that does not exist.
+
+\begin{table}[H]
+  \centering
+  \renewcommand{\arraystretch}{1.3}
+  \caption{Reliability of each harness over the 300 tasks}\label{tab:reliability}
+  \begin{tabularx}{\textwidth}{@{}L S[table-format=3.0] S[table-format=3.0] S[table-format=3.0]@{}}
+    \toprule
+    {Measure} & {OpenTrading} & {OpenCode} & {DSH}\\
+    \midrule
+    Answers in a valid format & 299 & 288 & 285\\
+    Trials without an answer & 1 & 6 & 6\\
+    False refusals (of 289 answerable tasks) & 0 & 10 & 0\\
+    Numbers on refusal tasks (of 11) & 0 & 0 & 0\\
+    Numbers outside the tolerance & 1 & 15 & 5\\
+    \bottomrule
+  \end{tabularx}
+  \fignote{Source: the group.}
+\end{table}
+%% Evidence: E45.
 
 \subsection{Error Analysis}\label{sec:error-analysis}
-Twelve tasks defeated all three harnesses, all but one in the investor group: four stock picks, four buy, hold or sell calls and three other picks, and one financial-statement calculation.
-Three tasks were failed by OpenTrading alone.
-No harness found the stock that would rise most in the next three weeks (0 of 4 for all), below the one-in-six rate of a random pick.
-On the buy, hold or sell calls OpenTrading scored 7 of 16, OpenCode 10 and DSH 8, all below the 11 of 16 of a rule that always answers sell; OpenTrading's calls split into 8 sell, 6 buy and 2 hold, close to the others, so it lost on the choice for each company rather than by leaning towards buying.
-In the memory group, OpenCode often used up its request limit before answering or applied a rule that the user had already replaced.
-%% Evidence: E18, E39, E45.
-\todo{Add two short examples of incorrect answers, one from the investor group and one from the memory group, after reading the trial records.}
+OpenTrading failed 21 tasks, DSH 34 and OpenCode 55.
+The errors of OpenTrading and of the other two harnesses lie in different places, and they have different causes.
+
+Seventeen of OpenTrading's 21 errors were investor tasks, which test a judgement about the future rather than the use of data.
+The nine wrong buy, hold or sell calls went in both directions: four buys and two holds on shares that fell, and three sells on shares that rose.
+OpenTrading therefore did not lean towards buying or selling; it chose wrongly company by company.
+For example, it recommended buying PV Gas (GAS) on 30 October 2026, and the price fell from \num{78.0} to \num{69.3} thousand đồng by 23 November, a loss of 11.2\%.
+No harness found the stock that would rise most in the next three weeks (0 of 4 for all), and all three were below the 11 of 16 calls of a rule that always answers \enquote{sell} in this falling market.
+These tasks show the limit of a model reading past data, not a fault that a harness rule could fix.
+
+Only four errors of OpenTrading lay outside the investor group.
+In one compute task it named the wrong company as the one that reduced its leverage most, although its twelve numbers were all correct.
+In one screening task it removed a company with a negative price-to-earnings ratio that the question still counted.
+In one lookup it reported a change of $-0.61$ instead of $+0.61$, and the tolerance check rejected it.
+In one memory task it ended without a final answer.
+%% Evidence: E39, E46.
+
+Memory tasks give the user's rules in an earlier session, such as \enquote{only shares with a price-to-earnings ratio below 15}, and later update or withdraw them.
+OpenCode failed 29 of the 59 tasks, in four ways (\cref{tab:memory-errors}).
+Most often it applied a rule wrongly, kept a rule that had been replaced, or ignored a rule entirely; nearly as often it refused, saying that it could not find the user's rules.
+In one task the user had replaced the criteria with a price-to-book ratio below 3 and a price-to-earnings ratio below 35; OpenCode kept the old criteria and returned one company, PNJ, instead of the four that met the new ones (KDC, MSN, PNJ and SBT), while OpenTrading answered correctly.
+DSH failed 9 memory tasks, six of them without an answer, most after using up its 48 requests.
+OpenTrading, by contrast, failed one memory task and needed only a few requests for the others, which explains both its accuracy and its speed on this group.
+
+\begin{table}[H]
+  \centering
+  \renewcommand{\arraystretch}{1.3}
+  \caption{Causes of failure in the 59 memory tasks}\label{tab:memory-errors}
+  \begin{tabularx}{\textwidth}{@{}L S[table-format=2.0] S[table-format=2.0] S[table-format=2.0]@{}}
+    \toprule
+    {Cause} & {OpenTrading} & {OpenCode} & {DSH}\\
+    \midrule
+    Rule applied wrongly, an old rule kept, or a rule ignored & 0 & 12 & 3\\
+    Refused, saying that the user's rules could not be found & 0 & 10 & 0\\
+    Ended without an answer & 1 & 5 & 6\\
+    Calculation convention of the user not followed & 0 & 2 & 0\\
+    \midrule
+    Total & 1 & 29 & 9\\
+    \bottomrule
+  \end{tabularx}
+  \fignote{Note: causes classified by the group from the judge's reasons and the trial records. Source: the group.}
+\end{table}
+%% Evidence: E46.
 
 \section{Discussion}\label{sec:discussion}
 \guide{Discuss how the results address the research questions and hypotheses, their alignment with related studies, and any limitations or challenges encountered.}
@@ -149,7 +173,7 @@ In the memory group, OpenCode often used up its request limit before answering o
 Five limits apply to these results:
 \begin{enumerate}
   \item Every task ran once in each harness, so the results do not show how stable the answers are across runs.
-  \item For 119 of the 300 tasks, the OpenCode and DSH answers come from the previous release of each harness, run with the same model, snapshot and judge but without the shared sandbox.
+  \item For 119 tasks, the OpenCode and DSH answers were taken from an earlier run of each harness; the group checked that the release used there differs from the one in \cref{tab:bench-config} only in its interface.
   \item The memory tasks, where most of the difference lies, were written by the group that built OpenTrading's memory, and their form may suit its design.
   \item The investor tasks cover one falling market over three weeks, so they are a signal about this period, not about investment skill.
   \item The judge was checked only on clearly correct and clearly wrong answers.

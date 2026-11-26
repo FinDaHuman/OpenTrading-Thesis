@@ -7,7 +7,8 @@
 \guide{Identify the specific research questions and objectives that the project will address.}
 
 \section{Data Collection and Preprocessing}\label{sec:data}
-OpenTrading does not store market data itself; it reads the data through the group's data server, which offers \num{175} tools to the harness \parencite{group2026opentradingmcp}.
+OpenTrading does not store market data itself.
+It reads the data through the Model Context Protocol (MCP), an open standard for connecting a model to tools and data, from the group's data server \enquote{opentrading-mcp}, which offers \num{175} tools \parencite{group2026opentradingmcp}.
 %% Evidence: E12.
 The data comes from public sources and from paid data services bought by the author: prices and indices of the Vietnamese exchanges through the \enquote{vnstock} library, financial statements from \enquote{Vietstock}, global indices and commodities from \enquote{Yahoo Finance}, crypto-assets from \enquote{Binance}, macroeconomic series from \enquote{FRED} and the \enquote{World Bank}, and news events from \enquote{GDELT}.
 
@@ -127,7 +128,6 @@ The prompt is assembled from blocks rather than written as one text.
 A line that describes a tool is included only when that tool is available, and the machine profile, used when another program rather than a person reads the answer, replaces the guidance on style with a strict answer format.
 In the first request of the benchmark tasks, the system prompt of the machine profile therefore ranged from 917 to \num{1645} words, depending on the tools and features of the task.
 %% Evidence: E22.
-The prompt has been written in English since November 2026, because the same rules take fewer tokens in English than in Vietnamese; the Vietnamese words that users type are kept where they decide which skill or tool is chosen.
 
 \subsection{Figure Tracing and Arithmetic}\label{sec:figure-tracing}
 A financial answer cannot be trusted if its figures do not come from the data.
@@ -275,25 +275,88 @@ The debate follows the bull and bear researchers of TradingAgents \parencite{xia
 Because ultradesk may use many requests (\cref{tab:playbooks}), it runs only when the user asks for it or approves it.
 %% Evidence: E29.
 
-\subsection{Financial Methods Behind the Data Tools}\label{sec:financial-methods}
-A model that receives a finished ratio cannot check how it was computed, so the financial measures that OpenTrading reads are computed by published methods rather than by the model.
-These include the Beneish M-score for earnings manipulation, the Piotroski F-score for financial strength, and the distribution days and follow-through days of William O'Neil for the state of the market.
-Inputs missing in the source are reported and never replaced by zero, so that the model can say what could not be computed instead of giving a partial score.
-%% Evidence: E36.
-\todo{Add the three sources after opening them: Beneish, Lee and Nichols (2013), Piotroski (2000), O'Neil.}
-
 \section{Model Configuration and Validation}\label{sec:validation}
-The project does not train a model, so validation tests whether the harness, not the model, improves the answers.
-OpenTrading was compared with two general-purpose harnesses on 300 financial tasks, with the same model, DeepSeek V4.1 Flash, the same frozen data and the same limits, so that only the harness differed.
-The setup and results are given in \cref{sec:bench-setup}.
-%% Evidence: E14, E37.
+The project does not train a model, so validation asks whether the harness, not the model, improves the answers.
+For a financial assistant two qualities matter most: the answer must be correct, both in its calculation and in its conclusion, and it must arrive quickly.
+These two criteria shaped the benchmark with which OpenTrading was compared to two general-purpose harnesses, OpenCode and DeepSeek Harness (DSH) \parencite{group2026opentradingbenchmark}.
+
+\subsection{Tasks}\label{sec:bench-tasks}
+The benchmark holds 300 tasks, questions in Vietnamese written as a user would ask them, each with a required answer format.
+They fall into the five groups of \cref{tab:taskset}, so that the result does not depend on one kind of question.
+To keep the correct answers fixed, the data tools answer from a frozen snapshot recorded on 1 November 2026, with 30 October 2026 as the last trading session, and every correct answer was computed from that snapshot by a script.
+Investor tasks assume a purchase at the close of 30 October 2026 and are scored with the closing prices of 23 November 2026.
+%% Evidence: E15, E20, E45.
+
+\begin{table}[H]
+  \centering
+  \renewcommand{\arraystretch}{1.3}
+  \caption{Task groups of the benchmark}\label{tab:taskset}
+  \begin{tabularx}{\textwidth}{@{}l L c@{}}
+    \toprule
+    {Group} & {What the task tests} & {Tasks}\\
+    \midrule
+    Compute & Calculations over price series and financial statements, such as returns, beta and growth & 79\\
+    Investor & Picking stocks, building a portfolio, or a buy, hold or sell call, scored by the later price & 36\\
+    Lookup & Finding and comparing published figures, including questions whose data does not exist & 112\\
+    Memory & Applying facts or rules that the user gave in an earlier session, including updated or withdrawn ones & 59\\
+    Robustness & Ignoring instructions planted in tool data, and stating the date of a price & 14\\
+    \midrule
+    Total & & 300\\
+    \bottomrule
+  \end{tabularx}
+  \fignote{Note: the investor group holds 20 portfolio tasks and 16 buy, hold or sell calls. Source: the group.}
+\end{table}
+
+\subsection{A Controlled Environment}\label{sec:bench-design}
+Each task was run once in each harness, \num{900} trials in total, and only the harness changed between them (\cref{tab:bench-config}).
+Each harness kept its own system prompt and tool design, since these are what a harness contributes.
+Everything else was locked, so that no harness had an advantage outside its design:
+\begin{enumerate}
+  \item The same model with the same settings answered in every harness.
+  \item Every harness saw only the same data tools; OpenTrading's other tools and its tool search were switched off.
+  \item Every command ran in the same isolated sandbox without network access.
+  \item The clock of every harness was set to the snapshot date, so no harness could mistake the snapshot for live data.
+  \item Questions that a harness normally asks its user, such as a request for permission, were answered automatically in the same way.
+  \item The same limits on requests, tokens and time applied to every trial.
+\end{enumerate}
+
+\begin{table}[H]
+  \centering
+  \renewcommand{\arraystretch}{1.3}
+  \caption{Configuration of the comparison}\label{tab:bench-config}
+  \begin{tabularx}{\textwidth}{@{}l L@{}}
+    \toprule
+    {Item} & {Setting}\\
+    \midrule
+    Model & DeepSeek V4.1 Flash, temperature 0, reasoning off\\
+    Harnesses & OpenTrading 0.5.0 with the change that allows buy and sell recommendations, machine profile; OpenCode 2.4.1; DSH 0.2.2-rc.5\\
+    Limits per trial & 24 model requests (48 for memory tasks), \num{4.6} million tokens, \qty{1800}{\second}\\
+    Grading & Rule-based checks, a language-model judge (Claude Haiku 5.5) and a manual review\\
+    \bottomrule
+  \end{tabularx}
+  \fignote{Source: the group.}
+\end{table}
+%% Evidence: E14, E16, E24.
+
+\subsection{Scoring}\label{sec:bench-scoring}
+A trial counts as correct only if all four conditions hold:
+\begin{enumerate}
+  \item The judge accepts the answer against the correct answer.
+  \item Every number lies within the tolerance of the correct value.
+  \item A task whose correct answer is a refusal, because the data does not exist, receives no number.
+  \item A manual review does not reject it; the review may reject a trial but never accept one.
+\end{enumerate}
+Investor tasks are scored by a fixed rule on the later prices, and a trial without a final answer counts as incorrect.
+Trials that failed for infrastructure reasons, such as a broken network connection, were run again, and judge replies that could not be read were judged again.
+Before the run, the judge classified 200 controlled answers, correct ones and copies made wrong in value, scale or refusal, all as expected (Cohen's $\kappa = 1.0$).
+%% Evidence: E17, E37, E43.
 
 \section{Evaluation Metrics}\label{sec:metrics}
 The primary metric is accuracy, the share of tasks that a harness $a$ answered correctly:
 \begin{equation}\label{eq:accuracy}
   \hat{p}_a=\frac{1}{|T|}\sum_{t\in T} y_{a,t},
 \end{equation}
-where $T$ is a set of tasks and $y_{a,t}$ is 1 when the trial of task $t$ in harness $a$ is correct under the rules of \cref{sec:bench-setup} and 0 otherwise.
+where $T$ is a set of tasks and $y_{a,t}$ is 1 when the trial of task $t$ in harness $a$ is correct under the rules of \cref{sec:bench-scoring} and 0 otherwise.
 A trial that ended without an answer counts as incorrect.
 
 Two harnesses are compared on the same tasks.
@@ -304,8 +367,13 @@ If the two harnesses were equally good, each of these $n$ tasks would be equally
 \end{equation}
 Tasks that both harnesses answered correctly, or both incorrectly, carry no information about the difference and are left out.
 
-Secondary metrics describe how an answer was reached: false refusals, numbers given where the correct answer is a refusal, trials without an answer, numbers outside the tolerance, and cost.
-They are reported separately and never added to accuracy as one score.
+Speed and cost are measured for every trial and reported separately, never added to accuracy as one score:
+\begin{enumerate}
+  \item Time per trial, from the question to the final answer, given as the median and the 90th percentile, because a few very slow trials matter to a user even when the typical trial is fast.
+  \item Model requests and data-tool calls per trial, which show how much work a harness needs to reach an answer.
+  \item Cost, as the total over all trials and as the cost per correct answer.
+\end{enumerate}
+Reliability is described by the trials without an answer, false refusals of answerable tasks, numbers given where the correct answer is a refusal, and numbers outside the tolerance.
 \todo{Cite a statistics reference for the sign test after opening it.}
 
 \section{Implementation Plan}\label{sec:implementation-plan}
