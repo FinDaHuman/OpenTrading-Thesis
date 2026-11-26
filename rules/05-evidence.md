@@ -30,6 +30,8 @@ PR thêm số mới phải thêm dòng vào bảng dưới. Ghi "đo" khi tự �
 | E43 | opentrading-benchmark: 1,199 test bộ v4.7 qua | CI run 45415688103 | đo | Tại commit của run đó |
 | E44 | Server dữ liệu chạy gói miễn phí của Render | opentrading-mcp `de956f8`, `render.yaml:16` | đo | Không có chi phí hosting được ghi |
 | E45 | Dự trù key OpenCode Go 10–15 USD | thesis `26226bb`, `admin/minutes/minutes.toml` tuần 8 | báo cáo | Dự trù, không phải chi thật; biên bản tuần 10 ghi 8 USD, chưa khớp E07 |
+| E46 | Issue đầu tiên của repo OpenTrading (#268) mở ngày 13/11/2026, tức tuần 10 | GitHub issues của FinDaHuman/OpenTrading | đo | Trước tuần 10 không có issue; việc chỉ nằm trong pull request |
+| E47 | Luật "thay đổi prompt/tool phải có số đo cặp nhỏ trước khi merge" có từ issue #354, ngày 16/11/2026, tức tuần 11 | GitHub issue FinDaHuman/OpenTrading#354 | báo cáo | Không áp dụng cho các thay đổi trước tuần 11 |
 
 ## Luật riêng
 
