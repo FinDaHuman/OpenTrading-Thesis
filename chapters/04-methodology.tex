@@ -7,8 +7,22 @@
 \guide{Identify the specific research questions and objectives that the project will address.}
 
 \section{Data Collection and Preprocessing}\label{sec:data}
-\guide{Describe the sources of data, methods of collection, selection criteria, sample size, diversity and representativeness (MCP data layer, frozen snapshot, task set).}
-\guide{Detail how the data is processed before analysis: cleaning, missing data, transformation, normalization of units and periods.}
+OpenTrading does not store market data itself.
+It reads the data through opentrading-mcp, a server built by the group that offers \num{175} tools through the Model Context Protocol (MCP) \parencite{group2026opentradingmcp}.
+%% Evidence: E12.
+Behind these tools are public sources and providers that require an account key: price and index data of the Vietnamese exchanges through the vnstock library, financial statements from Vietstock, global indices and commodities from Yahoo Finance, crypto-assets from Binance, macroeconomic series from FRED and the World Bank, and news events from GDELT.
+Gathering the providers behind one server means that every harness sees the same data in the same form.
+\todo{Confirm with the supervisor the licence wording for each provider before the server is described as public.}
+
+The providers disagree on units, periods and dates, so the server cleans the data before a model reads it.
+Four rules apply to every result.
+First, each result states the units of its numbers.
+This rule came from a real error: one provider gives Vietnamese share prices in thousands of đồng and another in đồng, and an early version of OpenTrading reported a price \num{1000} times too small.
+Second, reporting periods are always given in the same order, and trading days follow the calendar of the Vietnamese market; the server never invents a date for a day without trading.
+Third, missing data is reported as missing, with a reason and whether a retry may help, rather than filled with an estimate.
+Fourth, tools that compute statistics over a basket of today's listed companies warn that companies which left the market are not included, a bias known as survivorship bias.
+
+The data used to evaluate the harness, a frozen copy of the same server's answers and a set of questions with known answers, is described with the benchmark in \cref{sec:bench-tasks}.
 
 \section{Algorithm Design}\label{sec:algorithm}
 \guide{Replaces sample 1 “Feature Selection and Engineering”; supervisor’s “4.1 Algorithm”. The algorithms of the solution, with pseudocode and the reasons for each choice.}
@@ -108,6 +122,20 @@ The gate checks the form of an answer, not its truth.
 %% Evidence: E25.
 
 
+\subsection{Grounding Rules in the System Prompt}\label{sec:grounding-rules}
+The system prompt sets the rules that the model applies at every step, and OpenTrading puts them in a fixed order of priority.
+Core rules come first, then the working rules of the system, then the user's own request, so that a user cannot ask the model to break a core rule.
+Two core rules target the main risk of a financial assistant, a confident answer with a wrong number \parencite{kang2023deficiency}.
+First, every figure on prices, volumes, financial statements or the economy must come from a tool result in the same conversation; when data is missing, the model must say which part is missing instead of estimating it or using a figure it remembers.
+Second, the model may not calculate in its head; calculations go to a program, as \cref{sec:figure-tracing} explains.
+Views on the future must be given as scenarios, each with its assumptions, the conditions that would prove it wrong and a likelihood.
+
+The prompt is assembled from blocks rather than written as one text.
+A line that describes a tool is included only when that tool is available, and the machine profile, used when another program rather than a person reads the answer, replaces the guidance on style with a strict answer format.
+In the first request of the benchmark tasks, the system prompt of the machine profile therefore ranged from 917 to \num{1645} words, depending on the tools and features of the task.
+%% Evidence: E22.
+The prompt has been written in English since November 2026, because the same rules take fewer tokens in English than in Vietnamese; the Vietnamese words that users type are kept where they decide which skill or tool is chosen.
+
 \subsection{Figure Tracing and Arithmetic}\label{sec:figure-tracing}
 A financial answer cannot be trusted if its figures do not come from the data.
 The harness therefore compares the figures of an answer with the numbers that the model has read.
@@ -135,6 +163,41 @@ A command that contains only arithmetic normally runs without asking the user; i
 Since the model can still mistype an input, the harness looks for the typed numbers, apart from common constants, in what the model has read and can remind it of those it cannot find.
 On some model interfaces this reminder is not sent.
 %% Evidence: E25, E27.
+
+\subsection{Tool Search and Validation of Tool Inputs}\label{sec:tool-search}
+With \num{175} data tools and the harness's own tools, sending every tool definition in every request would take a large share of the model's context and would make the model choose among many similar tools \parencite{qin2024toolllm}.
+OpenTrading therefore defers some tools: the model receives only their names, and it loads a tool through a search tool when it needs it, as \cref{alg:tool-search} shows.
+In the default mode, rarely used local tools are always deferred, and all deferrable tools are deferred once there are more than 40 tools or once their definitions would take more than 10\% of the model's context.
+Sub-agents, which run short focused tasks, receive their tools directly.
+
+\begin{algorithm}[H]
+  \caption{Ranking of deferred tools for a search query}\label{alg:tool-search}
+  \begin{algorithmic}[1]
+    \Require query $q$; deferred tools $D$, each with name, search hint, description and parameter names
+    \Ensure tools of $D$ ordered by relevance to $q$
+    \If{$q$ has the form \texttt{select:}$a,b,\dots$} \State \Return the tools named $a,b,\dots$ \EndIf
+    \State $W \gets$ words of $q$ with Vietnamese diacritics removed; words marked \texttt{+} are required
+    \State add to $W$ the English terms of every Vietnamese market phrase found in $q$, longest phrase first
+    \For{each tool $d \in D$}
+      \State $s_d \gets \sum_{w \in W}$ ( 12 if $w$ is a word of the name, else 6 if it is part of one;
+      \Statex \hspace{\algorithmicindent}\hspace{\algorithmicindent} $+4$ if in the search hint; $+2$ if in the description; $+2$ if a parameter name )
+      \If{a required word scores 0 for $d$} \State discard $d$ \EndIf
+    \EndFor
+    \State \Return tools with $s_d>0$, by decreasing $s_d$, then by name
+  \end{algorithmic}
+\end{algorithm}
+
+The weights favour the name of a tool because data servers name their tools by function, such as \texttt{vn\_quote\_history}.
+The table of Vietnamese phrases lets a question such as \enquote{lịch sử giá} (price history) find tools that are described in English.
+Partial matches are allowed only for words of three letters or more, because short Vietnamese words would otherwise match half of the catalogue.
+%% Evidence: E23.
+
+Once a tool is chosen, its arguments can still be wrong, for example a period written in the wrong form \parencite{yao2024taubench}.
+If the server then returns no data, the model may conclude that the data does not exist and report it as missing, which is a false answer.
+In its grounded mode, OpenTrading checks every argument of a data tool against the schema that the server declares, before the call is sent.
+An invalid call is not executed; the model receives the reason, and an explicit statement that a rejected input is not evidence that the data is missing, so it corrects the call instead of giving up.
+A stricter optional policy, which also traces each reported figure back to the tool result it came from, exists for automated use; in the benchmark only the input check was enabled.
+%% Evidence: E24.
 
 \subsection{Permissions and Safe Execution}\label{sec:permissions}
 An agent that can write files and run commands can also do harm.
@@ -219,12 +282,65 @@ The debate follows the bull and bear researchers of TradingAgents \parencite{xia
 Because ultradesk may use many requests (\cref{tab:playbooks}), it runs only when the user asks for it or approves it.
 %% Evidence: E29.
 
+\subsection{Financial Methods in the Data Server}\label{sec:financial-methods}
+A model that receives a finished ratio cannot check how it was computed, so the data server computes its financial measures with published methods and states what it could not compute.
+Three principles apply to every method.
+Each measure follows a named source, and the server keeps the source's definitions rather than a simplified version.
+Inputs come from the same kind of statement for every company, by default the annual statements, and a line missing in the source is left out and reported, never replaced by zero; a ratio that is truly zero is kept as zero.
+When a measure cannot be computed, the result says which input is missing instead of returning a partial score.
+\Cref{tab:financial-methods} lists the main methods.
+
+\begin{table}[H]
+  \centering
+  \caption{Main financial methods of the data server}\label{tab:financial-methods}
+  \begin{tabularx}{\textwidth}{@{}l L L@{}}
+    \toprule
+    {Method} & {Question it answers} & {Rule kept from the source}\\
+    \midrule
+    Beneish M-score & Are the earnings likely to be manipulated? & Eight variables; total accruals from operating cash flow\\
+    Piotroski F-score & Is the company's financial strength improving? & Nine signals; returns and turnover on assets at the start of the year\\
+    Distribution days & Are large investors selling the market? & A fall of at least 0.2\% on higher volume, counted over 25 sessions\\
+    Follow-through day & Has a market rally been confirmed? & From the fourth day of a rally, a rise of at least 1.25\% on higher volume\\
+    Cycle statistics & Where is a sector in its price cycle? & Computed over today's listed companies, with a survivorship warning\\
+    \bottomrule
+  \end{tabularx}
+  \fignote{Source: opentrading-mcp \parencite{group2026opentradingmcp}, after the sources cited in the text.}
+\end{table}
+
+The two accounting scores follow Beneish, Lee and Nichols (2013) and Piotroski (2000).
+The two market-timing rules follow the method of William O'Neil: a distribution day stops counting after 25 sessions or once the index has risen 5\% above its close, and the first follow-through day becomes the reference for counting new distribution days.
+These rules let the model answer questions such as whether the market is in a confirmed uptrend with a result that a reader can recompute, instead of a judgement the model forms on its own.
+%% Evidence: E36.
+\todo{Add the three sources after opening them: Beneish, Lee and Nichols (2013), Piotroski (2000), O'Neil.}
+
 \section{Model Configuration and Validation}\label{sec:validation}
-\guide{Adapts sample 1 “Model Training and Validation”; supervisor’s “4.2 Validation”. Models considered, reasons for the final choice, configuration; arms, splits, runs, isolation, gold answers, judge.}
-\guide{State what was pre-registered and what was amended after seeing results (rules/05-evidence.md).}
+The project does not train a model, so validation tests whether the harness, not the model, changes the quality of the answers.
+The group validated OpenTrading with a controlled benchmark, opentrading-benchmark \parencite{group2026opentradingbenchmark}, which compares it with two general-purpose harnesses, OpenCode and DeepSeek Harness (DSH).
+All three used the same language model, DeepSeek V4.1 Flash, the same frozen copy of the data server and the same limits, so that only the harness differed.
+Each of 300 tasks was run once in each harness, \num{900} trials in total.
+The design is reported with its results in \cref{ch:results}: the tasks in \cref{sec:bench-tasks}, the comparison in \cref{sec:bench-design}, reproducibility and amendments in \cref{sec:bench-amendments} and scoring in \cref{sec:bench-scoring}.
+%% Evidence: E14, E37.
 
 \section{Evaluation Metrics}\label{sec:metrics}
-\guide{Identify the metrics used to assess performance, with formulas, and the statistical method for uncertainty.}
+The primary metric is accuracy, the share of tasks that a harness $a$ answered correctly:
+\begin{equation}\label{eq:accuracy}
+  \hat{p}_a=\frac{1}{|T|}\sum_{t\in T} y_{a,t},
+\end{equation}
+where $T$ is a set of tasks and $y_{a,t}$ is 1 when the trial of task $t$ in harness $a$ is correct under the rules of \cref{sec:bench-scoring} and 0 otherwise.
+A trial that ended without an answer counts as incorrect.
+
+Two harnesses are compared on the same tasks.
+Let $w$ be the number of tasks that OpenTrading answered correctly and the other harness did not, $l$ the reverse, and $n=w+l$.
+If the two harnesses were equally good, each of these $n$ tasks would be equally likely to fall either way, so the exact two-sided sign test gives
+\begin{equation}\label{eq:sign-test}
+  p=\min\Bigl(1,\;2\sum_{k=0}^{\min(w,l)}\binom{n}{k}2^{-n}\Bigr).
+\end{equation}
+Tasks that both harnesses answered correctly, or both incorrectly, carry no information about the difference and are left out.
+
+Secondary metrics describe how an answer was reached: false refusals on answerable tasks, numbers given on tasks whose correct answer is a refusal, trials without an answer, answers rejected because a number lay outside the tolerance, and the cost, tokens and time of a trial.
+They are reported separately and never added to accuracy as one score.
+The pre-registered design ran every task twice and estimated differences with a paired bootstrap; with one run per task the sign test replaced it, and stability across runs is not reported (\cref{sec:bench-amendments}).
+\todo{Cite a statistics reference for the sign test after opening it.}
 
 \section{Implementation Plan}\label{sec:implementation-plan}
 \guide{Describe in detail how the method is implemented, and the tools or technologies used to support this process.}

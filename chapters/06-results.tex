@@ -3,11 +3,277 @@
 \chapter{Results and Discussion}\label{ch:results}
 
 \section{Results and Analysis}\label{sec:results}
-\guide{Present the results obtained from executing the project, including numerical data, graphs, diagrams, and supportive imagery.}
-\guide{Provide a detailed analysis of the results obtained: comparison, error analysis, and their significance.}
+This section reports the benchmark that \cref{sec:validation} introduced: version 4.7 of opentrading-benchmark \parencite{group2026opentradingbenchmark}.
+Its design comes first, in \cref{sec:bench-tasks,sec:bench-design,sec:bench-amendments,sec:bench-scoring}, and its results follow.
+
+\subsection{Task Set and Selection}\label{sec:bench-tasks}
+A benchmark that read live market data would have a different correct answer on every run, so the benchmark uses a frozen snapshot.
+For each task, the answers that the data tools would give were recorded once, on 1 November 2026, with 30 October 2026 as the last trading session.
+During a trial the harness calls the same tools, but the answers come from the recording.
+The correct answer of each task was computed from the recorded data by a script, so it is correct with respect to the snapshot; it does not certify the original filings.
+Financial statements added for this version were checked against every earlier recording of the same companies and periods, and all 112 shared values matched.
+%% Evidence: E20.
+
+The tasks are questions in Vietnamese, written as a user would ask them, with a required answer format.
+They form two blocks (\cref{tab:taskset}).
+Block A holds the 200 tasks of this version and is the main measure.
+Block B holds 100 tasks of the previous version that do not repeat a block A task; it was added to widen the coverage of lookups.
+
+\begin{table}[H]
+  \centering
+  \caption{Task groups of the benchmark and the number of tasks in each block}\label{tab:taskset}
+  \begin{tabularx}{\textwidth}{@{}l L c c@{}}
+    \toprule
+    {Group} & {What the task tests} & {Block A} & {Block B}\\
+    \midrule
+    Compute & Calculations over price series and financial statements, such as returns, beta and growth & 69 & 10\\
+    Investor & Picking stocks, building a portfolio, or a buy, hold or sell call, scored by the later price & 36 & 0\\
+    Lookup & Finding and comparing published figures, including questions whose data does not exist & 30 & 82\\
+    Memory & Applying facts or rules that the user gave in an earlier session, including updated or withdrawn ones & 51 & 8\\
+    Robustness & Ignoring instructions planted in tool data, and stating the date of a price & 14 & 0\\
+    \midrule
+    Total & & 200 & 100\\
+    \bottomrule
+  \end{tabularx}
+  \fignote{Note: the investor group holds 20 portfolio tasks and 16 buy, hold or sell calls. Source: the group.}
+\end{table}
+%% Evidence: E15.
+
+The investor tasks assume a purchase at the close of 30 October 2026 and are scored with the closing prices of 23 November 2026, a period in which the market fell.
+Their scoring rules were recorded before any of these returns was computed.
+In the 16 buy, hold or sell calls, the correct answer was \enquote{sell} 11 times, so a rule that always answers sell would score 11 of 16.
+%% Evidence: E18.
+
+Tasks were selected by fixed rules.
+In the previous study, many tasks, mostly lookups and simple calculations, were answered correctly by every harness in both runs; 120 such tasks were removed because they cannot show a difference, but eight of them, whose correct answer is a refusal, were kept because a false answer to them is a serious error.
+Block B was formed from the 138 earlier tasks not repeated in block A by removing the 38 easiest lookups, chosen by their level and not by any result.
+The removal rule for block A was written after the earlier results were known; it applied to all harnesses alike, but it is an amendment (\cref{sec:bench-amendments}).
+%% Evidence: E19.
+
+\subsection{Comparison Design and Fairness}\label{sec:bench-design}
+The benchmark asks whether a harness built for financial analysis answers more questions correctly than a general-purpose one when the model, the data and the limits are the same.
+Three harnesses were compared: OpenTrading in its machine profile, OpenCode and DSH.
+\Cref{tab:bench-config} lists what they shared, and \cref{fig:bench-pipeline} shows the path of a task.
+Each harness kept its own system prompt and tool design, since these are what a harness contributes.
+
+\begin{table}[H]
+  \centering
+  \caption{Configuration shared by the three harnesses}\label{tab:bench-config}
+  \begin{tabularx}{\textwidth}{@{}l L@{}}
+    \toprule
+    {Item} & {Setting}\\
+    \midrule
+    Model & DeepSeek V4.1 Flash, temperature 0, reasoning off, through one paid provider route\\
+    Harnesses & OpenTrading 0.5.0 with the change that allows buy and sell recommendations, machine profile; OpenCode 2.4.1; DSH 0.2.2-rc.5\\
+    Data & One frozen snapshot of the data server, the same for every harness\\
+    Runs & One run of every task in every harness, \num{900} trials\\
+    Limits per trial & 24 model requests (48 for memory tasks), \num{4.6} million tokens, \qty{1800}{\second}\\
+    Calculation & Each harness's own shell, run in a shared sandbox without network access\\
+    Grading & Rule-based checks, a language-model judge (Claude Haiku 5.5) and a manual review\\
+    \bottomrule
+  \end{tabularx}
+  \fignote{Note: for block B and 19 block A tasks, the OpenCode and DSH answers come from the previous study (OpenCode 2.1.2, DSH 0.2.1); see \cref{sec:bench-amendments}. Source: the group.}
+\end{table}
+%% Evidence: E14, E16.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{benchmark-pipeline}
+  \caption{Path of a task through the benchmark}\label{fig:bench-pipeline}
+  \fignote{Source: the group.}
+\end{figure}
+
+A comparison between harnesses is only meaningful if no harness gets an advantage outside its own design, so the group took four measures.
+Every harness saw the same data tools; OpenTrading's other tools were removed and its tool search was switched off.
+Every harness calculated with its own shell, but every command ran in the same isolated sandbox, which replaced an earlier command filter that followed OpenTrading's own rules and so favoured it.
+The clock seen by every harness was set to the snapshot date, so that no harness could mistake the snapshot for live data.
+Questions that a harness normally asks its user were answered automatically in the same way for every harness.
+The limits on requests and tokens were enforced by a shared gateway between the harnesses and the model provider.
+
+\subsection{Reproducibility and Amendments}\label{sec:bench-amendments}
+Before the main run, the code of the benchmark, the task set and the configuration were sealed: the seal records a hash of each protected file, and a run whose files differ from the seal is refused.
+A held-out set of 70 tasks was not run; it is not described as unseen data, because its answers are in a public repository.
+Every change during the run was recorded as a dated amendment before it took effect, with one exception noted below.
+\Cref{tab:amendments} lists the differences between the pre-registered design and the run reported here.
+
+\begin{table}[H]
+  \centering
+  \caption{Differences between the pre-registered design and the reported run}\label{tab:amendments}
+  \begin{tabularx}{\textwidth}{@{}l L L@{}}
+    \toprule
+    {Item} & {Pre-registered} & {Reported run}\\
+    \midrule
+    Runs & Two runs of every task & One run, to finish within the time available\\
+    Statistics & Paired bootstrap; stability over two runs & Exact sign test; no stability measure\\
+    Task selection & All tasks of the previous set & Tasks that every harness solved were removed; rule written after the earlier results\\
+    Investor tasks & None & 36 tasks scored by the later price, rules fixed before returns were computed\\
+    Provider host & One pinned host & A second host for 45 block A trials and for OpenTrading in block B\\
+    Earlier answers & None & Block B and 19 block A tasks use the OpenCode and DSH answers of the previous study\\
+    Scoring fixes & Not specified & 17 unreadable judge verdicts judged again; 14 re-run trials given their own verdict; done after the results\\
+    \bottomrule
+  \end{tabularx}
+  \fignote{Source: the group.}
+\end{table}
+%% Evidence: E37, E43.
+
+The last change was made after the results were seen and had no amendment at the time.
+It corrected two faults in the first table of results, by rules that applied to every harness and did not depend on any trial's outcome.
+First, the judge's reply could not be read for 17 trials, which had therefore counted as incorrect; all 17 were judged again with the same judge, and 16 were then judged correct and one incorrect.
+Second, the 14 trials that had been run again after infrastructure failures were all counted as incorrect because their new verdicts had not been joined to the table; with their own verdicts, 7 were correct.
+Together the fixes turned 22 trials from incorrect into correct (11 OpenTrading, 6 OpenCode and 5 DSH trials) and moved OpenTrading's block A score from 169 to 180, so the earlier values are reported next to the final ones.
+
+\subsection{Scoring}\label{sec:bench-scoring}
+A trial counts as correct only if four conditions hold.
+The judge must accept the final answer as correct against the gold answer.
+Every number in the answer must lie within the tolerance of the gold value.
+On a task whose correct answer is a refusal, because the data does not exist, the answer must not contain a number.
+Finally, a manual review may reject a trial that the judge accepted, but it may never accept one that the judge rejected.
+Investor tasks are scored by their fixed rule on the later prices, and a trial without a final answer counts as incorrect.
+
+The judge was Claude Haiku 5.5 at temperature 0.
+Before the run it was checked on 200 controlled items, answers known to be correct and copies of them made wrong in value, scale or refusal, and it classified all 200 as expected (Cohen's $\kappa = 1.0$).
+The check does not cover borderline cases such as partly correct answers.
+For the answers taken from the previous study, only excerpts survive, so they keep that study's judge; the cleanest comparison is therefore the 181 block A tasks judged entirely by Haiku.
+%% Evidence: E17.
+
+\subsection{Completion of the Run}\label{sec:run-completion}
+All \num{900} trials were completed and none is missing.
+Fourteen trials that failed for infrastructure reasons, such as a broken network connection, were voided under the pre-registered rule and run again.
+In block A, OpenTrading gave a final answer in all 200 trials, while OpenCode and DSH each ended six trials without one.
+%% Evidence: E37, E41.
+
+\subsection{Accuracy by Group}\label{sec:accuracy}
+\Cref{tab:accuracy} and \cref{fig:accuracy} give the accuracy of each harness.
+On block A, OpenTrading answered 180 of 200 tasks correctly (90.0\%), DSH 166 (83.0\%) and OpenCode 145 (72.5\%).
+Before the scoring fixes of \cref{sec:bench-amendments}, the values were 169, 161 and 139.
+Block B was nearly saturated: all three harnesses solved at least 99 of its 100 tasks, so it adds little to the comparison.
+
+\begin{table}[H]
+  \centering
+  \caption{Tasks answered correctly by each harness}\label{tab:accuracy}
+  \begin{tabularx}{\textwidth}{@{}L S[table-format=3.0] S[table-format=3.0] S[table-format=3.0] S[table-format=3.0]@{}}
+    \toprule
+    {Group} & {Tasks} & {OpenTrading} & {OpenCode} & {DSH}\\
+    \midrule
+    Compute & 69 & 68 & 65 & 66\\
+    Investor & 36 & 19 & 16 & 16\\
+    Lookup & 30 & 28 & 28 & 28\\
+    Memory & 51 & 51 & 22 & 42\\
+    Robustness & 14 & 14 & 14 & 14\\
+    \midrule
+    Block A & 200 & 180 & 145 & 166\\
+    Block B & 100 & 99 & 100 & 100\\
+    All tasks & 300 & 279 & 245 & 266\\
+    \bottomrule
+  \end{tabularx}
+  \fignote{Note: values after the scoring fixes; before them, block A was 169, 139 and 161, and OpenTrading's memory group 43. Source: the group.}
+\end{table}
+%% Evidence: E38, E39.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{benchmark-accuracy}
+  \caption{Accuracy by task group in block A, with 95\% Wilson intervals}\label{fig:accuracy}
+  \fignote{Note: number of tasks in brackets. Source: the group.}
+\end{figure}
+
+The groups differ sharply.
+On calculation, lookup and robustness tasks the three harnesses were close, within three tasks of each other.
+The difference came from memory: OpenTrading applied every rule that a user had given in an earlier session, including rules later updated or withdrawn, while DSH solved 42 and OpenCode 22 of these 51 tasks.
+On the investor tasks all harnesses were weak, near one half.
+
+\subsection{Differences Between Harnesses}\label{sec:differences}
+\Cref{tab:differences} compares OpenTrading with each other harness on the same tasks, using the sign test of \cref{eq:sign-test}.
+On the 181 block A tasks judged entirely by Haiku, OpenTrading was ahead of OpenCode on 37 tasks and behind on 4, and ahead of DSH on 18 and behind on 5.
+Both differences are unlikely under the hypothesis of equal harnesses.
+The difference with DSH, however, depends on the scoring fixes: before them, OpenTrading was ahead on 19 tasks and behind on 12 ($p=0.28$), which would not support a difference.
+
+\begin{table}[H]
+  \centering
+  \caption{Paired comparison of OpenTrading with each other harness (exact two-sided sign test)}\label{tab:differences}
+  \begin{tabularx}{\textwidth}{@{}L l S[table-format=2.0] S[table-format=2.0] l@{}}
+    \toprule
+    {Tasks} & {Compared with} & {Ahead} & {Behind} & {$p$}\\
+    \midrule
+    Block A, judged by Haiku (181) & OpenCode & 37 & 4 & \num{1.0e-7}\\
+     & DSH & 18 & 5 & \num{0.011}\\
+    All tasks (300) & OpenCode & 40 & 6 & \num{3.1e-7}\\
+     & DSH & 19 & 6 & \num{0.015}\\
+    \bottomrule
+  \end{tabularx}
+  \fignote{Note: before the scoring fixes, block A judged by Haiku gave 36 ahead and 8 behind against OpenCode ($p=2.5\times10^{-5}$) and 19 and 12 against DSH ($p=0.28$). Source: the group.}
+\end{table}
+%% Evidence: E40.
+
+\subsection{Reliability and Cost}\label{sec:stability-cost}
+\Cref{tab:reliability} reports how the answers were reached in block A.
+OpenTrading returned a valid answer in every trial, never refused a task that had an answer, and had one answer rejected for a number outside the tolerance, against 15 for OpenCode and 5 for DSH.
+No harness gave a number on any of the eight tasks whose correct answer is a refusal.
+OpenTrading also used about half the cost of the other two per trial, and its slowest tenth of trials took under two minutes, against five to seven minutes for the others.
+
+\begin{table}[H]
+  \centering
+  \caption{Reliability, cost and time of each harness in block A}\label{tab:reliability}
+  \begin{tabularx}{\textwidth}{@{}L S[table-format=3.0] S[table-format=3.0] S[table-format=3.0]@{}}
+    \toprule
+    {Measure} & {OpenTrading} & {OpenCode} & {DSH}\\
+    \midrule
+    Valid answer format (of 200) & 200 & 188 & 186\\
+    Trials without an answer & 0 & 6 & 6\\
+    False refusals (of 192 answerable) & 0 & 10 & 0\\
+    Numbers on refusal tasks (of 8) & 0 & 0 & 0\\
+    Rejected for a number outside the tolerance & 1 & 15 & 5\\
+    Data-tool calls per trial (mean) & \num{4.4} & \num{5.9} & \num{5.4}\\
+    Time per trial, median (s) & 46 & 72 & 47\\
+    Time per trial, 90th percentile (s) & 117 & 401 & 297\\
+    Cost per trial (USD) & {0.0030} & {0.0061} & {0.0058}\\
+    Cost per correct answer (USD) & {0.0033} & {0.0084} & {0.0070}\\
+    \bottomrule
+  \end{tabularx}
+  \fignote{Note: cost as reported by the provider for each request, not checked again by the group; for 19 tasks the OpenCode and DSH costs come from the previous study. Source: the group.}
+\end{table}
+%% Evidence: E41, E42.
+
+On the easy tasks of block B the picture reversed: OpenTrading took a median of 29 seconds, against 16 and 17 for the others, because its system prompt and tools are larger.
+Its advantage in time appears only on long tasks with many steps.
+%% Evidence: E42.
+
+\subsection{Error Analysis}\label{sec:error-analysis}
+Twelve block A tasks defeated all three harnesses: four stock picks, four buy, hold or sell calls and four single tasks in other investor, memory-constrained picking and financial-statement families.
+Two tasks were failed by OpenTrading alone: one stock pick under a remembered constraint and one buy, hold or sell call.
+%% Evidence: E39.
+
+The investor group shows the limit of the harnesses rather than a difference between them.
+No harness found the stock that would rise most in the next three weeks (0 of 4 for all), which is below the one-in-six rate of a random pick.
+On the buy, hold or sell calls OpenTrading scored 7 of 16, OpenCode 10 and DSH 8, and all three were below the 11 of 16 of a rule that always answers sell.
+OpenTrading did not lean towards buying: its calls split into 8 sell, 6 buy and 2 hold, close to the other harnesses; it lost on the choice for each company.
+In the memory group, OpenCode often used up its request limit before answering or applied a rule that the user had already replaced, and DSH failed most often on the tasks that update a calculation convention (4 of 13).
+\todo{Add two short examples of incorrect answers, one from the investor group and one from the memory group, after reading the trial records.}
 
 \section{Discussion}\label{sec:discussion}
 \guide{Discuss how the results address the research questions and hypotheses, their alignment with related studies, and any limitations or challenges encountered.}
+
+\subsection{Threats to Validity}\label{sec:threats}
+The results support a narrower claim than the headline numbers may suggest, for six reasons.
+
+The difference between OpenTrading and DSH rests on 23 tasks out of 181, and it disappears without the scoring fixes, which were decided after the results were seen.
+The difference with OpenCode does not depend on it.
+
+Every task ran once in each harness.
+With temperature 0 the answers are more repeatable, but a single run cannot show how stable they are, which the pre-registered second run would have measured.
+
+Part of the comparison mixes generations and hosts.
+In block B and in 19 block A tasks, OpenTrading of this version is compared with older versions of OpenCode and DSH, run without the sandbox and with different limits; and 45 block A trials used a second provider host.
+The 181 tasks judged by Haiku avoid the first problem but not the second.
+
+The memory tasks, where most of the difference lies, were written by the same group that built OpenTrading's memory.
+The tasks follow what users ask, but their form may suit OpenTrading's design better than that of the other harnesses.
+
+The investor tasks cover one falling market over three weeks.
+Their results are a signal about this period, not about the harnesses' skill as investors.
+
+Finally, the judge was checked only on clearly correct and clearly wrong answers, and the task set was selected with rules partly written after earlier results.
+Both choices applied to all harnesses alike, but they limit how far the numbers can be generalised.
 
 \section{Recommendations}\label{sec:recommendations}
 \guide{Offer recommendations based on the findings, including further research, system improvements, or practical applications.}
