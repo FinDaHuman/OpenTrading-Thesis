@@ -295,7 +295,10 @@ Its tasks, design and scoring are described below.
 
 \label{sec:bench-tasks}
 The benchmark holds 300 tasks, questions in Vietnamese written as a user would ask them, each with a required answer format.
-They fall into the five groups of \cref{tab:taskset}.
+They fall into the five groups of \cref{tab:taskset} and come in two blocks.
+Block A holds 200 tasks; tasks that every harness had answered correctly in the previous version of the benchmark were left out, apart from eight whose correct answer is a refusal.
+Block B holds 100 tasks of the previous version that do not repeat block A (82 lookup, 10 compute and 8 memory tasks), left after the 38 easiest lookups were removed by a rule that did not look at the results.
+%% Evidence: E15, E19.
 To keep the correct answers fixed, the data tools answer from a frozen snapshot recorded on 1 November 2026, with 30 October 2026 as the last trading session, and every correct answer was computed from that snapshot by a script.
 Investor tasks assume a purchase at the close of 30 October 2026 and are scored with the closing prices of 23 November 2026.
 %% Evidence: E15, E20, E45.
@@ -320,8 +323,14 @@ Investor tasks assume a purchase at the close of 30 October 2026 and are scored 
 \end{table}
 
 \label{sec:bench-design}
-Each harness was run once on all 300 tasks and kept its own system prompt and tool design, since these are what a harness contributes.
-%% Evidence: E37, E45.
+Each harness answered each of the 300 tasks once and kept its own system prompt and tool design, since these are what a harness contributes.
+OpenTrading answered all 300 tasks in the runs of this study, as did OpenCode 2.4.1 and DeepSeek Harness 0.2.2-rc.5 for 181 tasks.
+For the other 119 tasks, all of block B and 19 of block A, among them 15 memory tasks, the answers of OpenCode and DeepSeek Harness were taken from an earlier run of the same tasks with the same model and data snapshot.
+That run used older versions of these two harnesses (OpenCode 2.1.2 and DeepSeek Harness 0.2.1-rc.2), no sandbox and a shorter time limit.
+Of the other trials, 517 were served by one host of the model and 145 by a second host of the same model.
+All 900 answers were graded in the same way (\cref{sec:bench-scoring}), and the effect of these differences is discussed with the results (\cref{sec:threats}).
+%% Evidence: E16, E37, E45, E78.
+
 The environment was set up to give no harness an advantage outside its design:
 \begin{enumerate}
   \item The same model, DeepSeek V4.1 Flash with temperature 0 and no reasoning requested, answered in every harness; OpenTrading 0.5.0 with the change that allows buy and sell recommendations ran with its machine profile.

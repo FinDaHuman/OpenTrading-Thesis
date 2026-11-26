@@ -7,7 +7,7 @@ The stop gate sends back answers that give figures as fetched data although no t
 A separate data server offers 175 market-data tools whose results state their availability, source and time.
 The rules were checked by automated tests, and the harness was compared with two general-purpose harnesses, OpenCode and DeepSeek Harness, on 300 tasks over a frozen data snapshot.
 OpenTrading answered 279 tasks correctly (\qty{93.0}{\percent}), against 266 for DeepSeek Harness (\qty{88.7}{\percent}) and 245 for OpenCode (\qty{81.7}{\percent}).
-On paired tasks, an exact sign test gave $p=0.015$ against DeepSeek Harness and $p=3.1\times10^{-7}$ against OpenCode.
+On paired tasks, an exact sign test gave $p=0.015$ against DeepSeek Harness and $p=3.1\times10^{-7}$ against OpenCode, and the order was the same on the benchmark's main block of 200 tasks.
 %% Evidence: E10, E12, E37, E45.
 Its cost per correct answer was about half that of DeepSeek Harness and less than half that of OpenCode.
 The difference came mostly from tasks that depend on rules given in an earlier session, while calculation and retrieval tasks ended within three tasks of each other and investor tasks showed no clear difference.
