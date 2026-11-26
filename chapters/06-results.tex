@@ -167,7 +167,36 @@ OpenTrading, by contrast, failed one memory task and needed only a few requests 
 %% Evidence: E46.
 
 \section{Discussion}\label{sec:discussion}
-\guide{Discuss how the results address the research questions and hypotheses, their alignment with related studies, and any limitations or challenges encountered.}
+The third objective of the project (\cref{sec:objective}) asked whether a harness designed for financial analysis answers better than a general one when the model and the data are the same.
+The results answer yes, but only for some kinds of question, and this section explains where the difference comes from and how it relates to earlier work.
+
+\subsection{Where the Harness Makes a Difference}\label{sec:harness-difference}
+On 205 of the 300 tasks, the compute, lookup and robustness groups, the three harnesses were within three tasks of each other.
+Once every harness had the same data tools and a shell for arithmetic, fetching a figure and computing with it did not depend on the harness: the model and the data did the work.
+
+The difference came from the memory group, where OpenTrading answered 58 of 59 tasks against 50 for DSH and 30 for OpenCode.
+These tasks depend on what the user said in an earlier session, which a model cannot recover from the data.
+In OpenTrading memory is part of the harness: at the start of every turn the user's constraints are placed in the system part of the prompt (\cref{sec:memory-flow}), so the model does not need to search for them.
+The other harnesses had to search for the user's notes with their tools; they spent 15 to 20 requests on a typical memory task, against 4 for OpenTrading, and still often kept an outdated rule or refused because they found none.
+The same difference explains most of OpenTrading's lead in speed and cost: fewer requests meant a shorter wait in the slowest trials and less than half the cost per correct answer.
+%% Evidence: E45, E46.
+
+The investor group shows the opposite limit.
+No harness beat a rule that always answers \enquote{sell}, and none found the stock that rose most.
+A harness can make sure that an answer rests on real data, but it cannot give the model foresight.
+This supports the scope of the project (\cref{sec:scope}): OpenTrading aims at answers whose figures can be checked, not at predictions of prices.
+
+\subsection{Relation to Earlier Work}\label{sec:related-results}
+Research harnesses for software tasks showed that the interface between the model and its tools changes how well an agent performs \parencite{yang2024sweagent}.
+The present results agree, and add two points from a controlled comparison in finance: the effect is concentrated in tasks that need state across sessions, and on tasks of plain retrieval and calculation it disappears.
+That calculation did not separate the harnesses is consistent with work showing that arithmetic written as a program is more reliable than arithmetic in words \parencite{gao2023pal,chen2023program}, since all three harnesses calculated through a shell.
+Long-term memory has been proposed as a function of the system around the model rather than of the model itself \parencite{packer2023memgpt}; the memory group gives measured support for this view in a financial setting.
+
+Earlier studies found that language models invent financial figures \parencite{kang2023deficiency}, and that a strong model with retrieval answered wrongly or refused most questions on company filings \parencite{islam2023financebench}.
+Here no harness gave a number on any task whose data does not exist, and OpenTrading had one answer rejected for a wrong number in 300.
+The settings differ, so the numbers cannot be compared directly, but the result suggests that structured data tools remove much of the room for invented figures.
+Finally, \textcite{kapoor2024agents} argued that evaluations of agents should hold the model fixed and report cost alongside accuracy; this benchmark does both, and the cost per correct answer differed by about a factor of two, more in relative terms than accuracy did.
+
 
 \subsection{Threats to Validity}\label{sec:threats}
 Four limits apply to these results:
