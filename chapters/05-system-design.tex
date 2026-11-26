@@ -2,7 +2,6 @@
 \chapter{System Design and Implementation}\label{ch:design}
 
 \section{AI Model Integration}\label{sec:integration}
-\guide{Describe how the AI model is integrated into the larger system, including the interface and data exchange between the AI model and other system components.}
 
 \subsection{Overall Architecture}\label{sec:architecture}
 \Cref{fig:architecture} shows the parts of the harness and the programs it talks to.
@@ -19,7 +18,7 @@ It produces a stream of events, and every interface reads the same events, so th
 The design follows three questions.
 The first is what the model sees.
 The system prompt is built in layers: the core rules and working rules, then the user's profile and constraints, then the style and the list of skills.
-A skill is a written method of analysis; of the 43 in OpenTrading, only those that the model loads or the user switches on are added in full.
+Of the 43 skills in OpenTrading (\cref{sec:skills}), only those that the model loads or the user switches on are added in full.
 The earlier layers rarely change, so the provider can reuse its cache; reminders such as the time of the market are sent with the messages.
 %% Evidence: E10.
 
@@ -48,10 +47,10 @@ OpenTrading reads market data through MCP (\cref{sec:data}), whose specification
 Its MCP client connects to the group's data server, which offers \num{175} tools and 6 prepared analysis workflows \parencite{group2026opentradingmcp}, and gives the model these tools next to its own, prefixed with the server's name so that two servers cannot clash.
 Above a threshold the model receives only the tool names and loads tools through the search of \cref{sec:tool-search}, and the workflows appear to the user as commands.
 %% Evidence: E12, E21.
-Every answer of the server uses the same envelope, which states whether the data is available, the units and source of each number and, when data is missing, the reason and whether a retry may help.
+Every answer of the server uses the same envelope, which states whether the data is available, its source and time, the units of prices for the tools whose units have been checked and, when data is missing, the reason and whether a retry may help.
 OpenTrading relies on this envelope: the model can choose its next step instead of stopping or guessing, and the final answer can cite where each number came from.
 Each tool of the data server declares whether it only reads data or also writes, for example to save a watch list.
-The harness runs reading tools at once and passes writing tools to the permission gate of \cref{sec:permissions}.
+The harness runs reading tools at once and passes writing tools, and tools that do not declare either, to the permission gate of \cref{sec:permissions}.
 When the user allows a tool permanently, the permission is tied to the exact server, so a different server that offers a tool with the same name is asked again.
 
 \subsection{Skills and Specialist Agents}\label{sec:skills}
@@ -61,9 +60,9 @@ A skill is a written method for one kind of analysis, such as a bank's asset qua
 %% Evidence: E44.
 The system prompt lists only the name and purpose of each skill, and the model loads the full method when a question needs it; a skill may also bring reference tables, which are read only on request.
 Each skill declares the data tools it needs, and a skill whose tools are missing is hidden, so the model is not offered a method it cannot carry out.
-Because users ask in Vietnamese while the methods are written in English, each skill also keeps Vietnamese phrases that decide when it applies.
+Because users ask in Vietnamese while the methods are written in English, each skill also keeps Vietnamese phrases; when a question matches them, the harness reminds the model of the skill, and the model decides whether to load it.
 
-A specialist agent is a sub-agent with its own instructions and a limited set of tools, for example valuation, technical analysis, macroeconomics, or the bull and bear sides of a debate.
+A specialist agent is a sub-agent with its own instructions and, for most of them, only the tools that read data, for example valuation, technical analysis, macroeconomics, or the bull and bear sides of a debate.
 The valuation agent, for instance, must compute both a simple discounted cash flow and a comparison with peers, test how far the value moves with its main assumption, and give every figure with its source and time.
 How the main agent hands work to these agents is described in \cref{sec:multi-agent}.
 
@@ -90,7 +89,6 @@ When a chart is made from a labelled result, the harness reads the numbers itsel
 \end{figure}
 
 \section{Data Flow and Processing}\label{sec:dataflow}
-\guide{Illustrate and describe the data flow through the system, from data collection, processing, to data analysis and result presentation.}
 
 \subsection{From a Question to an Answer}\label{sec:question-flow}
 \Cref{fig:question-flow} follows one message through the harness.
@@ -131,9 +129,9 @@ Only the user writes memory.
 Four commands open a form: \texttt{/nho} (\enquote{remember}) for a constraint or a presentation style, \texttt{/luandiem} (\enquote{thesis}) for the investment thesis on one subject, such as a ticker, \texttt{/baihoc} (\enquote{lesson}) for a lesson and \texttt{/quyetdinh} (\enquote{decision}) for a decision.
 The \texttt{/memory} screen lists the entries for viewing and editing.
 %% Evidence: E48.
-Every save passes one shared text check, which normalises Unicode, rejects empty or over-long text and refuses strings that look like an API key or a private key.
+Every save passes one shared text check, which normalises Unicode, rejects empty or over-long text and refuses text that has the form of a known API key or a private key.
 The model has no tool for writing; at most it ends an answer with a suggestion card, which opens the same form.
-The entry takes effect only when the user saves it, unless the user has switched on automatic saving for cards that quote the user word for word.
+The entry takes effect only when the user saves it, unless the user has switched on automatic saving, which applies only to constraint and style cards whose rule the user typed word for word.
 
 Constraints take a path of their own.
 At the start of every turn the harness opens the store in read-only mode, takes the constraints and closes it again, whether the notebook is on or off.
@@ -154,7 +152,7 @@ Decisions are never sent to the model; they appear only on the \texttt{/memory} 
 
 Memory blocks sent in earlier turns stay in the conversation history.
 Before each turn the harness checks them against the store and masks the entries that the user has deleted, which is step 2 of \cref{fig:question-flow}.
-When the conversation is compacted, memory blocks in the summarised part keep only their labels, and the model can read them again with \texttt{memory\_read}; suggestion cards are removed from the history on every turn.
+When the conversation is compacted, the model that writes the summary sees only the labels of the memory blocks, and the model can read them again with \texttt{memory\_read}; suggestion cards are removed from the history on every turn.
 
 \subsection{Data Behind a Tool Call}\label{sec:mcp-lifecycle}
 When OpenTrading calls a data tool, the server checks the caller's access and limits, reuses a recent answer to the same question where the market allows, and otherwise asks the provider, stopping for a while after repeated failures of that provider.
@@ -162,7 +160,6 @@ The result is cleaned by the rules of \cref{sec:data} and returned in the envelo
 For OpenTrading this means that a failed source returns a clear reason quickly, which the harness lists after the answer (step 7 of \cref{fig:question-flow}).
 
 \section{Deployment Strategy}\label{sec:deployment}
-\guide{Detail how the system is deployed, including the deployment environment and deployment procedures.}
 
 \subsection{Release and Update of the Harness}\label{sec:release}
 OpenTrading runs on the user's computer.
@@ -173,15 +170,14 @@ The files do not carry a publisher's certificate yet, so the operating system ma
 %% Evidence: E31.
 
 \subsection{Deployment of the Data Server}\label{sec:mcp-deployment}
-The data server is packaged as one container image.
-For a single user it runs on the same computer and talks to OpenTrading directly, without a network or a token; for the group it runs as a web service with a database and a cache.
+The data server can run in two ways.
+For a single user it runs on the same computer as a process that OpenTrading starts, without a token; for the group it runs from one container image as a web service with a PostgreSQL database and a Redis cache.
 Provider credentials and access tokens are given as environment settings and never stored in the repository.
 
 \section{Scalability and Maintenance}\label{sec:scalability}
-\guide{Discuss how the system is designed to handle growth and future maintenance, including system updates, scalability, and version management.}
 
 \subsection{Load on the Data Server}\label{sec:scaling}
-The data server is designed to stay responsive when many calls arrive together: connections to providers are reused, identical calls are merged, and above a bound new calls are refused at once with a retry time, so OpenTrading never waits on an overloaded server.
+The data server is designed to stay responsive when many calls arrive together: connections to providers are reused, identical calls are merged, and above a bound new calls are refused at once with a retry time, so OpenTrading is told to retry later instead of waiting on an overloaded server.
 No new load test was run for this version, so no throughput figure is claimed.
 
 \subsection{Testing and Maintenance}\label{sec:testing}
@@ -192,6 +188,6 @@ For the stop gate the tests contain both endings that must be caught and answers
 These tests show that a rule does what it was designed to do; they do not show that it improves the answers.
 %% Evidence: E11, E35.
 
-The data server is tested in the same way: at the version described here, \num{1338} tests passed, covering 71.69\% of its lines.
+The data server is tested in the same way: at the version described here, \num{1338} tests passed, covering \qty{71.69}{\percent} of its lines; the check that calls the tools with live data is not part of these automated checks.
 %% Evidence: E13.
 Its dependence on a vendor's own package index for Vietnamese market data is left for future work (\cref{sec:future}).

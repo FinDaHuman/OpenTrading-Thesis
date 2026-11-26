@@ -8,3 +8,4 @@ Theo [07-versioning.md](rules/07-versioning.md).
 - Hình và bảng `[H]` đặt ngay sau đoạn văn, cách đều trên dưới; ghi nguồn theo Harvard, không ghi mã commit trong bài.
 - Luật nhóm trong `rules/`, kiểm tra tự động, quản lý phiên bản PDF, GitHub Actions.
 - Bìa trường: họ tên, MSSV, mã sinh viên căn thành ba cột.
+- Bản đầy đủ đầu tiên: phần đầu, I đến VI, IX; hết `\guide`, `\TBC`, `\todo` ngoài phần VII; time plan và biên bản đến tuần 16.

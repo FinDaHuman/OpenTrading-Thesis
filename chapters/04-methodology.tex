@@ -1,6 +1,4 @@
 %% Part IV, school Report #4. Grading: 35% on-going, 35% defence (largest part). Budget: 9 pages.
-%% The school lets the team customise this part; based on "sample 1". Sections 3 and 4 are renamed because
-%% the project does not train a model; they carry the supervisor’s "Solutions: Algorithm / Validation".
 \chapter{Methodology}\label{ch:methodology}
 
 \section{Research Questions and Objectives}\label{sec:rq}
@@ -16,7 +14,7 @@ Each RQ states what is measured and where it is answered, so that \cref{sec:summ
   The benchmark measures the first aim: the secondary metrics of \cref{sec:metrics} count answers rejected for a figure outside the tolerance, figures given on tasks that should have been refused, and trials that end without an answer.
   \item[RQ2.~] How should a market-data server return its results so that the agent knows the unit, the source and the availability of each figure?
   The measure is whether every tool of the data server replies in one shape that states whether the data is available and where and when it was taken.
-  A contract test of the server calls every tool and checks this shape, and a second test checks that every tool returning a price or an amount of money states its units.
+  A contract check calls the tools of the server with live data and checks this shape, and a test checks that a listed set of tools that return prices or amounts of money state their units.
   The answer is given in \cref{sec:tool-exposure}.
   \item[RQ3.~] With the same model, the same data and the same scoring, does OpenTrading answer more financial tasks correctly than two general-purpose harnesses, OpenCode and DeepSeek Harness, and at what cost?
   The measures are accuracy with confidence intervals, a sign test on paired results for the same tasks, and the time and cost of each trial (\cref{sec:metrics}).
@@ -32,12 +30,12 @@ The harness is judged on whether its figures and conclusions match the data, not
 OpenTrading does not store market data itself.
 It reads the data through MCP (\cref{sec:project-overview}) from the group's data server \enquote{opentrading-mcp}, which offers \num{175} tools \parencite{group2026opentradingmcp}.
 %% Evidence: E12.
-The data comes from public sources and from data services used under the group's accounts: prices and indices of the Vietnamese exchanges through the \enquote{vnstock} library, financial statements from \enquote{Vietstock}, global indices and commodities from \enquote{Yahoo Finance}, crypto-assets from \enquote{Binance}, macroeconomic series from \enquote{FRED} and the \enquote{World Bank}, and news events from \enquote{GDELT}.
+The data comes from the following sources: prices and indices of the Vietnamese exchanges through the free tier of the \enquote{vnstock} library, financial statements from \enquote{Vietstock} through a paid API key, global indices and commodities from \enquote{Yahoo Finance}, crypto-assets from \enquote{Binance}, macroeconomic series from \enquote{FRED} and the \enquote{World Bank}, and news events from \enquote{GDELT}.
 
 The providers disagree on units, periods and dates, so the data is cleaned by four rules before the model reads it:
 \begin{enumerate}
-  \item Each result states the units of its numbers. One provider gives Vietnamese share prices in thousands of đồng and another in đồng, and an early version of OpenTrading labelled a price in thousands of đồng as đồng, a reading \num{1000} times too small.
-%% Evidence: E47.
+  \item Results of price tools state the units of their numbers, where the units have been checked. One provider gives Vietnamese share prices in thousands of đồng and another in đồng, and an early version of OpenTrading labelled a price in thousands of đồng as đồng, a reading \num{1000} times too small.
+%% Evidence: E64.
   \item Reporting periods are given in one order, from oldest to newest, and a price bar without a date is dropped, so no date is invented.
   \item Missing data is reported as missing, with a reason, rather than filled with an estimate.
   \item Statistics of sector cycles, which are computed over today's listed companies, warn that companies which left the market are not included, a bias known as survivorship bias.
@@ -185,7 +183,7 @@ On some model interfaces this reminder is not sent.
 With \num{175} data tools and the harness's own tools, sending every tool definition in every request would take a large share of the model's context and would make the model choose among many similar tools \parencite{qin2024toolllm}.
 OpenTrading therefore defers some tools: the model receives only their names, and it loads a tool through a search tool when it needs it, as \cref{alg:tool-search} shows.
 In the default mode, rarely used local tools are always deferred, and all deferrable tools are deferred once there are more than 40 tools or once their definitions would take more than 10\% of the model's context.
-For sub-agents, which run short focused tasks, the rarely used local tools are not deferred, but the limits of 40 tools and 10\% of the context still apply.
+For sub-agents the rarely used local tools are not deferred, but the limits of 40 tools and 10\% of the context still apply.
 
 \begin{algorithm}[H]
   \caption{Ranking of deferred tools for a search query}\label{alg:tool-search}
@@ -640,8 +638,8 @@ The results include ties and losses as well as wins: on compute, lookup and robu
 The harness is released under the Apache 2.0 licence and the data server under the MIT licence.
 Market data comes from third parties.
 Prices and indices of the Vietnamese exchanges come through the free tier of the vnstock library, which is downloaded from its provider's own package index rather than PyPI.
-Financial statements come from Vietstock through a paid API key.
-The other sources are public: Yahoo Finance through the yfinance library, DNSE and Binance for market prices, FRED and the World Bank for macroeconomic series, and GDELT for news events.
+Financial statements come from Vietstock through a paid API key, and the market data of DNSE and the macroeconomic series of FRED also need keys held by the group.
+The other sources are public: Yahoo Finance through the yfinance library, Binance for crypto-assets, the World Bank for macroeconomic series, and GDELT for news events.
 The terms of each source govern how its data may be used, and the software licences give no right to the data itself.
 The group uses the data only to answer analysis questions and to build the frozen copy used by the benchmark, for research and study, and the system prompt asks the model to cite the source of its figures.
 

@@ -5,7 +5,6 @@
 
 
 \subsection{Project Information}\label{sec:project-information}
-\guide{Provide the brief information of the project: project name, project code, group name, list out the details of the project team and supervisor (and stakeholders), etc.}
 \Cref{tab:project-info} gives the basic information of the project.
 
 \begin{table}[htb]
@@ -29,7 +28,6 @@
 \end{table}
 
 \subsection{Project Overview}\label{sec:project-overview}
-\guide{A brief overview of the project, including the main parts that will be discussed in the document, to give readers a general view of the report’s structure and content.}
 OpenTrading is a harness for financial analysis and market research on Vietnamese equities.
 A harness is the program around a large language model (LLM) that decides what the model sees, what it may do, and when its answer counts as finished.
 The group does not train a model; the user connects a model from a provider of their choice.
@@ -44,7 +42,6 @@ opentrading-benchmark compares OpenTrading with two general harnesses on the sam
 \Cref{ch:conclusion} concludes the report.
 
 \section{Project Background}\label{sec:background}
-\guide{Introduce the context and setting of the project. This may include why the project was chosen, which problem the project aims to address, and the importance of solving this issue.}
 Large language models have moved from answering questions to taking actions.
 An agent plans, calls tools, reads their results and decides the next step in a loop \parencite{xi2025rise,sapkota2026agents}.
 Harnesses for software engineering have shown that the program around the model shapes what an agent can achieve \parencite{yang2024sweagent,wang2025openhands}.
@@ -58,23 +55,19 @@ Vietnamese financial data follows local accounting standards that general tools 
 The group chose this topic because it lies where these trends meet: an agent that reads Vietnamese market data and answers only with figures it has fetched.
 
 \section{Project Objective}\label{sec:objective}
-\guide{The specific objectives of the project. Objectives should be clear, measurable, and achievable.}
-\guide{Supervisor: 2--3 objectives, short, simple and feasible; weights 50--60\%, 30--40\%, 0--20\%.}
 The project is above all a learning project: its aim is to learn how to design and build a harness, not to produce a system that outperforms existing ones.
 It has three objectives, ordered by weight.
 \begin{enumerate}
   \item Harness (main objective): build a harness for financial analysis whose answers use only figures taken from tool results, with an agent loop, grounding rules, memory, permissions and coordination of several agents.
   Measure: the share of correct answers in the benchmark (\cref{ch:results}), and automated tests of the stop gate and figure tracing (\cref{sec:testing}).
   \item Data: build a market-data server whose results state their unit, provenance and availability.
-  Measure: every tool result follows the shared answer contract, checked by the server's automated tests. \TBC{confirm with Long that the tests cover every tool}
+  Measure: tool results follow the shared answer contract, checked by a contract check that calls the tools of the server.
   \item Evaluation: compare the harness with two general harnesses on the same model, data and scoring.
   Measure: a comparison on the same tasks whose differences are tested with an exact sign test and reported with time and cost.
 \end{enumerate}
 \Cref{ch:results} reports how far each objective was met.
 
 \section{Problem Statement}\label{sec:problem}
-\guide{A specific statement of the problem that the project intends to solve: causes, impacts, and specific challenges.}
-\guide{Supervisor’s template section 2, Problem Description.}
 A general agent is not enough for financial analysis, for three reasons.
 
 First, models invent figures.
@@ -90,7 +83,6 @@ The impact is direct: an investor who acts on an invented price or a wrong ratio
 The challenge is therefore not a stronger model but a harness that traces every figure to a tool result, runs arithmetic as commands and reports missing data as missing.
 
 \section{Significance of the Project}\label{sec:significance}
-\guide{The importance of the project: benefits, both theoretical and practical, and its impact on the scientific community, industry, or society at large.}
 In theory, the project gives a controlled comparison in which only the harness changes, while the model, the data snapshot and the scoring stay the same.
 Such a comparison shows which parts of an agent's result come from the harness rather than from the model; \cref{ch:results} reports what it found, including where the harnesses tied.
 
@@ -98,14 +90,13 @@ In practice, the project gives Vietnamese retail investors a research assistant 
 The harness is released under the Apache 2.0 licence and works with free model tiers.
 
 \section{Project Scope \& Limitations}\label{sec:scope}
-\guide{What the project will and will not cover. This section helps set expectations and prevent misunderstandings.}
 The project covers a research assistant that runs in a terminal for one user on one machine.
 It analyses Vietnamese equities, with selected global market and macroeconomic data.
 Its tools only read data unless the user allows more.
 
 The project does not place orders: no built-in tool can trade.
 It does not manage portfolios, train models, offer a web interface or serve many users.
-\TBC{state whether OpenTrading may give buy, hold or sell recommendations; version 0.5.1 allows them but the README disclaims investment advice}
+When the user asks for one, OpenTrading may give a buy, hold or sell recommendation based on the figures of its tools; it places no order, the user makes the decision, and its README states that it is not an investment advisory service.
 
 The project has four limitations.
 It depends on external data providers and on a data server hosted on a free plan.
