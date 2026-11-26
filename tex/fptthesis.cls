@@ -192,6 +192,10 @@
 \setlength\textfloatsep{18bp plus 2bp minus 2bp}
 \setlength\floatsep{18bp plus 2bp minus 2bp}
 \setlength\intextsep{18bp plus 2bp minus 2bp}
+% [H]: same gap above and below; the paragraph after the float adds \parskip itself
+\renewcommand\float@endH{\@endfloatbox\vskip\intextsep
+  \if@flstyle\setbox\@currbox\float@makebox\columnwidth\fi
+  \box\@currbox\vskip\glueexpr\intextsep-\parskip\relax}
 \renewcommand\topfraction{.85}\renewcommand\bottomfraction{.7}
 \renewcommand\textfraction{.1}\renewcommand\floatpagefraction{.75}
 
