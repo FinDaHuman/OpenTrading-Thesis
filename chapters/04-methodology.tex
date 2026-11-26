@@ -373,7 +373,7 @@ For 119 of them, the answers of OpenCode and DSH were taken from an earlier run 
 Each harness kept its own system prompt and tool design, since these are what a harness contributes.
 The environment was set up to give no harness an advantage outside its design:
 \begin{enumerate}
-  \item The same model, DeepSeek V4.1 Flash with temperature 0 and no reasoning requested, answered in every harness; OpenTrading 0.5.1 ran with its machine profile.
+  \item The same model, DeepSeek V4.1 Flash with temperature 0 and no reasoning requested, answered in every harness; OpenTrading 0.5.0 with the change that allows buy and sell recommendations ran with its machine profile.
   \item Every harness saw the same data tools and a shell; the other settings of OpenTrading are given in \cref{sec:algorithm}.
   \item The clock of every harness was set to the snapshot date, so that the snapshot looked current to each harness.
   \item Questions that a harness normally asks its user, such as a request for permission, were answered automatically in the same way.
