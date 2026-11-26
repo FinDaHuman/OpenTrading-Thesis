@@ -11,7 +11,7 @@ Each RQ states what is measured and where it is answered, so that \cref{sec:rq-a
   The measure is whether every tool of the data server replies in one shape that states whether the data is available and where and when it was taken.
   A contract check calls the tools of the server with live data and checks this shape, and a test checks that each tool on a list of tools returning prices or amounts of money states its units.
   The answer is given in \cref{sec:tool-exposure}.
-  \item[RQ3.~] With the same model and the same data, does OpenTrading answer more financial tasks correctly than two general-purpose harnesses, OpenCode and DeepSeek Harness (DSH), and at what cost?
+  \item[RQ3.~] With the same model and the same data, does OpenTrading answer more financial tasks correctly than two general-purpose harnesses, OpenCode and DeepSeek Harness, and at what cost?
   The measures are accuracy with confidence intervals, a sign test on paired results for the same tasks, and the time and cost of each trial (\cref{sec:metrics}).
   The answer is given in \cref{sec:results}.
 \end{description}
@@ -342,7 +342,7 @@ Because ultradesk may use many requests, it runs only when the user asks for it 
 \section{Model Configuration and Validation}\label{sec:validation}
 The project does not train a model, so validation asks whether the harness, not the model, improves the answers.
 For a financial assistant two qualities matter most: the answer must be correct, both in its calculation and in its conclusion, and it must arrive quickly.
-These two criteria shaped the benchmark with which OpenTrading was compared with two general-purpose harnesses, OpenCode and DSH \parencite{group2026opentradingbenchmark}; its tasks, design and scoring are described below.
+These two criteria shaped the benchmark with which OpenTrading was compared with two general-purpose harnesses, OpenCode and DeepSeek Harness \parencite{group2026opentradingbenchmark}; its tasks, design and scoring are described below.
 
 \label{sec:bench-tasks}
 The benchmark holds 300 tasks, questions in Vietnamese written as a user would ask them, each with a required answer format.
@@ -372,8 +372,7 @@ Investor tasks assume a purchase at the close of 30 October 2026 and are scored 
 
 \label{sec:bench-design}
 Each harness was run once on all 300 tasks.
-For 119 of them, the answers of OpenCode and DSH were taken from an earlier run of the same tasks with the same model and data snapshot but older versions of these two harnesses.
-%% Evidence: E16, E45.
+%% Evidence: E37, E45.
 Each harness kept its own system prompt and tool design, since these are what a harness contributes.
 The environment was set up to give no harness an advantage outside its design:
 \begin{enumerate}
@@ -396,9 +395,9 @@ A trial counts as correct only if all four conditions hold:
 Investor tasks are scored by a fixed rule on the later prices, and a trial without a final answer counts as incorrect.
 Trials that failed for infrastructure reasons, such as a broken network connection, were run again, and judge replies that could not be read were judged again.
 Both corrections applied the same rule to every harness and were made after the results had been seen.
-Before the run, the main judge, Claude Haiku 5.5, was tested on 200 controlled answers, correct ones and copies made wrong in value, scale or refusal, and classified all of them as expected (Cohen's $\kappa = 1.0$).
-The answers of OpenCode and DSH that were taken from the earlier run kept the grading of that run, by another language-model judge with a manual review.
-%% Evidence: E16, E17, E37, E43.
+The judge, Claude Haiku 5.5, graded all 900 trials.
+Before the run, it was tested on 200 controlled answers, correct ones and copies made wrong in value, scale or refusal, and classified all of them as expected (Cohen's $\kappa = 1.0$).
+%% Evidence: E17, E37, E43, E71.
 
 \section{Evaluation Metrics}\label{sec:metrics}
 The primary metric is accuracy, followed by a paired sign test, speed and cost, and reliability; accuracy is the share of tasks that a harness $a$ answered correctly:

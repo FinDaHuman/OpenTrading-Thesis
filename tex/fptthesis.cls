@@ -207,7 +207,7 @@
 \RequirePackage{multirow}
 \RequirePackage{colortbl}
 \RequirePackage{siunitx}
-\sisetup{group-separator={,},group-minimum-digits=4,detect-all}
+\sisetup{group-separator={,},group-minimum-digits=4,detect-all,table-number-alignment=center}
 \AtBeginEnvironment{tabular}{\small}
 \AtBeginEnvironment{tabularx}{\small}
 \newcolumntype{L}{>{\raggedright\arraybackslash}X}
