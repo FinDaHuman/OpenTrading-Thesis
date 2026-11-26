@@ -2,8 +2,8 @@
 
 ## Số trang
 
-Mục tiêu: **25 đến 35 trang** ("25-35 pages hoàn chỉnh", GVHD). Nhóm tạm hiểu là phần I đến VII; chưa hỏi lại GVHD,
-nên kiểm tra số trang chỉ cảnh báo, không chặn bản nộp.
+GVHD (26/11/2026): 25–35 trang chỉ là khuyến khích; bài cần ngắn gọn, đơn giản, dễ hiểu.
+Mục tiêu của nhóm: **khoảng 40 trang**, không tính phụ lục, mục lục, danh sách bảng và hình. Kiểm tra số trang chỉ cảnh báo, không chặn bản nộp.
 
 Ngân sách dưới đây chia theo trọng số điểm. Cột Pages của GVHD chia theo nội dung: ba từ khóa 2-4, 2-3, 1-2;
 ba mục tiêu 10-12, 8-10, 6-8; đánh giá 2-4; kết luận 1 (cộng 32 đến 44). Lệch nhau thì hỏi GVHD.
@@ -23,8 +23,7 @@ ba mục tiêu 10-12, 8-10, 6-8; đánh giá 2-4; kết luận 1 (cộng 32 đ�
 
 - **IV: thuật toán và lý do.** V: thành phần nằm ở đâu, dữ liệu chảy thế nào. **VI: benchmark** (thiết kế ở VI.1.1-VI.1.4, kết quả ở VI.1.5-VI.1.9).
 - IV.4 và IV.5 giữ ngắn (cách kiểm chứng, công thức), chi tiết trỏ sang VI.1.
-- Không tả một thứ hai lần; trỏ bằng `\cref`. Tối đa ba cấp tiêu đề; tên mục cấp 1, 2 giữ theo trường.
-- Đầu mục cấp 3 và người viết: issue #2.
+- Không tả một thứ hai lần; trỏ bằng `\cref`. Chỉ hai cấp tiêu đề (GVHD, 26/11/2026); tên mục cấp 1, 2 giữ theo trường. Mục cấp 2 có nhiều ý thì mở bằng một câu nêu các ý, và câu đầu mỗi đoạn nêu ý của đoạn.
 
 ## Văn phong
 

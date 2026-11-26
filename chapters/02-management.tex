@@ -2,12 +2,8 @@
 \chapter{Project Management Plan}\label{ch:management}
 
 \section{Team Work}\label{sec:teamwork}
-
-\subsection{Team Structure and Roles}\label{sec:roles}
-The team has four members and one supervisor.
-Each member leads one area of the product.
-The report is divided by part, and each member writes and defends their own parts.
-\Cref{tab:roles} lists the role and the main areas of work of each member.
+\label{sec:roles}
+The team has four members and one supervisor; each member leads one area of the product and writes and defends their own parts of this report (\cref{tab:roles}).
 
 \begin{table}[H]
   \centering
@@ -25,20 +21,17 @@ The report is divided by part, and each member writes and defends their own part
   \fignote{Source: authors of merged pull requests in the three repositories; thesis assignment in the group's tracking issue.}
 \end{table}
 
-\subsection{Communication Plan}\label{sec:communication}
-The group met the supervisor every Thursday, with all four members present, and the supervisor's feedback is recorded in the weekly minutes.
-Two demonstrations, in weeks 4 and 7, showed the working product to the supervisor.
-Between meetings, members discussed each change in writing in its pull request on GitHub.
+\label{sec:communication}
+For communication, the group met the supervisor every Thursday, with all four members present, and the supervisor's feedback was recorded in the weekly minutes.
+Two demonstrations, in weeks 4 and 7, showed the working product to the supervisor, and between meetings members discussed each change in writing in its pull request on GitHub.
 %% Evidence: E62.
 From week 10, tasks were also tracked as GitHub issues, so that each decision sits next to the change it affects.
 
 \section{Project Management Approach}\label{sec:approach}
-
-\subsection{WBS}\label{sec:wbs}
+\label{sec:wbs}
+This section covers the work breakdown structure (WBS), risk management, quality management, budget, change management and closure.
 \Cref{tab:wbs} breaks the project into five work packages, and \cref{tab:milestones} places their milestones in time.
-Each package has one lead.
-The harness and its memory share one repository, while the data server, the benchmark and the report each have their own.
-The harness depends on the data server only through the Model Context Protocol, which let the two be developed and tested separately.
+Each product package has one lead, and the harness depends on the data server only through the Model Context Protocol, which let the two be developed and tested separately.
 
 \begin{table}[H]
   \centering
@@ -75,16 +68,16 @@ The harness depends on the data server only through the Model Context Protocol, 
   \fignote{Source: the group's time plan and minutes; release page of OpenTrading.}
 \end{table}
 
-\subsection{Risk Management}\label{sec:risk}
+\label{sec:risk}
 %% Evidence: E62.
-From week 10, the group tracked risks as GitHub issues with a priority label from P0 (critical) to P3 (low).
-\Cref{tab:risks} lists risks that occurred during the project and the response to each.
+For risk management, the group tracked risks from week 10 as GitHub issues with a priority label from P0 (critical) to P3 (low).
+\Cref{tab:risks} lists the risks that occurred or became pressing during the project and the response to each.
 Most of them came from outside the group: data providers, model providers and package registries.
 
 %% Evidence: E54--E56, E58.
 \begin{table}[H]
   \centering
-  \caption{Risks that occurred and the response to each}\label{tab:risks}
+  \caption{Risks that occurred or became pressing, and the response to each}\label{tab:risks}
   \begin{tabularx}{\textwidth}{@{}p{0.18\textwidth} L L@{}}
     \toprule
     {Risk} & {What happened} & {Response}\\
@@ -98,9 +91,9 @@ Most of them came from outside the group: data providers, model providers and pa
   \fignote{Source: release notes and documentation of OpenTrading; documentation of opentrading-mcp.}
 \end{table}
 
-\subsection{Quality Management}\label{sec:quality}
-Almost every change to the product goes through a pull request, and \cref{tab:quality-checks} lists the automated checks run on it.
-On OpenTrading, a member without administrator rights cannot merge a change until the tests on Ubuntu and Windows and the secret scan pass.
+\label{sec:quality}
+For quality management, almost every change to the product goes through a pull request, and \cref{tab:quality-checks} lists the automated checks run on it.
+On OpenTrading, a member without administrator rights cannot merge a change without one approval and until the tests on Ubuntu and Windows and the secret scan pass.
 %% Evidence: E63.
 From week 11, a change to a prompt or a tool also needs a small paired measurement, run before and after the change.
 \Cref{ch:results} reports the validation of the product as a whole.
@@ -125,21 +118,21 @@ From week 11, a change to a prompt or a tool also needs a small paired measureme
   \fignote{Source: automated check runs of the three repositories.}
 \end{table}
 
-\subsection{Budget and Funding (Optional)}\label{sec:budget}
+\label{sec:budget}
 The project had no external funding.
 %% Evidence: E60, E66.
 The group kept costs low with free model tiers, one prepaid key and a free hosting plan for the data server.
 The main use of models was the benchmark, whose 900 trials used about 75.6 million tokens: 15.6 million input and 0.84 million output tokens for OpenTrading, 27.1 million and 1.77 million for OpenCode, and 28.6 million and 1.64 million for DSH.
 The cost per correct answer of each harness is reported in \cref{sec:speed-cost}.
 
-\subsection{Change Management Process}\label{sec:change}
-Larger decisions are written down as short decision records with their reason; for example, the first scaffold of the harness was written in Python, and in week 3 the group chose TypeScript on Bun for the core and the interface.
+\label{sec:change}
+For change management, larger decisions are written down as short decision records with their reason; for example, the first scaffold of the harness was written in Python, and in week 3 the group chose TypeScript on Bun for the core and the interface.
 From week 10, a change of scope also starts as an issue that states the problem and the proposed change.
 Changes that affect the core of the harness need the agreement of its lead before they are merged.
 Changes to the benchmark plan after the plan was fixed are recorded as amendments, so that planned and later analyses stay apart (\cref{ch:methodology}).
 
-\subsection{Closure and Evaluation}\label{sec:closure}
-Each version of the product closes with a tagged release and its release notes.
+\label{sec:closure}
+At closure, each version of the product ends with a tagged release and its release notes.
 After measurements in week 10, the group listed what to improve, chiefly the system prompt and the calculation tools; version 0.5.0 shortened the system prompt and replaced the calculation tools with arithmetic shell commands.
 The project closes after Review 1.1: the group will apply the board's feedback and submit the final report.
 Lessons learned are summarised in \cref{sec:reflection}.
