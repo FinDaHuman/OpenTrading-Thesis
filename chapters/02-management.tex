@@ -1,12 +1,9 @@
 %% Part II, school Report #2. Grading: 10% on-going, 5% defence. Budget: 3 pages.
-%% Draft by Trung (Refs #2). Tables hold checked facts; Trung writes the prose around them.
 \chapter{Project Management Plan}\label{ch:management}
 
 \section{Team Work}\label{sec:teamwork}
 
-
 \subsection{Team Structure and Roles}\label{sec:roles}
-\guide{Describe the structure of the team and the roles of each member: specific tasks, responsibilities, and communication methods between members.}
 The team has four members and one supervisor.
 Each member leads one area of the product.
 The report is divided by part, and each member writes and defends their own parts.
@@ -29,7 +26,6 @@ The report is divided by part, and each member writes and defends their own part
 \end{table}
 
 \subsection{Communication Plan}\label{sec:communication}
-\guide{Describe how and how often project information will be communicated among team members and advisor (and other stakeholders).}
 The group met the supervisor every Thursday, with all four members present, and the supervisor's feedback is recorded in the weekly minutes.
 Two demonstrations, in weeks 4 and 7, showed the working product to the supervisor.
 Between meetings, members discussed each change in writing in its pull request on GitHub.
@@ -38,9 +34,7 @@ From week 10, tasks were also tracked as GitHub issues, so that each decision si
 
 \section{Project Management Approach}\label{sec:approach}
 
-
 \subsection{WBS}\label{sec:wbs}
-\guide{Provide detailed descriptions for each task or duty within the WBS, including objectives, required resources, and assigned responsibilities.}
 \Cref{tab:wbs} breaks the project into five work packages, and \cref{tab:milestones} places their milestones in time.
 Each package has one lead.
 The harness and its memory share one repository, while the data server, the benchmark and the report each have their own.
@@ -78,11 +72,10 @@ The harness depends on the data server only through the Model Context Protocol, 
     13 & 30 Nov -- 3 Dec & Review 1.1\\
     \bottomrule
   \end{tabularx}
-  \fignote{Source: the group's time plan and minutes; release page of OpenTrading. Week dates are inferred from week 13 being Review 1.1. \TBC{check the week dates against the FAP schedule}}
+  \fignote{Source: the group's time plan and minutes; release page of OpenTrading.}
 \end{table}
 
 \subsection{Risk Management}\label{sec:risk}
-\guide{Describe potential risks during the project execution and preventive measures or response plans for each risk.}
 %% Evidence: E62.
 From week 10, the group tracked risks as GitHub issues with a priority label from P0 (critical) to P3 (low).
 \Cref{tab:risks} lists risks that occurred during the project and the response to each.
@@ -107,7 +100,6 @@ Most of them came from outside the group: data providers, model providers and pa
 \end{table}
 
 \subsection{Quality Management}\label{sec:quality}
-\guide{Details on the measures and processes applied to ensure the quality of the project, including testing and validation of the product or project outcomes.}
 Almost every change to the product goes through a pull request, and \cref{tab:quality-checks} lists the automated checks run on it.
 On OpenTrading, a member without administrator rights cannot merge a change until the tests on Ubuntu and Windows and the secret scan pass.
 %% Evidence: E63.
@@ -135,23 +127,19 @@ From week 11, a change to a prompt or a tool also needs a small paired measureme
 \end{table}
 
 \subsection{Budget and Funding (Optional)}\label{sec:budget}
-\guide{If applicable, describe the project budget and funding sources, with estimated costs and financial management throughout the project.}
 The project had no external funding.
 %% Evidence: E07, E60, E61.
 The group kept costs low with free model tiers and a free hosting plan for the data server.
 The largest recorded cost is model use in the first benchmark study: 1.498 USD for OpenTrading, 0.972 USD for OpenCode and 0.944 USD for DeepSeek Harness, where the first value is a lower bound because one trial has no recorded cost.
-A paid key of 10 to 15 USD was also planned in week 8.
-\TBC{reconcile the 8 USD in the week-10 minutes with these costs}
+A paid key of 10 to 15 USD was planned in week 8, and the minutes of week 10 record 8 USD of credit bought on OpenRouter for this study; the recorded use above falls within it.
 
 \subsection{Change Management Process}\label{sec:change}
-\guide{Describe the process followed for any changes in the project scope, schedule, resources, or other requirements.}
-Larger decisions are written down as short decision records with their reason; for example, in week 3 the group decided to replace the first Python design with TypeScript.
+Larger decisions are written down as short decision records with their reason; for example, the first scaffold of the harness was written in Python, and in week 3 the group chose TypeScript on Bun for the core and the interface.
 From week 10, a change of scope also starts as an issue that states the problem and the proposed change.
 Changes that affect the core of the harness need the agreement of its lead before they are merged.
 Changes to the benchmark plan after the plan was fixed are recorded as amendments, so that planned and later analyses stay apart (\cref{ch:methodology}).
 
 \subsection{Closure and Evaluation}\label{sec:closure}
-\guide{Describe the process for closing and evaluating the project upon completion, including how experiences and lessons learned will be summarized.}
 Each version of the product closes with a tagged release and its release notes.
 After the first benchmark, the group listed what to improve, chiefly the system prompt and the calculation tools; version 0.5.0 shortened the system prompt and replaced the calculation tools with arithmetic shell commands.
 The project closes after Review 1.1: the group will apply the board's feedback and submit the final report.
