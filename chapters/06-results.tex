@@ -197,6 +197,7 @@ These tasks depend on what the user said in an earlier session, which a model ca
 In OpenTrading memory is part of the harness: at the start of every turn the user's constraints are placed in the system part of the prompt (\cref{sec:memory,sec:memory-flow}), so the model does not need to search for them.
 This group therefore favours OpenTrading by design: the benchmark's controller saved each rule through the same path as the user's form, in the user's exact words, while OpenCode could only resume the earlier session and DSH could resume it and search past sessions.
 The other harnesses had to find the rules in the earlier session; they spent 15 to 20 requests on a typical memory task, against 4 for OpenTrading, and still often kept an outdated rule, gave no answer or, in the case of OpenCode, refused because they found none.
+%% Evidence: E65.
 The same difference explains most of OpenTrading's lead in speed and cost: fewer requests meant a shorter wait in the slowest trials and about half the cost per correct answer.
 %% Evidence: E45, E46.
 
@@ -225,7 +226,6 @@ Six limits apply to these results:
   \item The investor tasks cover one falling market over three weeks, so they are a signal about this period, not about investment skill.
   \item The judge was checked only on clearly correct and clearly wrong answers.
   \item For 119 tasks, the answers of OpenCode and DSH come from an earlier run with the same model and data but older versions of these harnesses; most of these tasks are lookups on which the three harnesses scored almost the same.
-  \item The model was served by two hosting providers, and the trials are not split evenly between them.
 \end{enumerate}
 %% Evidence: E15, E16, E17, E37.
 

@@ -31,7 +31,7 @@ The harness is judged on whether its figures and conclusions match the data, not
 OpenTrading does not store market data itself.
 It reads the data through MCP (\cref{sec:project-overview}) from the group's data server \enquote{opentrading-mcp}, which offers \num{175} tools \parencite{group2026opentradingmcp}.
 %% Evidence: E12.
-The data comes from the following sources: prices and indices of the Vietnamese exchanges through the free tier of the \enquote{vnstock} library, financial statements from \enquote{Vietstock} through a paid API key, global indices and commodities from \enquote{Yahoo Finance}, crypto-assets from \enquote{Binance}, macroeconomic series from \enquote{FRED} and the \enquote{World Bank}, and news events from \enquote{GDELT}.
+The data comes from the following sources: prices and indices of the Vietnamese exchanges through the free tier of the \enquote{vnstock} library, financial statements from \enquote{Vietstock} through a paid API key, global indices and commodities from \enquote{Yahoo Finance}, market data from \enquote{DNSE}, crypto-assets from \enquote{Binance}, macroeconomic series from \enquote{FRED} and the \enquote{World Bank}, and news events from \enquote{GDELT}.
 
 The providers disagree on units, periods and dates, so the data is cleaned by four rules before the model reads it:
 \begin{enumerate}
@@ -72,7 +72,7 @@ The sources report the difficulties; they do not evaluate the rules.
 The benchmark of \cref{sec:validation} does not measure all of these rules.
 There, OpenTrading has only the data tools, a shell, a tool that reads long results and, in memory tasks, one that reads notes.
 Tool search is off, every command runs without approval inside a sandbox, and the model interface is one on which OpenTrading sends no reminders after tool results.
-The benchmark therefore does not measure tool search, the arithmetic rule for the shell, the permission gate, skills, sub-agents, ultradesk or those reminders.
+The benchmark therefore does not measure tool search, the filter that lets arithmetic commands run without approval, the permission gate, skills, sub-agents, ultradesk or those reminders.
 %% Evidence: E32.
 
 \subsection{Agent Loop and Stop Gate}\label{sec:agent-loop}
@@ -410,7 +410,7 @@ Investor tasks assume a purchase at the close of 30 October 2026 and are scored 
     Total & & 300\\
     \bottomrule
   \end{tabularx}
-  \fignote{Note: the investor group holds 20 portfolio tasks and 16 buy, hold or sell calls. Source: the group.}
+  \fignote{Note: the investor group holds 20 tasks that pick stocks or flag risks and 16 buy, hold or sell calls. Source: the group.}
 \end{table}
 
 \subsection{A Controlled Environment}\label{sec:bench-design}
@@ -435,7 +435,7 @@ The environment was set up so that no harness had an advantage outside its desig
     \midrule
     Model & DeepSeek V4.1 Flash, temperature 0, reasoning not requested\\
     Harnesses & OpenTrading 0.5.1, machine profile; OpenCode; DSH\\
-    Grading & Rule-based checks, a language-model judge and a manual review\\
+    Grading & Rule-based checks, a language-model judge and a manual review; for 119 tasks of OpenCode and DSH, the judge and manual review of the earlier run\\
     \bottomrule
   \end{tabularx}
   \fignote{Source: the group.}
@@ -454,7 +454,8 @@ Investor tasks are scored by a fixed rule on the later prices, and a trial witho
 Trials that failed for infrastructure reasons, such as a broken network connection, were run again, and judge replies that could not be read were judged again.
 Both corrections apply the same rule to every harness and were made after the results had been seen.
 Before the run, the main judge, Claude Haiku 5.5, classified 200 controlled answers, correct ones and copies made wrong in value, scale or refusal, all as expected (Cohen's $\kappa = 1.0$).
-%% Evidence: E17, E37, E43.
+The answers of OpenCode and DSH that were taken from the earlier run kept the grading of that run, by another language-model judge with a manual review.
+%% Evidence: E16, E17, E37, E43.
 
 \section{Evaluation Metrics}\label{sec:metrics}
 The primary metric is accuracy, the share of tasks that a harness $a$ answered correctly:
