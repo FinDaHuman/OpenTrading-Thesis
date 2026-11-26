@@ -7,6 +7,8 @@
 
 \subsection{Team Structure and Roles}\label{sec:roles}
 \guide{Describe the structure of the team and the roles of each member: specific tasks, responsibilities, and communication methods between members.}
+The team has four members and one supervisor.
+Each member leads one area of the product and writes the parts of this report that describe it, because the board questions each member on their own work.
 \Cref{tab:roles} lists the role and the main areas of work of each member.
 
 \begin{table}[htb]
@@ -27,6 +29,11 @@
 
 \subsection{Communication Plan}\label{sec:communication}
 \guide{Describe how and how often project information will be communicated among team members and advisor (and other stakeholders).}
+The group reported to the supervisor every week, and the supervisor's feedback was recorded in the weekly minutes.
+Two demonstrations, in weeks 4 and 7, showed the working product to the supervisor.
+Between meetings, members discussed work in writing on GitHub: each task is an issue, and each change is a pull request with its own discussion.
+This keeps every decision next to the change it affects.
+\TBC{meeting dates, attendees and the chat channel used by the group}
 
 \section{Project Management Approach}\label{sec:approach}
 
@@ -34,6 +41,8 @@
 \subsection{WBS}\label{sec:wbs}
 \guide{Provide detailed descriptions for each task or duty within the WBS, including objectives, required resources, and assigned responsibilities.}
 \Cref{tab:wbs} breaks the project into five work packages, and \cref{tab:milestones} places their milestones in time.
+Each package has one lead and its own repository, so the packages could progress in parallel.
+The harness depends on the data server only through the Model Context Protocol, which let the two packages be developed and tested separately.
 
 \begin{table}[htb]
   \centering
@@ -76,7 +85,10 @@
 
 \subsection{Risk Management}\label{sec:risk}
 \guide{Describe potential risks during the project execution and preventive measures or response plans for each risk.}
+The group tracked risks as GitHub issues with a priority label from P0 (critical) to P3 (low).
 \Cref{tab:risks} lists risks that occurred during the project and the response to each.
+Most risks came from outside the group: data providers, model providers and package registries.
+The common response was to make a failure visible rather than silent, for example by reporting a data source as unavailable instead of returning an empty result.
 
 %% Evidence: E38--E42.
 \begin{table}[htb]
@@ -98,7 +110,11 @@
 
 \subsection{Quality Management}\label{sec:quality}
 \guide{Details on the measures and processes applied to ensure the quality of the project, including testing and validation of the product or project outcomes.}
+Every change to the product goes through a pull request.
 \Cref{tab:quality-checks} lists the automated checks that every change passes before it is merged.
+On OpenTrading, a change cannot be merged until the tests on Ubuntu and Windows and the secret scan pass.
+A change to a prompt or a tool also needs a small paired measurement, run before and after the change, before it is merged.
+\Cref{ch:results} reports the validation of the product as a whole.
 
 %% Evidence: E11, E13, E43.
 \begin{table}[htb]
@@ -122,7 +138,10 @@
 
 \subsection{Budget and Funding (Optional)}\label{sec:budget}
 \guide{If applicable, describe the project budget and funding sources, with estimated costs and financial management throughout the project.}
-\Cref{tab:costs} lists the recorded costs; the project had no external funding.
+The project had no external funding.
+The group kept costs low by using free model tiers during development and a free plan for the data server.
+Paid model use was limited to the benchmark, where every run had a cap on the number of requests.
+\Cref{tab:costs} lists the recorded costs.
 
 %% Evidence: E07, E44, E45.
 \begin{table}[htb]
@@ -143,6 +162,14 @@
 
 \subsection{Change Management Process}\label{sec:change}
 \guide{Describe the process followed for any changes in the project scope, schedule, resources, or other requirements.}
+A change of scope starts as an issue that states the problem and the proposed change.
+Larger decisions are written down as short decision records with their reason; for example, the group replaced the first Python design with TypeScript in week 4.
+Changes to the benchmark plan after the plan was fixed are recorded as amendments, so that planned and later analyses stay apart (\cref{ch:methodology}).
+Changes that affect the core of the harness need the agreement of its lead before they are merged.
 
 \subsection{Closure and Evaluation}\label{sec:closure}
 \guide{Describe the process for closing and evaluating the project upon completion, including how experiences and lessons learned will be summarized.}
+Each stage of the project closes with a tagged release and a written review.
+After the first benchmark, the group listed what to improve, chiefly the system prompt and the calculation tools, and fixed these before version 0.5.0.
+The project closes after Review 1.1: the group will apply the board's feedback, run the locked benchmark again and submit the final report.
+Lessons learned are collected in \cref{ch:conclusion}.
