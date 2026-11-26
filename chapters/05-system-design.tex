@@ -48,7 +48,7 @@ Its MCP client connects to the group's data server, which offers \num{175} tools
 Above a threshold the model receives only the tool names and loads tools through the search of \cref{sec:tool-search}, and the workflows appear to the user as commands.
 %% Evidence: E12, E21.
 
-The server returns its answers in one envelope.
+The server returns its answers in one envelope, the shared answer contract of the second objective (\cref{sec:objective}).
 The envelope states whether the data is available, its source and time and, for the tools whose units have been checked, the units of prices; when data is missing, it gives the reason and whether a retry may help.
 OpenTrading relies on this envelope: the model can choose its next step instead of stopping or guessing, and the final answer can cite where each number came from.
 
