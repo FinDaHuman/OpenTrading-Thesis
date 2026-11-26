@@ -51,7 +51,7 @@ Above a threshold the model receives only the tool names and loads tools through
 Every answer of the server uses the same envelope, which states whether the data is available, its source and time, the units of prices for the tools whose units have been checked and, when data is missing, the reason and whether a retry may help.
 OpenTrading relies on this envelope: the model can choose its next step instead of stopping or guessing, and the final answer can cite where each number came from.
 Each tool of the data server declares whether it only reads data or also writes, for example to save a watch list.
-The permission gate of \cref{sec:permissions} lets reading tools run without asking, and treats writing tools, and tools that declare neither, according to the permission mode.
+The permission gate of \cref{sec:permissions} usually lets reading tools run without asking, and treats writing tools, and tools that declare neither, according to the permission mode.
 When the user allows a tool permanently, the permission is tied to the exact server, so a different server that offers a tool with the same name is asked again.
 
 \label{sec:skills}

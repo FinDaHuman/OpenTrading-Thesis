@@ -178,7 +178,7 @@ The difference came mostly from the memory tasks, and the limits listed at the e
 
 \label{sec:harness-difference}
 On 205 of the 300 tasks, the compute, lookup and robustness groups, the three harnesses were within three tasks of each other: once every harness had the same data tools and a shell, the model and the data did the work.
-The difference came mostly from the memory group, where OpenTrading answered 58 of 59 tasks against 50 for DSH and 30 for OpenCode.
+In the memory group, OpenTrading answered 58 of 59 tasks against 50 for DSH and 30 for OpenCode.
 These tasks depend on what the user said in an earlier session, which a model cannot recover from the data.
 In OpenTrading memory is part of the harness: at the start of every turn the user's constraints are placed in the system part of the prompt (\cref{sec:memory,sec:memory-flow}), so the model does not need to search for them.
 This group therefore favours OpenTrading by design: the benchmark's controller saved each rule through the same path as the user's form, in the user's exact words, while OpenCode could only resume the earlier session and DSH could resume it and search past sessions.

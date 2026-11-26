@@ -9,7 +9,7 @@ Each RQ states what is measured and where it is answered, so that \cref{sec:rq-a
   The parts are the rules of \cref{sec:algorithm}, checked by automated tests (\cref{sec:testing}); the benchmark measures the first two aims through its reliability measures (\cref{sec:metrics}) and its memory group (\cref{sec:validation}).
   \item[RQ2.~] How should a market-data server return its results so that the agent knows the unit, the source and the availability of each figure?
   The measure is whether every tool of the data server replies in one shape that states whether the data is available and where and when it was taken.
-  A contract check calls the tools of the server with live data and checks this shape, and a test checks that a listed set of tools that return prices or amounts of money state their units.
+  A contract check calls the tools of the server with live data and checks this shape, and a test checks that each tool on a list of tools returning prices or amounts of money states its units.
   The answer is given in \cref{sec:tool-exposure}.
   \item[RQ3.~] With the same model, the same data and the same scoring, does OpenTrading answer more financial tasks correctly than two general-purpose harnesses, OpenCode and DeepSeek Harness (DSH), and at what cost?
   The measures are accuracy with confidence intervals, a sign test on paired results for the same tasks, and the time and cost of each trial (\cref{sec:metrics}).
@@ -121,8 +121,8 @@ Its ten cases fall into four groups, shown in \cref{tab:stop-gate}.
   \fignote{Note: the model's task list does not count as a tool here. Source: OpenTrading version 0.5.1 \parencite{group2026opentrading}.}
 \end{table}
 
-A turn may be sent back twice.
-If a tool has already returned something to answer from, an empty answer may be sent back up to three times in total, so five recoveries are the most that a turn can have.
+A turn may be sent back twice for any case.
+If a tool has already returned something to answer from, an empty answer has an extra allowance of up to three in total, so a turn has at most five recoveries.
 If the text is still empty or only a repeat after that, the user is told that there is no answer.
 Any other answer is kept, with a warning if its figures are unsupported.
 The gate checks the form of an answer, not its truth.
@@ -474,7 +474,7 @@ The loop, the access to data and the permissions came first, because the other r
 \label{sec:workflow}
 Since 14 November 2026, problems found in use or in test reports have been opened as issues on GitHub, and choices with lasting effect are written as short decision records with their reason.
 %% Evidence: E50.
-A rule is then written as code in the harness core, which does not depend on the interface (\cref{sec:architecture}), covered by tests with a simulated model, and merged through a pull request that passes the automated checks (\cref{sec:quality,sec:testing}); a release workflow then builds and checks the installable versions (\cref{sec:release}).
+Each rule is written as code in the harness core, which does not depend on the interface (\cref{sec:architecture}), covered by tests with a simulated model, and merged through a pull request that passes the automated checks (\cref{sec:quality,sec:testing}); a release workflow then builds and checks the installable versions (\cref{sec:release}).
 The method as a whole is checked in the two steps set out in \cref{sec:rq}: tests for each rule, and the benchmark for the answers.
 
 \section{Ethical Considerations}\label{sec:ethics}
@@ -495,11 +495,11 @@ Ten red-team questions in the evaluation set of the harness test these rules, fr
 The README of the harness states that it is research software, not an investment advisory service, that its answers are written by AI models and may be wrong or out of date, and that the user alone is responsible for investment decisions.
 OpenTrading therefore offers analysis to support a decision that remains the user's.
 
-On accuracy, the grounding rules (\cref{sec:grounding-rules}) and figure tracing (\cref{sec:figure-tracing}) check that a figure matches the data, not that the data is right: a data provider can still supply a wrong value, so the prompt asks the model to state the date of data that may be out of date and to suggest checking the official source.
-On privacy, the data of the harness, including API keys, sessions, configuration and the memory store, is stored on the user's machine in its data folder.
-Where the operating system supports file permissions, the file of API keys is written so that only its owner can read it.
-Shell commands run by the agent receive an environment from which variables whose names mark them as keys or tokens have been removed, and reading a key file asks the user in every mode, or is refused when no user is present (\cref{sec:permissions}).
+On accuracy, the grounding rules and figure tracing (\cref{sec:algorithm}) check that a figure matches the data, not that the data is right: a data provider can still supply a wrong value, so the prompt asks the model to state the date of data that may be out of date and to suggest checking the official source.
 
+On privacy, the data of the harness, including API keys, sessions, configuration and the memory store, is stored on the user's machine in its data folder.
+Where the operating system allows, only its owner can read the file of API keys.
+Shell commands run by the agent receive an environment from which variables whose names mark them as keys or tokens have been removed, and reading a key file asks the user in every mode, or is refused when no user is present (\cref{sec:permissions}).
 Some data does leave the machine: the question, the tool results and the memory placed in the prompt go to the model provider that the user has chosen, data requests go to the data server, and web searches go to DuckDuckGo or to a search service whose key the user has set, either of which can learn which tickers interest the user; two further hosted search servers are switched off by default.
 The memory store rejects text that has the form of a known key (\cref{sec:memory-flow}), and the investor's decisions are not sent to the model.
 Deleting a memory entry is a logical delete; backups and content already sent to a provider are out of the harness's reach, so the interface does not promise physical deletion.
@@ -514,6 +514,6 @@ The market data comes from the third-party sources of \cref{sec:data}: vnstock t
 The terms of each source govern how its data may be used, the software licences give no right to the data itself, and the group uses the data only for research and study, to answer analysis questions and to build the frozen copy used by the benchmark.
 
 Finally, the group used AI tools, namely Claude Code from Anthropic and OpenAI Codex and ChatGPT, mainly to write and fix the code of the harness, the data server and the benchmark.
-Members of the group reviewed this code through pull requests, which need one approval and passing automated checks before they are merged, although administrators can bypass these rules (\cref{sec:quality}).
+The code reached the main branch through pull requests, which need one approval and passing automated checks, although administrators can bypass these rules (\cref{sec:quality}).
 %% Evidence: E35.
 The group is responsible for all code and text in the project.

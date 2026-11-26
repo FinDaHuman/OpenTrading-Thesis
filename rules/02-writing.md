@@ -8,6 +8,8 @@ Mục tiêu của nhóm: **khoảng 40 trang**, không tính phụ lục, mục 
 Ngân sách dưới đây chia theo trọng số điểm. Cột Pages của GVHD chia theo nội dung: ba từ khóa 2-4, 2-3, 1-2;
 ba mục tiêu 10-12, 8-10, 6-8; đánh giá 2-4; kết luận 1 (cộng 32 đến 44). Lệch nhau thì hỏi GVHD.
 
+Bảng dưới là ngân sách gốc (tổng 35), chỉ để tham khảo tỉ lệ giữa các phần.
+
 | Phần | Ngân sách (trang) | Trọng số hội đồng | Trọng số quá trình |
 |---|---|---|---|
 | I. Project Introduction | 3 | 5% | 10% |
