@@ -23,15 +23,14 @@ The team has four members and one supervisor; each member works on the areas lis
 
 \label{sec:communication}
 For communication, the group met the supervisor every Thursday, with all four members present, and the supervisor's feedback was recorded in the weekly minutes.
-Two demonstrations, in weeks 4 and 7, showed the working product to the supervisor, and between meetings members discussed each change in writing in its pull request on GitHub.
+Two demonstrations, in weeks 4 and 7, showed the working product to the supervisor, and between meetings members discussed each change in writing in its pull request (PR) on GitHub.
 %% Evidence: E62.
 From week 10, tasks were also tracked as GitHub issues, so that each decision sits next to the change it affects.
 
 \section{Project Management Approach}\label{sec:approach}
 \label{sec:wbs}
 This section covers the work breakdown structure (WBS), risk, quality, budget, change management and closure.
-\Cref{tab:wbs} breaks the project into five work packages, and \cref{tab:milestones} places their milestones in time.
-Each product package has one lead.
+\Cref{tab:wbs} breaks the project into five work packages.
 The harness depends on the data server only through the Model Context Protocol, which let the two be developed and tested separately.
 
 \begin{table}[H]
@@ -52,22 +51,9 @@ The harness depends on the data server only through the Model Context Protocol, 
 \end{table}
 
 %% Evidence: E52, E53, E37.
-\begin{table}[H]
-  \centering
-  \caption{Milestones of the project}\label{tab:milestones}
-  \begin{tabularx}{\textwidth}{@{}p{0.08\textwidth} p{0.22\textwidth} L@{}}
-    \toprule
-    {Week} & {Dates (2026)} & {Milestone}\\
-    \midrule
-    0 & 31 Aug -- 6 Sep & Topic chosen: multi-agent systems for financial analysis\\
-    4 & 28 Sep -- 4 Oct & Demo I: first data server, first skills, basic memory\\
-    7 & 19 Oct -- 25 Oct & Demo II; version 0.2.1, the first public release, on 23 October\\
-    12 & 23 Nov -- 29 Nov & Versions 0.5.0 and 0.5.1; benchmark v4.7 completed (300 tasks); Review 1.1 documents submitted\\
-    13 & 30 Nov -- 6 Dec & Review 1.1, held from 30 November to 3 December\\
-    \bottomrule
-  \end{tabularx}
-  \fignote{Source: the group's time plan and minutes; release page of OpenTrading.}
-\end{table}
+\label{sec:milestones}
+The topic was chosen in week 0 (31 August to 6 September 2026), and two demonstrations followed in weeks 4 and 7.
+Version 0.2.1, the first public release, came out on 23 October, versions 0.5.0 and 0.5.1 and the 300 tasks of benchmark 4.7 were completed in week 12, and Review 1.1 is held from 30 November to 3 December; the weekly plan is given in the separate time plan.
 
 \label{sec:risk}
 %% Evidence: E62.
@@ -92,15 +78,15 @@ For risk management, the group tracked risks from week 10 as GitHub issues with 
 \end{table}
 
 \label{sec:quality}
-For quality management, almost every change to the product goes through a pull request.
-Each pull request runs a type check and tests on Ubuntu and Windows, shell tests on macOS and Linux, a build check and a secret scan for known key patterns; releases also run installer checks on three operating systems.
+For quality management, almost every change to the product goes through a PR.
+Each PR runs a type check and tests on Ubuntu and Windows, shell tests on macOS and Linux, a build check and a secret scan for known key patterns; releases also run installer checks on three operating systems.
 The test counts are in \cref{sec:testing}, and the benchmark repository has \num{1199} passing tests of the current study.
 %% Evidence: E11, E13, E35, E59.
 On OpenTrading, a member without administrator rights cannot merge a change until it has one approval and the tests on Ubuntu and Windows and the secret scan pass.
 %% Evidence: E74.
 Some cases were also tested by hand in the terminal or offline, with a simulated model and a simulated data server, and their reports were written on the issues of the harness.
 %% Evidence: E63.
-From week 11, a change to a prompt or a tool also needs a small paired measurement, run before and after the change; \cref{ch:results} reports the validation of the product as a whole.
+From week 11, a change to a prompt or a tool also needs a small paired measurement, run before and after the change.
 
 \label{sec:budget}
 The project had no external funding.
