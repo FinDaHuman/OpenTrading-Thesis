@@ -1,8 +1,73 @@
-%% Part IX. Supervisor’s appendices: Program Code; Other if needed.
 \Appendices
 
 \section{Appendix - Program Code}\label{sec:app-code}
-\guide{Short excerpts of the group’s own source code, Courier New 9, single spaced; full code is in the public repositories.}
+This appendix gives three short excerpts of the group's source code, copied without change; the full code is in the public repositories of \cref{tab:repositories}.
+
+\Cref{lst:check-fits} is the check of line 3 of \cref{alg:memory-turn}: a turn is held when the model cannot hold the identity layer, all the constraints and room for an answer.
+
+\begin{lstlisting}[caption={Check that the constraints fit the model, from OpenTrading version 0.5.1 \parencite{group2026opentrading}},label={lst:check-fits}]
+/** Room kept for the answer: a model that can only just read the rules but not reply is no use. */
+const ANSWER_ROOM_TOKENS = 4096
+
+export function checkFits(bound: Bound, role: Role, target: FitTarget, promptsDir?: string): void {
+  if (!bound.constraints) return
+  const limit = target.provider.models[target.model]?.limit
+  if (!limit?.context) return
+  const answer = Math.min(limit.output ?? ANSWER_ROOM_TOKENS, ANSWER_ROOM_TOKENS)
+  const needed = estimateTokens(identityLayer(role, promptsDir) ?? "") + estimateTokens(bound.constraints) + answer
+  if (needed >= limit.context) throw new TurnHeldError({ kind: "too-large", model: target.model }, role)
+}
+\end{lstlisting}
+
+\Cref{lst:term-score} gives the score of one query word for one tool, the inner sum of \cref{alg:tool-search}.
+
+\begin{lstlisting}[caption={Score of a query word in tool search, from OpenTrading version 0.5.1 \parencite{group2026opentrading}},label={lst:term-score}]
+const termScore = (term: string) => {
+  let s = 0
+  if (parts.includes(term)) s += 12
+  // Partial matches only for 3+ letters: "co"/"gia" would hit half the catalog.
+  else if (term.length >= 3 && parts.some((p) => p.includes(term) || (p.length >= 3 && term.startsWith(p)))) s += 6
+  if (hint.has(term)) s += 4
+  if (desc.has(term)) s += 2
+  if (params.has(term)) s += 2
+  return s
+}
+\end{lstlisting}
+
+\Cref{lst:envelope} builds the envelope that every tool of the data server returns (\cref{sec:tool-exposure}).
+
+\begin{lstlisting}[language=Python,caption={The shared answer envelope, from opentrading-mcp \parencite{group2026opentradingmcp}},label={lst:envelope}]
+has_data = data not in (None, {}, [], ())
+body: dict[str, Any] = {
+    "data": normalize_dates(data),
+    "provenance": {
+        "source": source,
+        "as_of": utc_now_iso(),
+        "timezone": TIMEZONE,
+    },
+    "warnings": warnings or [],
+    "availability": availability or ("available" if has_data else "empty"),
+}
+if body["availability"] == "unavailable":
+    body.update(failure_fields(data, body["warnings"]))
+if data_time is not None:
+    body["provenance"]["data_time"] = data_time
+\end{lstlisting}
 
 \section{Appendix - Other if needed}\label{sec:app-other}
-\guide{Any other supplement content: raw data, full configurations, more detailed diagrams.}
+\Cref{tab:repositories} lists where the products of the project can be found.
+
+\begin{table}[H]
+  \centering
+  \caption{Public repositories of the project}\label{tab:repositories}
+  \begin{tabularx}{\textwidth}{@{}l l L@{}}
+    \toprule
+    {Product} & {Version described} & {Repository}\\
+    \midrule
+    OpenTrading & 0.5.1 & \url{https://github.com/FinDaHuman/OpenTrading}\\
+    opentrading-mcp & state of 24 November 2026 & \url{https://github.com/DoanDuyLong212/opentrading-mcp}\\
+    opentrading-benchmark & study 4.7 & \url{https://github.com/DoanDuyLong212/opentrading-benchmark}\\
+    \bottomrule
+  \end{tabularx}
+  \fignote{Source: the group.}
+\end{table}

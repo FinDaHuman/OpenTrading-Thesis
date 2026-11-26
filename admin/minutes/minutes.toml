@@ -318,9 +318,12 @@ meeting = "Thứ Năm, 26/11/2026"
 attendees = "GVHD TS. Lê Đình Huynh; đủ 4 thành viên (Long, Hiếu, Tuấn, Trung)"
 status = "current"
 done = '''
-[CẦN XÁC NHẬN] Nháp từ GitHub: phát hành OpenTrading v0.5.0 (24/11), v0.5.1 (25/11); lập khung thesis LaTeX và luật viết (25/11).'''
+- Phát hành OpenTrading v0.5.0 (24/11) và v0.5.1 (25/11)
+- Chạy benchmark v4.7: 300 task, 3 harness, 900 trial (24-26/11)
+- Lập khung thesis LaTeX và luật viết (25/11); viết các phần I đến VI và phụ lục (26/11)'''
 next = '''
-[CẦN XÁC NHẬN] Viết thesis, slide, time plan; nộp trước 23h59 ngày 28/11.'''
+- Viết phần VII, hoàn thiện slide, time plan và biên bản
+- Nộp tài liệu Review 1.1 trước 23h59 ngày 28/11'''
 issues = '''
 '''
 supervisor = '''
@@ -332,8 +335,8 @@ milestone = '''
 number = 13
 from = "30/11/2026"
 to = "06/12/2026"
-meeting = "[CẦN XÁC NHẬN]"
-attendees = "[CẦN XÁC NHẬN]"
+meeting = "Thứ Năm, 03/12/2026 (dự kiến)"
+attendees = "GVHD TS. Lê Đình Huynh; 4 thành viên (dự kiến)"
 status = "planned"
 done = '''
 '''
@@ -350,8 +353,8 @@ Review 1.1'''
 number = 14
 from = "07/12/2026"
 to = "13/12/2026"
-meeting = "[CẦN XÁC NHẬN]"
-attendees = "[CẦN XÁC NHẬN]"
+meeting = "Thứ Năm, 10/12/2026 (dự kiến)"
+attendees = "GVHD TS. Lê Đình Huynh; 4 thành viên (dự kiến)"
 status = "planned"
 done = '''
 '''
@@ -368,8 +371,8 @@ milestone = '''
 number = 15
 from = "14/12/2026"
 to = "20/12/2026"
-meeting = "[CẦN XÁC NHẬN]"
-attendees = "[CẦN XÁC NHẬN]"
+meeting = "Thứ Năm, 17/12/2026 (dự kiến)"
+attendees = "GVHD TS. Lê Đình Huynh; 4 thành viên (dự kiến)"
 status = "planned"
 done = '''
 '''
@@ -386,8 +389,8 @@ milestone = '''
 number = 16
 from = "21/12/2026"
 to = "27/12/2026"
-meeting = "[CẦN XÁC NHẬN]"
-attendees = "[CẦN XÁC NHẬN]"
+meeting = "Thứ Năm, 24/12/2026 (dự kiến)"
+attendees = "GVHD TS. Lê Đình Huynh; 4 thành viên (dự kiến)"
 status = "planned"
 done = '''
 '''
