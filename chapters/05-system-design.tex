@@ -43,6 +43,30 @@ An exhausted daily quota or a wrong key is reported at once, a rate limit is tri
 A request that stays silent for five minutes is cut and reported as an error.
 %% Evidence: E30.
 
+\subsection{Connection to the Data Server}\label{sec:tool-exposure}
+OpenTrading reads market data through MCP (\cref{sec:data}), whose specification defines how tools are listed and called \parencite{modelcontextprotocol2025specification}.
+Its MCP client connects to the group's data server, which offers \num{175} tools and 6 prepared analysis workflows \parencite{group2026opentradingmcp}, and gives the model these tools next to its own, prefixed with the server's name so that two servers cannot clash.
+Above a threshold the model receives only the tool names and loads tools through the search of \cref{sec:tool-search}, and the workflows appear to the user as commands.
+%% Evidence: E12, E21.
+Every answer of the server uses the same envelope, which states whether the data is available, the units and source of each number and, when data is missing, the reason and whether a retry may help.
+OpenTrading relies on this envelope: the model can choose its next step instead of stopping or guessing, and the final answer can cite where each number came from.
+Each tool of the data server declares whether it only reads data or also writes, for example to save a watch list.
+The harness runs reading tools at once and passes writing tools to the permission gate of \cref{sec:permissions}.
+When the user allows a tool permanently, the permission is tied to the exact server, so a different server that offers a tool with the same name is asked again.
+
+\subsection{Skills and Specialist Agents}\label{sec:skills}
+Knowledge of the Vietnamese market is kept outside the model's prompt, in 43 skills and 17 specialist agents.
+%% Evidence: E10.
+A skill is a written method for one kind of analysis, such as a bank's asset quality, a sector's place in its cycle or a valuation; 13 of them cover sectors of the Vietnamese economy.
+%% Evidence: E44.
+The system prompt lists only the name and purpose of each skill, and the model loads the full method when a question needs it; a skill may also bring reference tables, which are read only on request.
+Each skill declares the data tools it needs, and a skill whose tools are missing is hidden, so the model is not offered a method it cannot carry out.
+Because users ask in Vietnamese while the methods are written in English, each skill also keeps Vietnamese phrases that decide when it applies.
+
+A specialist agent is a sub-agent with its own instructions and a limited set of tools, for example valuation, technical analysis, macroeconomics, or the bull and bear sides of a debate.
+The valuation agent, for instance, must compute both a simple discounted cash flow and a comparison with peers, test how far the value moves with its main assumption, and give every figure with its source and time.
+How the main agent hands work to these agents is described in \cref{sec:multi-agent}.
+
 \subsection{Interface and Charts}\label{sec:interface}
 The user works in a Vietnamese terminal interface.
 Besides the answer, it shows information that does not depend on the model: the permission mode, the share of the context in use, the running tools and sub-agents, and the data tools whose source failed.
@@ -132,6 +156,11 @@ Memory blocks sent in earlier turns stay in the conversation history.
 Before each turn the harness checks them against the store and masks the entries that the user has deleted, which is step 2 of \cref{fig:question-flow}.
 When the conversation is compacted, memory blocks in the summarised part keep only their labels, and the model can read them again with \texttt{memory\_read}; suggestion cards are removed from the history on every turn.
 
+\subsection{Data Behind a Tool Call}\label{sec:mcp-lifecycle}
+When OpenTrading calls a data tool, the server checks the caller's access and limits, reuses a recent answer to the same question where the market allows, and otherwise asks the provider, stopping for a while after repeated failures of that provider.
+The result is cleaned by the rules of \cref{sec:data} and returned in the envelope of \cref{sec:tool-exposure}.
+For OpenTrading this means that a failed source returns a clear reason quickly, which the harness lists after the answer (step 7 of \cref{fig:question-flow}).
+
 \section{Deployment Strategy}\label{sec:deployment}
 \guide{Detail how the system is deployed, including the deployment environment and deployment procedures.}
 
@@ -143,13 +172,26 @@ An update of a script installation is checked against its checksum and started o
 The files do not carry a publisher's certificate yet, so the operating system may show a warning.
 %% Evidence: E31.
 
+\subsection{Deployment of the Data Server}\label{sec:mcp-deployment}
+The data server is packaged as one container image.
+For a single user it runs on the same computer and talks to OpenTrading directly, without a network or a token; for the group it runs as a web service with a database and a cache.
+Provider credentials and access tokens are given as environment settings and never stored in the repository.
+
 \section{Scalability and Maintenance}\label{sec:scalability}
 \guide{Discuss how the system is designed to handle growth and future maintenance, including system updates, scalability, and version management.}
 
-\subsection{Testing and Maintenance of the Harness}\label{sec:testing}
+\subsection{Load on the Data Server}\label{sec:scaling}
+The data server is designed to stay responsive when many calls arrive together: connections to providers are reused, identical calls are merged, and above a bound new calls are refused at once with a retry time, so OpenTrading never waits on an overloaded server.
+No new load test was run for this version, so no throughput figure is claimed.
+
+\subsection{Testing and Maintenance}\label{sec:testing}
 Each pull request is tested automatically on Linux and Windows.
 At version 0.5.1, \num{2249} of \num{2253} tests passed on Linux; the four others, which need macOS or Windows, were skipped.
 Instead of a paid model, the tests use a simulated one that returns prepared answers, including broken ones.
 For the stop gate the tests contain both endings that must be caught and answers that must be left alone.
 These tests show that a rule does what it was designed to do; they do not show that it improves the answers.
 %% Evidence: E11, E35.
+
+The data server is tested in the same way: at the version described here, \num{1338} tests passed, covering 71.69\% of its lines.
+%% Evidence: E13.
+Its dependence on a vendor's own package index for Vietnamese market data is left for future work (\cref{sec:future}).
