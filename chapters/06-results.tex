@@ -33,7 +33,13 @@ Investor tasks assume a purchase at the close of 30 October 2026 and are scored 
 
 Each task was run once in each harness, \num{900} trials in total, under the shared configuration of \cref{tab:bench-config}.
 Each harness kept its own system prompt and tool design, since these are what a harness contributes.
-To give no harness an advantage outside its design, all three saw only the same data tools (OpenTrading's tool search was off), ran their commands in the same isolated sandbox, saw a clock set to the snapshot date, and had their questions to the user answered automatically in the same way.
+To give no harness an advantage outside its design, all three:
+\begin{enumerate}
+  \item saw only the same data tools, with OpenTrading's tool search switched off;
+  \item ran their commands in the same isolated sandbox;
+  \item saw a clock set to the snapshot date;
+  \item had their questions to the user answered automatically in the same way.
+\end{enumerate}
 
 \begin{table}[H]
   \centering
@@ -52,7 +58,13 @@ To give no harness an advantage outside its design, all three saw only the same 
 \end{table}
 %% Evidence: E14, E16, E24.
 
-A trial counts as correct only if the judge accepts the answer against the gold answer, every number lies within the tolerance of the gold value, a task whose correct answer is a refusal receives no number, and a manual review does not reject it; the review may reject a trial but never accept one.
+A trial counts as correct only if all four conditions hold:
+\begin{enumerate}
+  \item the judge accepts the answer against the gold answer;
+  \item every number lies within the tolerance of the gold value;
+  \item a task whose correct answer is a refusal receives no number;
+  \item a manual review does not reject it (the review may reject a trial but never accept one).
+\end{enumerate}
 Investor tasks are scored by a fixed rule on the later prices, and a trial without a final answer counts as incorrect.
 Trials that failed for infrastructure reasons, such as a broken network connection, were run again, and judge replies that could not be read were judged again.
 Before the run, the judge classified 200 controlled answers, correct ones and copies made wrong in value, scale or refusal, all as expected (Cohen's $\kappa = 1.0$).
@@ -134,12 +146,14 @@ In the memory group, OpenCode often used up its request limit before answering o
 \guide{Discuss how the results address the research questions and hypotheses, their alignment with related studies, and any limitations or challenges encountered.}
 
 \subsection{Threats to Validity}\label{sec:threats}
-Five limits apply to these results.
-Every task ran once in each harness, so the results do not show how stable the answers are across runs.
-For 119 of the 300 tasks, the OpenCode and DSH answers come from the previous release of each harness, run with the same model, snapshot and judge but without the shared sandbox.
-The memory tasks, where most of the difference lies, were written by the group that built OpenTrading's memory, and their form may suit its design.
-The investor tasks cover one falling market over three weeks, so they are a signal about this period, not about investment skill.
-Finally, the judge was checked only on clearly correct and clearly wrong answers.
+Five limits apply to these results:
+\begin{enumerate}
+  \item Every task ran once in each harness, so the results do not show how stable the answers are across runs.
+  \item For 119 of the 300 tasks, the OpenCode and DSH answers come from the previous release of each harness, run with the same model, snapshot and judge but without the shared sandbox.
+  \item The memory tasks, where most of the difference lies, were written by the group that built OpenTrading's memory, and their form may suit its design.
+  \item The investor tasks cover one falling market over three weeks, so they are a signal about this period, not about investment skill.
+  \item The judge was checked only on clearly correct and clearly wrong answers.
+\end{enumerate}
 %% Evidence: E16, E17.
 
 \section{Recommendations}\label{sec:recommendations}
