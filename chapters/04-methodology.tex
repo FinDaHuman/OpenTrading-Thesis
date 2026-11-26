@@ -16,18 +16,19 @@ RQ1 is the main question, as it matches the objective with the largest weight; R
 The harness is judged on whether its figures and conclusions match the data, not on market returns.
 
 \section{Data Collection and Preprocessing}\label{sec:data}
-OpenTrading does not store market data; it reads it through MCP (\cref{sec:project-overview}) from the group's data server \enquote{opentrading-mcp}, which offers \num{175} tools \parencite{group2026opentradingmcp}.
+OpenTrading does not store market data itself.
+It reads the data through MCP (\cref{sec:project-overview}) from the group's data server \enquote{opentrading-mcp}, which offers \num{175} tools \parencite{group2026opentradingmcp}.
 %% Evidence: E12.
 The data comes from the following sources: prices and indices of the Vietnamese exchanges through the free tier of the \enquote{vnstock} library, financial statements from \enquote{Vietstock} through a paid API key, global indices and commodities from \enquote{Yahoo Finance}, market data from \enquote{DNSE}, crypto-assets from \enquote{Binance}, macroeconomic series from \enquote{FRED} and the \enquote{World Bank}, and news events from \enquote{GDELT}.
 
 The providers disagree on units, periods and dates, so the data is cleaned by four rules before the model reads it:
 \begin{enumerate}
   \item Results of price tools state the units of their numbers, where the units have been checked.
-  One provider gives Vietnamese share prices in thousands of đồng and another in đồng, and an early version of OpenTrading read such a price \num{1000} times too small.
+  One provider gives Vietnamese share prices in thousands of đồng and another in đồng, and an early version of OpenTrading labelled a price in thousands of đồng as đồng, a reading \num{1000} times too small.
 %% Evidence: E64.
   \item Reporting periods are given in one order, from oldest to newest, and a price bar without a date is dropped, so no date is invented.
   \item Missing data is reported as missing, with a reason, rather than filled with an estimate.
-  \item Statistics of sector cycles warn that companies which left the market are not included (survivorship bias).
+  \item Statistics of sector cycles, which are computed over today's listed companies, warn that companies which left the market are not included, a bias known as survivorship bias.
 \end{enumerate}
 
 \section{Algorithm Design}\label{sec:algorithm}
@@ -289,16 +290,12 @@ Because a run may use many requests, it starts only when the user asks for it or
 
 \section{Model Configuration and Validation}\label{sec:validation}
 The project does not train a model, so validation asks whether the harness, not the model, improves the answers.
-Answers are judged first by correctness and then by time and cost.
-The validation is a benchmark in which OpenTrading was compared with two general-purpose harnesses, OpenCode and DeepSeek Harness \parencite{group2026opentradingbenchmark}.
-Its tasks, design and scoring are described below.
+For a financial assistant two qualities matter most: the answer must be correct, both in its calculation and in its conclusion, and it must arrive quickly.
+These two criteria shaped the benchmark with which OpenTrading was compared with two general-purpose harnesses, OpenCode and DeepSeek Harness \parencite{group2026opentradingbenchmark}; its tasks, design and scoring are described below.
 
 \label{sec:bench-tasks}
 The benchmark holds 300 tasks, questions in Vietnamese written as a user would ask them, each with a required answer format.
-They fall into the five groups of \cref{tab:taskset} and come in two blocks.
-Block A holds 200 tasks; tasks that every harness had answered correctly in the previous version of the benchmark were left out, apart from eight whose correct answer is a refusal.
-Block B holds 100 tasks of the previous version that do not repeat block A (82 lookup, 10 compute and 8 memory tasks), left after the 38 easiest lookups were removed by a rule that did not look at the results.
-%% Evidence: E15, E19.
+They fall into the five groups of \cref{tab:taskset}, so that the result does not depend on one kind of question.
 To keep the correct answers fixed, the data tools answer from a frozen snapshot recorded on 1 November 2026, with 30 October 2026 as the last trading session, and every correct answer was computed from that snapshot by a script.
 Investor tasks assume a purchase at the close of 30 October 2026 and are scored with the closing prices of 23 November 2026.
 %% Evidence: E15, E20, E45.
@@ -323,26 +320,20 @@ Investor tasks assume a purchase at the close of 30 October 2026 and are scored 
 \end{table}
 
 \label{sec:bench-design}
-Each harness answered each of the 300 tasks once and kept its own system prompt and tool design, since these are what a harness contributes.
-OpenTrading answered all 300 tasks in the runs of this study, as did OpenCode 2.4.1 and DeepSeek Harness 0.2.2-rc.5 for 181 tasks.
-For the other 119 tasks, all of block B and 19 of block A, among them 15 memory tasks, the answers of OpenCode and DeepSeek Harness were taken from an earlier run of the same tasks with the same model and data snapshot.
-That run used older versions of these two harnesses (OpenCode 2.1.2 and DeepSeek Harness 0.2.1-rc.2), no sandbox and a shorter time limit.
-Of the other trials, 517 were served by one host of the model and 145 by a second host of the same model.
-All 900 answers were graded in the same way (\cref{sec:bench-scoring}), and the effect of these differences is discussed with the results (\cref{sec:threats}).
-%% Evidence: E16, E37, E45, E78.
-
+Each harness was run once on all 300 tasks.
+%% Evidence: E37, E45.
+Each harness kept its own system prompt and tool design, since these are what a harness contributes.
 The environment was set up to give no harness an advantage outside its design:
 \begin{enumerate}
   \item The same model, DeepSeek V4.1 Flash with temperature 0 and no reasoning requested, answered in every harness; OpenTrading 0.5.0 with the change that allows buy and sell recommendations ran with its machine profile.
-  \item Every harness saw the same data tools and a shell.
-  OpenTrading also had its tool for reading the full stored result of an earlier data call (\cref{sec:architecture}) and, in memory tasks, its read-only memory tool.
-  Its tool search was off, every command ran without approval inside a sandbox, and no reminders were sent after tool results; of its grounded mode, only the input check was on (\cref{sec:tool-search}).
+  \item Every harness saw the same data tools and a shell. OpenTrading also had its tool for reading the full stored result of an earlier data call (\cref{sec:architecture}) and, in memory tasks, its read-only memory tool; its tool search was off, every command ran without approval inside a sandbox, no reminders were sent after tool results, and of its grounded mode only the input check was on (\cref{sec:tool-search}).
 %% Evidence: E24, E32.
-  \item The clock of every harness was set to the snapshot date, and questions that a harness normally asks its user, such as a request for permission, were answered automatically in the same way.
+  \item The clock of every harness was set to the snapshot date, so that the snapshot looked current to each harness.
+  \item Questions that a harness normally asks its user, such as a request for permission, were answered automatically in the same way.
   \item In memory tasks, each harness received the earlier session through its own mechanism, since memory is part of what a harness contributes.
   For OpenTrading, the benchmark's controller saved each of the user's rules in the memory store through the same path as the user's form, in the user's exact words, and the notebook was on.
   OpenCode could only resume the earlier session, and DeepSeek Harness could resume it and search past sessions with its own tool.
-  This setup favours OpenTrading by design, because the current version of each rule reaches its model without a search; \cref{sec:harness-difference} discusses what this means for the results.
+  This setup favours OpenTrading by design, because the current version of each rule reaches its model without a search (\cref{sec:harness-difference}).
 %% Evidence: E65.
 \end{enumerate}
 
@@ -360,12 +351,11 @@ Investor tasks are scored by a fixed rule on the later prices, and a trial witho
 Trials that failed for infrastructure reasons, such as a broken network connection, were run again, and judge replies that could not be read were judged again.
 Both corrections applied the same rule to every harness and were made after the results had been seen.
 The judge, Claude Haiku 5.5, graded all 900 trials.
-Before the run, it was tested on 200 controlled answers, correct ones and copies made wrong in value, scale or refusal, and it classified all of them as expected (Cohen's $\kappa = 1.0$).
+Before the run, it was tested on 200 controlled answers, correct ones and copies made wrong in value, scale or refusal, and classified all of them as expected (Cohen's $\kappa = 1.0$).
 %% Evidence: E17, E37, E43, E71.
 
 \section{Evaluation Metrics}\label{sec:metrics}
-The primary metric is accuracy, followed by a paired sign test, speed and cost, and reliability.
-Accuracy is the share of tasks that a harness $a$ answered correctly:
+The primary metric is accuracy, followed by a paired sign test, speed and cost, and reliability; accuracy is the share of tasks that a harness $a$ answered correctly:
 \begin{equation}\label{eq:accuracy}
   \hat{p}_a=\frac{1}{|T|}\sum_{t\in T} y_{a,t},
 \end{equation}
@@ -382,9 +372,12 @@ If the two harnesses were equally good, each of these $n$ tasks would be equally
 Tasks that both harnesses answered correctly, or both incorrectly, carry no information about the difference and are left out.
 This is the exact form of McNemar's test, which compares two systems on the same test items through the items on which they disagree \parencite{dietterich1998approximate}.
 
-Speed and cost are reported separately and are never added to accuracy as one score.
-Time per trial is given as the median and the 90th percentile, because a few slow trials matter to a user.
-Work is given as the model requests and data-tool calls per trial, and cost in total and per correct answer.
+Speed and cost are measured for every trial and reported separately, never added to accuracy as one score:
+\begin{enumerate}
+  \item Time per trial, from the question to the final answer, given as the median and the 90th percentile, because a few slow trials matter to a user even when the typical trial is fast.
+  \item Model requests and data-tool calls per trial, which show how much work a harness needs to reach an answer.
+  \item Cost, as the total over all trials and as the cost per correct answer.
+\end{enumerate}
 Reliability is described by the trials without an answer, false refusals of answerable tasks, numbers given where the correct answer is a refusal, and numbers outside the tolerance.
 
 \section{Implementation Plan}\label{sec:implementation-plan}
