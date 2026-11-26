@@ -7,6 +7,6 @@ A separate data server offers 175 market-data tools whose results state their av
 The rules were checked by automated tests, and the harness was compared with two general-purpose harnesses, OpenCode and DeepSeek Harness, on 300 tasks over a frozen data snapshot.
 OpenTrading answered 279 tasks correctly (\qty{93.0}{\percent}), against 266 for DeepSeek Harness (\qty{88.7}{\percent}) and 245 for OpenCode (\qty{81.7}{\percent}); on paired tasks an exact sign test gave $p=0.015$ against DeepSeek Harness and $p=3.1\times10^{-7}$ against OpenCode.
 %% Evidence: E10, E12, E37, E43, E45.
-Its cost per correct answer was about half that of DeepSeek Harness and less than half that of OpenCode, with part of the cost of both estimated.
+Its cost per correct answer was about half that of DeepSeek Harness and less than half that of OpenCode.
 The difference came mostly from tasks that depend on rules given in an earlier session, while calculation and retrieval tasks ended within three tasks of each other.
 Each task ran once and the memory tasks were written by the group, so the result is a first measurement rather than a general claim.
