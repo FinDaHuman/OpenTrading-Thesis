@@ -20,6 +20,16 @@ PR thêm số mới phải thêm dòng vào bảng dưới. Ghi "đo" khi tự �
 | E11 | OpenTrading: 2,253 test trên Ubuntu, 0 lỗi | CI run 45617110999 | đo | Tại `7319264` |
 | E12 | opentrading-mcp: 175 tool đăng ký (174 khác nhau) | mcp `de956f8`, đếm bằng `list_tools` | đo | 176 khi có khóa web_search |
 | E13 | opentrading-mcp: 1,338 test qua, độ phủ 71.69% | CI run 45325615006 | đo | Tại `de956f8` |
+| E36 | Mốc theo tuần trong `tab:milestones`: chọn đề tài tuần 0, khảo sát harness tuần 2, demo I tuần 4, demo II tuần 7, or16 xong tuần 10, Review 1.1 tuần 13 | thesis `26226bb`, `admin/time-plan/2026FALL_G11.tex`, `admin/minutes/minutes.toml` | báo cáo | Ngày của tuần suy từ tuần 13 = Review 1.1, chưa đối chiếu FAP |
+| E37 | Phát hành: 0.2.1 ngày 23/10/2026 (bản công khai đầu tiên), 0.5.0 ngày 24/11/2026, 0.5.1 ngày 25/11/2026 | GitHub releases của FinDaHuman/OpenTrading; `CHANGELOG.md` tại `7319264` | đo | 0.2.0 chưa từng phát hành |
+| E38 | 0.2.0 không phát hành vì npm từ chối tên gói; gói đổi thành `@findahuman/opentrading` | OpenTrading `7319264`, `CHANGELOG.md:794-798` | báo cáo | |
+| E39 | vnstock 6.0.0rc5 bị tắt từ 11/11/2026; 6.0.0 dùng được tới 10/11/2027 | opentrading-mcp `de956f8`, `README.md:43-44` | báo cáo | |
+| E40 | Gói miễn phí Gemini: model Flash ngoài Flash-Lite chỉ 20 request/ngày | OpenTrading `7319264`, `docs/gemini-limits.md:12` | báo cáo | Theo trang Google ngày 25/11/2026 |
+| E41 | or16: 132 lượt OT hỏng trước khi gọi model do symlink `node_modules` gãy khi dọn đĩa, đã chạy lại | benchmark `3be3e1b`, or16 MAIN-REPORT.md:50 | báo cáo | Lỗi hạ tầng, 0 request tới model |
+| E42 | Token npm hết hạn muộn nhất 21/01/2027 | OpenTrading `7319264`, `docs/release.md:20` | báo cáo | |
+| E43 | opentrading-benchmark: 1,199 test bộ v4.7 qua | CI run 45415688103 | đo | Tại commit của run đó |
+| E44 | Server dữ liệu chạy gói miễn phí của Render | opentrading-mcp `de956f8`, `render.yaml:16` | đo | Không có chi phí hosting được ghi |
+| E45 | Dự trù key OpenCode Go 10–15 USD | thesis `26226bb`, `admin/minutes/minutes.toml` tuần 8 | báo cáo | Dự trù, không phải chi thật; biên bản tuần 10 ghi 8 USD, chưa khớp E07 |
 
 ## Luật riêng
 

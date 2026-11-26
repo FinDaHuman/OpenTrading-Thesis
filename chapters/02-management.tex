@@ -1,4 +1,5 @@
 %% Part II, school Report #2. Grading: 10% on-going, 5% defence. Budget: 3 pages.
+%% Draft by Trung (Refs #2). Tables hold checked facts; Trung writes the prose around them.
 \chapter{Project Management Plan}\label{ch:management}
 
 \section{Team Work}\label{sec:teamwork}
@@ -6,6 +7,23 @@
 
 \subsection{Team Structure and Roles}\label{sec:roles}
 \guide{Describe the structure of the team and the roles of each member: specific tasks, responsibilities, and communication methods between members.}
+\Cref{tab:roles} lists the role and the main areas of work of each member.
+
+\begin{table}[htb]
+  \centering
+  \caption{Roles and main areas of work of the four members}\label{tab:roles}
+  \begin{tabularx}{\textwidth}{@{}p{0.22\textwidth} L L@{}}
+    \toprule
+    {Member} & {Role} & {Main areas of work}\\
+    \midrule
+    Đoàn Duy Long & Team leader & Market-data server (opentrading-mcp), benchmark (opentrading-benchmark), analysis skills\\
+    Trần Huy Tuấn & \TBC{confirm that the FinDaHuman account is Tuấn} & Harness core, terminal interface, releases\\
+    Đoàn Minh Hiếu & Member & Memory of the harness; later tools, permissions and the agent loop\\
+    Hoàng Hiếu Trung & Member & MCP client, web search and fetch tools, stop gate, compaction, evaluation thresholds; Parts I to III of this report\\
+    \bottomrule
+  \end{tabularx}
+  \fignote{Source: authors of merged pull requests in the three repositories; thesis assignment in the group's tracking issue.}
+\end{table}
 
 \subsection{Communication Plan}\label{sec:communication}
 \guide{Describe how and how often project information will be communicated among team members and advisor (and other stakeholders).}
@@ -15,15 +33,113 @@
 
 \subsection{WBS}\label{sec:wbs}
 \guide{Provide detailed descriptions for each task or duty within the WBS, including objectives, required resources, and assigned responsibilities.}
+\Cref{tab:wbs} breaks the project into five work packages, and \cref{tab:milestones} places their milestones in time.
+
+\begin{table}[htb]
+  \centering
+  \caption{Work packages, their outputs and their leads}\label{tab:wbs}
+  \begin{tabularx}{\textwidth}{@{}p{0.2\textwidth} L p{0.22\textwidth} p{0.14\textwidth}@{}}
+    \toprule
+    {Package} & {Main tasks} & {Output} & {Lead}\\
+    \midrule
+    Agent harness & Agent loop, system prompt, tools, permissions, sub-agents, ultradesk, terminal interface & OpenTrading version 0.5.1 & \TBC{Tuấn}\\
+    Memory & Memory store, investor constraints, recall & Memory of OpenTrading & Hiếu\\
+    Market-data server & Market-data tools, shared answer contract, cloud deployment & opentrading-mcp & Long\\
+    Evaluation & Task set, frozen data snapshot, comparison of three harnesses & opentrading-benchmark & Long\\
+    Report & Parts I to IX, figures, references & This report & All members\\
+    \bottomrule
+  \end{tabularx}
+  \fignote{Source: the group's time plan and tracking issue.}
+\end{table}
+
+%% Evidence: E36, E37.
+\begin{table}[htb]
+  \centering
+  \caption{Milestones of the project}\label{tab:milestones}
+  \begin{tabularx}{\textwidth}{@{}p{0.08\textwidth} p{0.22\textwidth} L@{}}
+    \toprule
+    {Week} & {Dates (2026)} & {Milestone}\\
+    \midrule
+    0 & 31 Aug -- 6 Sep & Topic chosen: multi-agent systems for financial analysis\\
+    2 & 14 Sep -- 20 Sep & Survey of Claude Code, OpenCode, Codex and Cursor; keywords fixed\\
+    4 & 28 Sep -- 4 Oct & Demo I: first data server, first skills, basic memory\\
+    7 & 19 Oct -- 25 Oct & Demo II\\
+    8 & 23 Oct & Version 0.2.1, the first public release\\
+    10 & 9 Nov -- 15 Nov & Benchmark study or16 completed\\
+    12 & 24 Nov, 25 Nov & Versions 0.5.0 and 0.5.1\\
+    12 & 28 Nov & Review 1.1 documents submitted\\
+    13 & 30 Nov -- 3 Dec & Review 1.1\\
+    \bottomrule
+  \end{tabularx}
+  \fignote{Source: the group's time plan and minutes; release page of OpenTrading. Week dates are inferred from week 13 being Review 1.1. \TBC{check the week dates against the FAP schedule}}
+\end{table}
 
 \subsection{Risk Management}\label{sec:risk}
 \guide{Describe potential risks during the project execution and preventive measures or response plans for each risk.}
+\Cref{tab:risks} lists risks that occurred during the project and the response to each.
+
+%% Evidence: E38--E42.
+\begin{table}[htb]
+  \centering
+  \caption{Risks that occurred and the response to each}\label{tab:risks}
+  \begin{tabularx}{\textwidth}{@{}p{0.18\textwidth} L L@{}}
+    \toprule
+    {Risk} & {What happened} & {Response}\\
+    \midrule
+    Release failure & Version 0.2.0 was never published: the package registry refused its name & Republished as version 0.2.1 under a scoped package name\\
+    Data library expiry & A release candidate of the vnstock data library was switched off on 11 November 2026 & Moved to version 6.0.0, valid until 10 November 2027\\
+    Provider quota & Free model tiers allow as few as 20 requests per day & Limits documented for users; a paid key planned as fallback\\
+    Infrastructure fault & 132 benchmark trials of OpenTrading failed before calling the model, after a broken link during disk clean-up & Trials rerun and the rerun recorded in the study report\\
+    Credential expiry & The publishing token expires by 21 January 2027 & Move to trusted publishing before then\\
+    \bottomrule
+  \end{tabularx}
+  \fignote{Source: release notes and documentation of OpenTrading; documentation of opentrading-mcp; report of study or16.}
+\end{table}
 
 \subsection{Quality Management}\label{sec:quality}
 \guide{Details on the measures and processes applied to ensure the quality of the project, including testing and validation of the product or project outcomes.}
+\Cref{tab:quality-checks} lists the automated checks that every change passes before it is merged.
+
+%% Evidence: E11, E13, E43.
+\begin{table}[htb]
+  \centering
+  \caption{Automated checks run on each change}\label{tab:quality-checks}
+  \begin{tabularx}{\textwidth}{@{}p{0.22\textwidth} p{0.26\textwidth} L@{}}
+    \toprule
+    {Check} & {When it runs} & {What it verifies}\\
+    \midrule
+    Type check and tests & Every pull request to OpenTrading, on Ubuntu and Windows & \num{2253} tests pass, none fail\\
+    Shell tests & Every pull request, on macOS and Ubuntu & Arithmetic commands give the same result on each shell\\
+    Build check & Every pull request & The program builds and passes its self-check\\
+    Secret scan & Every pull request & No key or token appears in the history\\
+    Installer checks & Releases and installer changes & Install, update and uninstall on three operating systems\\
+    Data-server tests & Every pull request to opentrading-mcp & \num{1338} tests pass; \qty{71.69}{\percent} line coverage\\
+    Benchmark tests & Every pull request to opentrading-benchmark & \num{1199} tests of the current study pass\\
+    \bottomrule
+  \end{tabularx}
+  \fignote{Source: automated check runs of the three repositories.}
+\end{table}
 
 \subsection{Budget and Funding (Optional)}\label{sec:budget}
 \guide{If applicable, describe the project budget and funding sources, with estimated costs and financial management throughout the project.}
+\Cref{tab:costs} lists the recorded costs; the project had no external funding.
+
+%% Evidence: E07, E44, E45.
+\begin{table}[htb]
+  \centering
+  \caption{Recorded and planned costs}\label{tab:costs}
+  \begin{tabularx}{\textwidth}{@{}L S[table-format=1.3] L@{}}
+    \toprule
+    {Item} & {Cost (USD)} & {Note}\\
+    \midrule
+    Model use of OpenTrading in study or16 & 1.498 & Lower bound: one trial has no recorded cost\\
+    Model use of OpenCode in study or16 & 0.972 & \\
+    Model use of DeepSeek Harness in study or16 & 0.944 & \\
+    Hosting of the data server & 0.000 & Free plan of the cloud host\\
+    \bottomrule
+  \end{tabularx}
+  \fignote{Source: report of study or16; deployment file of opentrading-mcp. A paid key of 10 to 15 USD was planned in week 8. \TBC{reconcile the 8 USD in the week-10 minutes with the 3.414 USD above}}
+\end{table}
 
 \subsection{Change Management Process}\label{sec:change}
 \guide{Describe the process followed for any changes in the project scope, schedule, resources, or other requirements.}
