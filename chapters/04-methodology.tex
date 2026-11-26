@@ -419,77 +419,73 @@ Speed and cost are measured for every trial and reported separately, never added
 Reliability is described by the trials without an answer, false refusals of answerable tasks, numbers given where the correct answer is a refusal, and numbers outside the tolerance.
 
 \section{Implementation Plan}\label{sec:implementation-plan}
-The group implemented the method as three programs (\cref{sec:wbs}); this section gives their technologies (\cref{tab:stack}), the stages of the harness and how a rule reaches a release.
-\label{sec:stack}
+The method was implemented in three phases, one for each research question of \cref{sec:rq}, so that each phase delivers a program checked on its own before the next relies on it.
+\Cref{tab:plan} gives the work, the output and the acceptance check of each phase.
+\label{sec:stages}
 
 \begin{table}[H]
   \centering
-  \caption{Technologies used to implement each component}\label{tab:stack}
-  \begin{tabularx}{\textwidth}{@{}l L L@{}}
+  \caption{Phases of the implementation plan}\label{tab:plan}
+  \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.15\textwidth} L >{\raggedright\arraybackslash}p{0.19\textwidth} L@{}}
     \toprule
-    {Component} & {Language and main libraries} & {Checked or reported in}\\
+    {Phase} & {Work} & {Output} & {Acceptance check}\\
     \midrule
-    Harness (OpenTrading) & TypeScript on the Bun runtime; Vercel AI SDK for model providers; MCP SDK for the data tools; OpenTUI with SolidJS for the terminal interface & automated tests with a simulated model, on Ubuntu and Windows (\cref{sec:testing})\\
+    1. Data foundation (RQ2) & A data server whose results state availability, source and time & opentrading-mcp & Automated tests; a contract check with live data (\cref{sec:testing})\\
     \addlinespace[2pt]
-    Data server (opentrading-mcp) & Python; the MCP library; vnstock libraries for Vietnamese market data; pandas & automated tests, and a separate check, run outside the automated tests, that calls the tools with live data\\
+    2. Harness rules (RQ1) & Agent loop and stop gate, grounding rules and figure tracing, tool search, memory, permissions, sub-agents & OpenTrading, in tagged releases & Automated tests with a simulated model, on Ubuntu and Windows\\
     \addlinespace[2pt]
-    Benchmark (opentrading-benchmark) & Python, with TypeScript runners for OpenTrading & design and results in \cref{ch:results}\\
+    3. Evaluation (RQ3) & A mode without a user, then a benchmark of three harnesses with the same model and data & opentrading-benchmark and its results & Accuracy, cost and reliability (\cref{sec:metrics})\\
     \bottomrule
   \end{tabularx}
-  \fignote{Source: the group, based on OpenTrading version 0.5.1 \parencite{group2026opentrading} and the source code of opentrading-mcp and opentrading-benchmark.}
+  \fignote{Source: the group.}
 \end{table}
 
-The harness started on 12 September 2026 as a Python scaffold.
-On 27 September the group chose TypeScript on Bun instead, so that the agent loop, the model providers and the interface stay in one language, with prebuilt terminal binaries for three operating systems.
-Quantitative libraries and Vietnamese market data are available mainly in Python, so they live in the data server, whose tools the harness calls through MCP.
+The phases overlapped in time (\cref{tab:milestones}), but each depended on the one before.
+The harness rules needed real figures from the data server before they could be tried in use, and the benchmark needed a harness that runs without a user, so that it drives the same agent loop as the terminal.
+Keeping the data server behind MCP also let the two programs be built and tested separately, and let the other harnesses of the benchmark use the same data tools.
+
+\label{sec:stack}
+The languages follow the same split.
+The harness is written in TypeScript on Bun, chosen on 27 September 2026 after a first scaffold in Python, so that the agent loop, the model providers and the terminal interface share one language.
+It uses the Vercel AI SDK for model providers and OpenTUI for the interface.
+The data server is written in Python, where the quantitative libraries and the sources of Vietnamese market data are available, and uses the vnstock libraries and pandas.
 %% Evidence: E50.
 
-\label{sec:stages}
-The harness was built in stages, each closed by a release.
-Version 0.1.0 (22 October 2026, not published) rewrote the harness in TypeScript with the agent loop, tool search, compaction, the MCP client, skills, a first memory, sub-agents, ultradesk and the permission modes.
-Version 0.2.1 (23 October) was the first public release, and version 0.3.0 (31 October) added the checks that make a turn end with an answer or a statement that there is none.
-Version 0.4.0 (8 November) added the mode without a user for the benchmark and the notebook memory, and version 0.5.0 (24 November) shortened the system prompt and replaced the calculation tools with arithmetic in the shell (\cref{sec:figure-tracing}).
-Version 0.5.1 (25 November), the version described in this report, lets the model recommend buying, holding or selling when asked.
-%% Evidence: E50.
+The plan was adjusted as the work showed what was needed.
+The change of language was one such adjustment.
+Version 0.5.0 replaced the calculation tools with arithmetic in the shell (\cref{sec:figure-tracing}), and version 0.5.1 replaced the earlier ban on recommendations with rules for giving them (\cref{sec:ethics}).
+From week 11, a change to a prompt or a tool also needed a small measurement before and after it (\cref{sec:quality}).
 
 \label{sec:workflow}
-From week 10, problems found in use or in test reports have been opened as issues on GitHub.
-%% Evidence: E50.
-Each rule is written as code in the harness core, which does not depend on the interface (\cref{fig:architecture}), tested with a simulated model, merged through a pull request that passes the automated checks (\cref{sec:quality,sec:testing}) and released by a workflow that builds and checks the installable versions (\cref{sec:release}).
+From week 10, a problem typically became an issue, was fixed by a rule written as code and tested, and reached the main branch through a pull request that passes the automated checks (\cref{sec:quality}); a release workflow then builds the installable versions (\cref{sec:release}).
 
 \section{Ethical Considerations}\label{sec:ethics}
-OpenTrading produces analysis that a user may act on with real money, so its main ethical risks are a recommendation that is wrong or misread, the exposure of private data, and a biased comparison with other harnesses.
+OpenTrading produces analysis that a user may act on with real money, so its main ethical risks are a wrong or misread recommendation, the exposure of private data and a biased comparison with other harnesses.
+Each risk is set out below with the safeguard that the group chose and the limit of that safeguard.
 
-Since version 0.5.1, the harness may give a buy, hold or sell recommendation when a question calls for one, and the system prompt states that the user always makes the final decision.
-When the user asks the model to choose, the system prompt tells it to fetch the data and give a choice within the user's risk tolerance, horizon and constraints, with the reason, the main risks and what would make it wrong.
-The prompt also tells the model to say so instead of picking when data is missing or too thin, and to give no call when the user has ruled out recommendations.
-A target price, a buy or sell zone or a stop-loss is derived only from tool figures of the conversation, with the method, and views on future prices are given as scenarios with a likelihood (\cref{sec:grounding-rules}).
-Requests to place an order, manipulate prices, trade on inside information, spread rumours or evade regulations are refused.
+The first risk is harm from a recommendation: a user may lose money by acting on a wrong call, or trust a model's call more than it deserves.
+Since version 0.5.1 the harness may recommend buying, holding or selling, so the group kept the decision with the user.
+The model is told to give the reasons for the call, its main risks and what would prove it wrong, and the harness has no built-in tool that places orders.
+Requests to manipulate prices, trade on inside information or spread rumours are refused, so that the harness does not help to harm other investors.
+Its documentation states that it is research software, not an investment advisory service.
+These safeguards rest partly on instructions that a model may not follow (\cref{sec:grounding-rules}), so they reduce the risk rather than remove it.
 
-These rules are instructions to a model, not guarantees, and a model may fail to follow them.
-Two safeguards do not depend on the model: the harness has no built-in tool that places an order, and every tool call passes the permission gate of \cref{tab:permission-modes}.
-Ten red-team questions in the evaluation set of the harness test these rules, from forced choices to an order request.
-%% Evidence: E51.
-The README of the harness states that it is research software, not an investment advisory service, that its answers are written by AI models and may be wrong or out of date, and that the user alone is responsible for investment decisions.
+The same holds for figures: a figure can look verified and still be wrong.
+The harness is designed so that the figures of an answer come from tool results (\cref{sec:figure-tracing}), but a figure that matches its source is still wrong if the source is wrong.
+The model is therefore told to date figures that may be out of date and to point the user to the official source, and the user remains responsible for checking a figure before acting on it.
 
-On accuracy, the grounding rules and figure tracing (\cref{sec:algorithm}) check that a figure matches the data, not that the data is right: a data provider can still supply a wrong value, so the prompt asks the model to state the date of data that may be out of date and to suggest checking the official source.
+The second risk is the exposure of private data, since investment questions reveal what a person owns and plans.
+Keys, sessions and memory stay on the user's machine, the user chooses the model provider, and only the user decides what memory holds; the investor's decisions are never sent to the model (\cref{sec:memory-flow}).
+Deleting a memory entry is logical: the entry is cleared in the store, but backups and text already sent to a provider are out of the harness's reach, so the interface does not promise physical deletion.
+The limit is that the question, the tool results and the memory placed in the prompt must still go to the chosen provider, and a web search can reveal which tickers interest the user.
 
-On privacy, the data of the harness, including API keys, sessions, configuration and the memory store, is stored on the user's machine in its data folder.
-Where the operating system allows, only its owner can read the file of API keys.
-Shell commands run by the agent receive an environment from which variables whose names mark them as keys or tokens have been removed, and reading a key file asks the user in every mode, or is refused when no user is present (\cref{sec:permissions}).
-Some data does leave the machine: the question, the tool results and the memory placed in the prompt go to the model provider that the user has chosen, and data requests go to the data server.
-Web searches go to DuckDuckGo or to a search service whose key the user has set, either of which can learn which tickers interest the user.
-The memory store rejects text that has the form of a known key (\cref{sec:memory-flow}), and the investor's decisions are not sent to the model.
+The third risk is a biased comparison, because the group built both OpenTrading and the benchmark that judges it.
+To limit it, the three harnesses used the same model and the same data, and the results report ties and losses as well as wins (\cref{sec:validation,sec:accuracy}).
+The memory group was still designed around what OpenTrading can do, so its results favour OpenTrading, and this limit is stated with the results (\cref{sec:threats}).
+%% Evidence: E15, E45.
 
-The group built both OpenTrading and the benchmark that compares it with other harnesses, which creates a risk of bias.
-To limit it, the three harnesses used the same model and the same data (\cref{sec:validation}), and the results report ties and losses as well as wins (\cref{sec:accuracy}).
-The memory group was designed around what OpenTrading can do, a limit noted in \cref{sec:threats}.
-%% Evidence: E15, E16, E45.
-
-As for licences, the harness is released under the Apache 2.0 licence and the data server under the MIT licence.
-The market data comes from the third-party sources of \cref{sec:data}, some through the free tier of a library or through keys held by the group.
-The terms of each source govern how its data may be used, and the software licences give no right to the data itself; the group uses the data only for research and study.
-
-Finally, the group used AI tools, namely Claude Code, OpenAI Codex and ChatGPT, mainly to write and fix code.
-The code reached the main branch through pull requests that need one approval and passing automated checks, although administrators can bypass these rules (\cref{sec:quality}); the group is responsible for all code and text.
+Finally, the harness is released under the Apache 2.0 licence and the data server under the MIT licence.
+These licences give no right to market data, whose use follows the terms of each provider (\cref{sec:data}), and the group used the data only for research and study.
+The group used AI tools, namely Claude Code, OpenAI Codex and ChatGPT, mainly to write and fix code.
+This code reached the main branch through pull requests that need one approval, although administrators can bypass this rule (\cref{sec:quality}), and the group is responsible for all code and text.
 %% Evidence: E35.
