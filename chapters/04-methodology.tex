@@ -272,7 +272,7 @@ The memory budget of line 10 depends on the context size of the model: \num{1000
 An entry that does not fit is left out whole or replaced by a pointer, so nothing is cut.
 %% Evidence: E49.
 
-Edits to constraints, theses and lessons are checked against the version that the form read, so an outdated form cannot overwrite a newer one; a deleted entry is only marked as deleted, so the interface does not promise that it is erased.
+Edits to constraints, theses and lessons are checked against the version that the form read, so an outdated form cannot overwrite a newer one, and deletion is logical (\cref{sec:ethics}).
 
 \label{sec:permissions}
 Permissions matter because an agent that can write files and run commands can also do harm.
@@ -478,7 +478,7 @@ On privacy, the data of the harness, including API keys, sessions, configuration
 Where the operating system allows, only its owner can read the file of API keys.
 Shell commands run by the agent receive an environment from which variables whose names mark them as keys or tokens have been removed, and reading a key file asks the user in every mode, or is refused when no user is present (\cref{sec:permissions}).
 Some data does leave the machine: the question, the tool results and the memory placed in the prompt go to the model provider that the user has chosen, and data requests go to the data server.
-Web searches go to DuckDuckGo, to a search service whose key the user has set or, if the user turns them on, to two hosted search services, and each of them can learn which tickers interest the user.
+Web searches go to DuckDuckGo or to a search service whose key the user has set, either of which can learn which tickers interest the user.
 The memory store rejects text that has the form of a known key (\cref{sec:memory-flow}), and the investor's decisions are not sent to the model.
 
 The group built both OpenTrading and the benchmark that compares it with other harnesses, which creates a risk of bias.
