@@ -26,7 +26,7 @@ The path to today's agents took about four years.
 In 2022, prompting a model to write its reasoning step by step improved arithmetic and logic tasks \parencite{wei2022chain}.
 In 2023, models learned to interleave reasoning with actions \parencite{yao2023react}, to decide when to call a tool \parencite{schick2023toolformer}, to search over several lines of reasoning \parencite{yao2023tree} and to learn from their own failures \parencite{shinn2023reflexion}.
 The same year brought systems of several agents that split roles or debate an answer \parencite{hong2024metagpt,wu2024autogen,du2024improving}.
-From 2024, research harnesses for software tasks showed that the design of the interface between model and tools changes how well an agent performs \parencite{yang2024sweagent,wang2025openhands}.
+From 2024, research harnesses for software tasks showed that the design of the interface between model and tools changes how well an agent performs \parencite{yang2024sweagent}, and open platforms for such agents followed \parencite{wang2025openhands}.
 In November 2024, the Model Context Protocol gave tools a common way to reach any model \parencite{anthropic2024introducing}.
 
 Finance followed a parallel path.
@@ -77,7 +77,7 @@ The protocol brings new security risks, such as tool descriptions that carry hid
 
 Agent harnesses have become platforms in their own right, with loops, context management and several agents \parencite{wang2025openhands}.
 Long contexts remain a weakness, because models use information in the middle of a long input poorly \parencite{liu2024lost}.
-This is why OpenTrading searches for tools only when needed and keeps a table of verified figures when it compacts a conversation.
+This is why OpenTrading searches for tools only when needed and, when it compacts a conversation, asks the model to keep every sourced figure in a table.
 
 \section{Comparison of Existing Systems}\label{sec:comparison}
 \guide{Compare and contrast existing systems or technologies, including their advantages and disadvantages compared to your project.}
