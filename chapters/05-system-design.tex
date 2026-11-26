@@ -159,7 +159,7 @@ These tests show that a rule does what it was designed to do; they do not show t
 %% Evidence: E11, E35.
 
 The data server is tested in the same way: at the version described here, \num{1338} tests passed, covering \qty{71.69}{\percent} of its lines.
-A separate contract check calls every registered tool once over MCP with live data and checks that each reply has the shape of the envelope.
+A separate contract check calls every registered tool once over MCP with live data, except four tools that rewrite shared tables, and checks that each reply has the shape of the envelope.
 An automated test confirms that this check covers every registered tool, but the live check itself is left out of the automated checks, because it depends on outside providers, and the group has no recorded run of it for the version described here.
 %% Evidence: E76.
 %% Evidence: E13.

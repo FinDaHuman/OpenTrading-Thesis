@@ -7,8 +7,8 @@ Accuracy comes first, then speed and cost, reliability, and an analysis of the e
 
 \label{sec:accuracy}
 OpenTrading answered 279 of the 300 tasks correctly (\qty{93.0}{\percent}), DeepSeek Harness 266 (\qty{88.7}{\percent}) and OpenCode 245 (\qty{81.7}{\percent}), as \cref{tab:accuracy} and \cref{fig:accuracy} show.
-The total over all 300 tasks is the result planned before the run.
-The investor group, however, measures a judgement about later prices rather than the use of data, and none of the harnesses did better there than a fixed rule (\cref{sec:error-analysis}).
+The total over all 300 tasks is the main result of this report.
+The investor group, however, measures a judgement about later prices rather than the use of data, and on its 16 buy, hold or sell calls none of the harnesses did better than a fixed rule (\cref{sec:error-analysis}).
 \Cref{tab:accuracy} therefore also reports the 264 tasks without the investor group, an analysis added after the results had been seen.
 
 \begin{table}[H]
@@ -84,7 +84,7 @@ On the same tasks, the sign test of \cref{eq:sign-test} compares OpenTrading wit
 Over all 300 tasks, OpenTrading was ahead of OpenCode on 40 tasks and behind on 6 ($p=3.1\times10^{-7}$), and ahead of DeepSeek Harness on 19 and behind on 6 ($p=0.015$).
 %% Evidence: E45.
 On the 36 investor tasks alone, it was ahead of each of them on 7 tasks and behind on 4 ($p=0.55$), so this group shows no difference.
-Without the investor group, it was ahead of OpenCode on 33 tasks and behind on 2 ($p=3.7\times10^{-8}$), and ahead of DeepSeek Harness on 12 and behind on 2 ($p=0.013$); this split was chosen after the results had been seen, so it supports the planned result but does not replace it.
+Without the investor group, it was ahead of OpenCode on 33 tasks and behind on 2 ($p=3.7\times10^{-8}$), and ahead of DeepSeek Harness on 12 and behind on 2 ($p=0.013$); this split was chosen after the results had been seen, so it supports the result over all 300 tasks but does not replace it.
 %% Evidence: E77.
 
 \label{sec:speed-cost}
@@ -138,11 +138,11 @@ Most failures of the other two harnesses came from the memory group.
 This group holds 12 of the 15 numbers of OpenCode outside the tolerance, all ten of its false refusals and all six trials of DeepSeek Harness without an answer.
 Outside that group, each harness had between one and three numbers outside the tolerance, so on calculation and lookup the harnesses were about equally reliable.
 Answers in an invalid format came mostly from investor and memory tasks, where the answer is long (6 and 5 for OpenCode, 6 and 6 for DeepSeek Harness).
-OpenTrading's machine profile follows the format that the calling program gives (\cref{sec:grounding-rules}), and its one invalid answer was the memory trial without an answer, which ended on a failed request to the model provider.
+OpenTrading's machine profile follows the format that the calling program gives (\cref{sec:grounding-rules}), and its one invalid answer was the memory trial without an answer, which ended with an error before the stop gate could judge it.
 %% Evidence: E73, E75.
 
 The trial records also show how often the stop gate of OpenTrading acted.
-In none of its 300 trials did the gate send an answer back: no recovery was recorded, and the one trial without an answer ended on the failed request, not on the gate.
+In none of its 300 trials did the gate send an answer back: no recovery was recorded, and the one trial without an answer ended with an error, not with a verdict of the gate.
 With this model and these tasks, the gate was therefore never triggered.
 This means that it raised no false alarm, but also that the benchmark did not test whether it improves answers.
 The records published with the benchmark do not include the figures that tracing found unsupported, so the share of traced figures is not reported here.
