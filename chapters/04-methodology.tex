@@ -37,6 +37,7 @@ The data comes from public sources and from data services used under the group's
 The providers disagree on units, periods and dates, so the data is cleaned by four rules before the model reads it:
 \begin{enumerate}
   \item Each result states the units of its numbers. One provider gives Vietnamese share prices in thousands of đồng and another in đồng, and an early version of OpenTrading labelled a price in thousands of đồng as đồng, a reading \num{1000} times too small.
+%% Evidence: E47.
   \item Reporting periods are given in one order, from oldest to newest, and a price bar without a date is dropped, so no date is invented.
   \item Missing data is reported as missing, with a reason, rather than filled with an estimate.
   \item Statistics of sector cycles, which are computed over today's listed companies, warn that companies which left the market are not included, a bias known as survivorship bias.
@@ -452,6 +453,7 @@ A trial counts as correct only if all four conditions hold:
 \end{enumerate}
 Investor tasks are scored by a fixed rule on the later prices, and a trial without a final answer counts as incorrect.
 Trials that failed for infrastructure reasons, such as a broken network connection, were run again, and judge replies that could not be read were judged again.
+Both corrections apply the same rule to every harness and were made after the results had been seen.
 Before the run, the main judge, Claude Haiku 5.5, classified 200 controlled answers, correct ones and copies made wrong in value, scale or refusal, all as expected (Cohen's $\kappa = 1.0$).
 %% Evidence: E17, E37, E43.
 

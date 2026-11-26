@@ -74,7 +74,7 @@ OpenTrading also needed fewer model requests, 3.8 per trial against about 7 for 
 %% Evidence: E42, E45, E46.
 
 The picture depends on the kind of task (\cref{tab:speed-group}).
-On short lookups OpenTrading was the slowest, with a median of 29 seconds against 17 and 18, probably because its system prompt and tool descriptions are larger and every request carries them.
+On short lookups OpenTrading was the slowest, with a median of 29 seconds against 17 and 18, because it typically made one more model request (3 against 2), each taking about ten seconds.
 On memory tasks it was the fastest by far, 69 seconds against 165 for DSH and 226 for OpenCode, because it needed a median of 4 model requests there, against 15 for OpenCode and 20 for DSH.
 Its advantage in time therefore appears on long tasks with many steps, which are also the tasks where a user waits longest.
 
