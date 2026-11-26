@@ -35,7 +35,7 @@ The group does not train a model; the user connects a model from a provider of t
 The project consists of three products.
 OpenTrading is the harness: a terminal program that runs the agent loop, the tools and the checks on figures.
 opentrading-mcp is a market-data server that offers its data tools through the Model Context Protocol (MCP), an open standard for connecting models to tools and data \parencite{anthropic2024introducing}.
-opentrading-benchmark compares OpenTrading with two general harnesses on the same model, data and scoring.
+opentrading-benchmark compares OpenTrading with two general-purpose harnesses on the same model, data and scoring.
 
 \Cref{ch:management} describes how the work was managed, and \cref{ch:existing} reviews existing studies and systems.
 \Cref{ch:methodology} explains the methods, \cref{ch:design} the design and implementation, and \cref{ch:results} the results.
@@ -62,7 +62,7 @@ It has three objectives, ordered by weight.
   Measure: the share of correct answers in the benchmark (\cref{ch:results}), and automated tests of the stop gate and figure tracing (\cref{sec:testing}).
   \item Data: build a market-data server whose results state their unit, provenance and availability.
   Measure: tool results follow the shared answer contract, checked by a contract check that calls the tools of the server.
-  \item Evaluation: compare the harness with two general harnesses on the same model, data and scoring.
+  \item Evaluation: compare the harness with two general-purpose harnesses on the same model, data and scoring.
   Measure: a comparison on the same tasks whose differences are tested with an exact sign test and reported with time and cost.
 \end{enumerate}
 \Cref{ch:results} reports how far each objective was met.
