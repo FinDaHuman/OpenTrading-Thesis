@@ -37,7 +37,7 @@ PR thêm số mới phải thêm dòng vào bảng dưới. Ghi "đo" khi tự �
 | E20 | Snapshot 01/11/2026, phiên cuối 30/10/2026; BCTC bổ sung khớp 112/112 giá trị cũ; investor và R chấm theo giá đóng cửa 23/11/2026 | benchmark `3be3e1b` `snapshot-extension-2026-11-24/RECEIPT.json`, `task.toml` | đo | |
 | E21 | opentrading-mcp: 6 workflow prompt | mcp `de956f8` `prompts.py` | đo | |
 | E22 | System prompt profile machine, request đầu: 917 đến 1,645 từ | 311 request đầu của `opentrading_machine` trong các run v4.7 | đo | Runtime `ae7ec48`; đếm từ, không phải token |
-| E23 | Tool search: điểm 12/6/4/2/2; hoãn khi hơn 40 tool hoặc hơn 10% context; subagent không hoãn | OpenTrading `7319264` `src/core/tools/search.ts`, `docs/mcp.md` §7 | đo | Benchmark tắt tool search |
+| E23 | Tool search: điểm 12/6/4/2/2; hoãn khi hơn 40 tool hoặc hơn 10% context; subagent chỉ không hoãn các tool ít dùng, vẫn hoãn khi vượt 40 tool hoặc 10% (`src/core/agent.ts:871-873`); giữ kết quả ≥ nửa điểm cao nhất, tối đa 5 mặc định | OpenTrading `7319264` `src/core/tools/search.ts`, `docs/mcp.md` §7 | đo | Benchmark tắt tool search |
 | E24 | v4.7: OT chạy grounded mode (kiểm tham số tool MCP theo schema), `finance_policy` tắt | benchmark `3be3e1b` `tools/runners/ot_headless.ts`, `run_opentrading.py`; config run | đo | |
 | E36 | MCP: Beneish M-score 8 biến, accrual theo CFO; Piotroski F-score, tài sản đầu năm; phiên phân phối giảm ≥0.2% volume cao hơn, cửa sổ 25 phiên, rớt khi hồi 5%; FTD từ ngày 4, tăng ≥1.25% volume cao hơn; thiếu dòng thì loại và báo | mcp `de956f8` `forensic_models.py`, `tools/market_timing.py`, PR #48, #54, #57 | đo | |
 | E37 | 300 task × 3 arm × 1 lượt = 900 trial, 0 thiếu; 45 trial khối A và mọi trial OT khối B chạy trên host DeepInfra, còn lại Pearl Research; 14 trial bị huỷ vì lỗi hạ tầng và chạy lại | run `deepinfra-20261125` (máy Long, chưa commit vào repo benchmark) `FINAL-REPORT-20261126.md`; amendment 25/11 | đo | |
@@ -69,6 +69,7 @@ PR thêm số mới phải thêm dòng vào bảng dưới. Ghi "đo" khi tự �
 | E61 | Dự trù key OpenCode Go 10–15 USD | thesis `26226bb`, `admin/minutes/minutes.toml` tuần 8 | báo cáo | Dự trù, không phải chi thật; biên bản tuần 10 ghi 8 USD, chưa khớp E07 |
 | E62 | Issue đầu tiên của repo OpenTrading (#268) mở ngày 13/11/2026, tức tuần 10 | GitHub issues của FinDaHuman/OpenTrading | đo | Trước tuần 10 không có issue; việc chỉ nằm trong pull request |
 | E63 | Luật "thay đổi prompt/tool phải có số đo cặp nhỏ trước khi merge" có từ issue #354, ngày 16/11/2026, tức tuần 11 | GitHub issue FinDaHuman/OpenTrading#354 | báo cáo | Không áp dụng cho các thay đổi trước tuần 11 |
+| E64 | Lỗi nhãn đơn vị cũ: giá nghìn đồng ghi là đồng, đọc lệch 1,000 lần | opentrading-mcp commit `ae03e18` ("62,2 (đ)" cho 62.2 nghìn đồng), `units.py` docstring; OpenTrading `CHANGELOG.md` (#329, #430) | đọc repo | Lỗi nhãn, không phải lỗi tính |
 
 ## Luật riêng
 

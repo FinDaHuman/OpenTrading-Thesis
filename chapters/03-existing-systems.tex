@@ -1,15 +1,7 @@
 %% Part III, school Report #3. Grading: 10% on-going, 5% defence. Budget: 5 pages.
-%% Supervisor: 10--15 papers per keyword (Agentic AI, Financial analysis, Agent harness), last 3--5 years.
 \chapter{Existing Systems/State of the Art}\label{ch:existing}
-%% Agent-harness sources (Refs #2). \nocite only keeps them listed until the text cites them:
-%% replace each with \parencite or \textcite where it is used, then delete this block.
-\todo{Cite the sources in the text of Part III, then remove the nocite lists below.}
-\nocite{anthropic2024introducing,hou2025model,liu2024agentbench,modelcontextprotocol2025specification,qin2024tool,qin2024toolllm,shinn2023reflexion,wang2024survey,wang2025openhands,wu2024autogen,yang2024sweagent,yao2023react,yao2024taubench}
-%% Agentic AI and financial-analysis sources (Refs #2), same rule as above.
-\nocite{acharya2025agentic,chan2023harms,chen2021finqa,chen2023program,ding2026large,du2024improving,guo2024multiagent,hong2024metagpt,huang2025hallucination,islam2023financebench,kang2023deficiency,kapoor2024agents,li2023large,liu2024lost,mialon2024gaia,nguyen2025finstat2sql,sapkota2026agents,schick2023toolformer,wei2022chain,wu2023bloomberggpt,xi2025rise,xie2023pixiu,xie2024finben,yang2023fingpt,yang2024finrobot,yao2023tree,yu2024fincon,zhang2024finagent,zhou2024webarena,zhu2021tatqa}
 
 \section{Overview of the Field}\label{sec:field}
-\guide{Provide an overview of the field of study related to your project. This helps place your project within the broader context of that field.}
 This project sits where three lines of work meet: agentic AI, language models for finance, and agent harnesses.
 
 An agent senses its environment, decides and acts; with an LLM as its core, it can plan, call tools and read their results \parencite{xi2025rise,wang2024survey}.
@@ -21,7 +13,6 @@ The third line studies the harness itself: the program that gives the model its 
 OpenTrading belongs to this third line, applied to the second.
 
 \section{Historical Context}\label{sec:history}
-\guide{Provide some historical background or developments in the field, especially those directly related to your project.}
 The path to today's agents took about four years.
 In 2022, prompting a model to write its reasoning step by step improved arithmetic and logic tasks \parencite{wei2022chain}.
 In 2023, models learned to interleave reasoning with actions \parencite{yao2023react}, to decide when to call a tool \parencite{schick2023toolformer}, to search over several lines of reasoning \parencite{yao2023tree} and to learn from their own failures \parencite{shinn2023reflexion}.
@@ -35,37 +26,34 @@ Models trained for finance followed in 2023 \parencite{wu2023bloomberggpt,yang20
 From 2024, research moved to financial agents with tools, memory and several roles \parencite{zhang2024finagent,yu2024fincon,yang2024finrobot}.
 
 \section{Key Studies and Theories}\label{sec:studies}
-\guide{Describe and assess key studies, theories, and published works related to your topic, both fundamental and applied research.}
-\guide{Supervisor’s table columns: title, authors, year, technique, dataset, result, limitation/future work, further information.}
 \Cref{tab:key-studies} summarises the studies closest to this project.
 Three lessons stand out.
 First, reasoning in words helps, but arithmetic in words fails; moving the computation into a program works better \parencite{chen2023program}.
 Second, tools extend what a model can do \parencite{schick2023toolformer,qin2024toolllm}, yet on realistic tasks agents remain far behind people: \qty{14.41}{\percent} against \qty{78.24}{\percent} on web tasks \parencite{zhou2024webarena} and \qty{15}{\percent} against \qty{92}{\percent} on questions for general assistants \parencite{mialon2024gaia}.
 Third, in finance the gap is about figures: a strong model with a retrieval system answered wrongly or refused most questions on company filings \parencite{islam2023financebench}, and off-the-shelf models hallucinate seriously on financial tasks \parencite{kang2023deficiency}.
 
-\begin{table}[htb]
+\begin{table}[H]
   \centering
   \caption{Key studies on agents and on language models for finance}\label{tab:key-studies}
-  \begin{tabularx}{\textwidth}{@{}p{0.2\textwidth} L p{0.2\textwidth} L@{}}
+  \begin{tabularx}{\textwidth}{@{}L L L L L@{}}
     \toprule
-    {Study} & {Technique} & {Data} & {Main result}\\
+    {Study} & {Technique} & {Data} & {Main result} & {Limitation stated by the authors}\\
     \midrule
-    \textcite{yao2023tree} & Search over several reasoning paths & Game of 24, creative writing, crosswords & Game of 24 solved in \qty{74}{\percent} of cases, against \qty{4}{\percent} with chain of thought\\
-    \textcite{schick2023toolformer} & Model learns when to call tools, a calculator among them & Self-labelled tool calls & Better zero-shot results on many tasks\\
-    \textcite{zhou2024webarena} & Realistic web environment for agents & Web tasks & Best agent \qty{14.41}{\percent} success, humans \qty{78.24}{\percent}\\
-    \textcite{zhu2021tatqa} & Question answering over tables and text & Financial reports & Best model F1 \qty{58.0}{\percent}, experts \qty{90.8}{\percent}\\
-    \textcite{islam2023financebench} & Open-book financial question answering & Public company filings & Model with retrieval wrong or refused on \qty{81}{\percent} of questions\\
-    \textcite{kang2023deficiency} & Measurement of hallucination & Financial tasks & Off-the-shelf models hallucinate seriously\\
-    \textcite{chen2023program} & Computation written as a program & Math and financial question sets & About \qty{12}{\percent} average gain over chain of thought\\
-    \textcite{zhang2024finagent} & Multimodal trading agent with tools & Six stock and crypto datasets & Over \qty{36}{\percent} average profit gain over nine baselines\\
-    \textcite{nguyen2025finstat2sql} & Multi-agent text-to-SQL under Vietnamese accounting standards & Synthetic questions on financial statements & Fine-tuned 7B model \qty{61.33}{\percent} accuracy\\
+    \textcite{yao2023tree} & Search over several reasoning paths & Game of 24, creative writing, crosswords & Game of 24 solved in \qty{74}{\percent} of cases, against \qty{4}{\percent} with chain of thought & Only three simple tasks; search costs more than sampling\\
+    \textcite{schick2023toolformer} & Model learns when to call tools, a calculator among them & Self-labelled tool calls & Better zero-shot results on many tasks & Cannot chain tools or use them interactively\\
+    \textcite{zhou2024webarena} & Realistic web environment for agents & Web tasks & Best agent \qty{14.41}{\percent} success, humans \qty{78.24}{\percent} & No limitations section; calls for more robust agents\\
+    \textcite{zhu2021tatqa} & Question answering over tables and text & Financial reports & Best model F1 \qty{58.0}{\percent}, experts \qty{90.8}{\percent} & Most errors come from evidence not found in the table or text\\
+    \textcite{islam2023financebench} & Open-book financial question answering & Public company filings & Model with retrieval wrong or refused on \qty{81}{\percent} of questions & Single-turn questions on one listed company; some questions simple or ambiguous\\
+    \textcite{kang2023deficiency} & Measurement of hallucination & Financial tasks & Off-the-shelf models hallucinate seriously & Tasks do not cover all of finance; mitigations are task-specific\\
+    \textcite{chen2023program} & Computation written as a program & Math and financial question sets & About \qty{12}{\percent} average gain over chain of thought & Running generated code carries risk; weak on complex algebra\\
+    \textcite{zhang2024finagent} & Multimodal trading agent with tools & Six stock and crypto datasets & Over \qty{36}{\percent} average profit gain over nine baselines & No limitation stated; portfolio management left for future work\\
+    \textcite{nguyen2025finstat2sql} & Multi-agent text-to-SQL under Vietnamese accounting standards & Synthetic questions on financial statements & Fine-tuned 7B model \qty{61.33}{\percent} accuracy & Only large listed firms under Vietnamese standards; relies on closed models\\
     \bottomrule
   \end{tabularx}
-  \fignote{Source: the cited studies. \TBC{add the limitation of each study after reading it}}
+  \fignote{Source: the cited studies.}
 \end{table}
 
 \section{Technological Advancements}\label{sec:advances}
-\guide{Discuss recent or significant technological advancements in your field, and how they affect your project.}
 Three advances shape this project.
 
 Tool calling lets a model ask the program to run a function and read its result \parencite{qin2024tool}.
@@ -80,47 +68,42 @@ Long contexts remain a weakness, because models use information in the middle of
 This is why OpenTrading searches for tools only when needed and, when it compacts a conversation, asks the model to keep every sourced figure in a table.
 
 \section{Comparison of Existing Systems}\label{sec:comparison}
-\guide{Compare and contrast existing systems or technologies, including their advantages and disadvantages compared to your project.}
-\guide{Supervisor’s table columns: product, company, country, year, features, advantages, limitations, further information.}
 \Cref{tab:systems} compares OpenTrading with general harnesses and with systems built for finance.
 General harnesses are strong at running tools but treat a figure like any other text.
 Financial models know the language of finance but are not harnesses: they have no data tools and no check of figures.
 Financial agents in research aim at trading returns in back-tests rather than at answers a reader can verify.
 
 %% Evidence: E05.
-\begin{table}[htb]
+\begin{table}[H]
   \centering
   \caption{Existing systems compared with the needs of financial analysis}\label{tab:systems}
-  \begin{tabularx}{\textwidth}{@{}p{0.2\textwidth} p{0.17\textwidth} L L@{}}
+  \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.2\textwidth} >{\raggedright\arraybackslash}p{0.15\textwidth} L L@{}}
     \toprule
     {System} & {Type} & {Strengths} & {Gap for financial analysis}\\
     \midrule
-    Claude Code, Codex CLI, Cursor \TBC{cite official pages} & Commercial coding harnesses & Agent loop, context compaction, sub-agents, tool servers & Built for code; no check of figures against tool results found in their documentation \TBC{verify}\\
-    OpenCode \TBC{cite} & Open-source coding harness & Open source; connects to MCP servers & No memory tool; prompts written for code\\
+    Claude Code, USA \parencite{anthropic2025claudecode}; Codex CLI, USA \parencite{openai2025codexcli}; Cursor, USA \parencite{anysphere2026cursor} & Commercial coding harnesses & Agent loop, context compaction, sub-agents, tool servers & Built for code; their documentation describes no check that the figures of an answer come from tool results\\
+    OpenCode \parencite{anomaly2025opencode} & Open-source coding harness & Open source; connects to MCP servers & No memory tool; prompts written for code\\
     \textcite{yang2024sweagent}; \textcite{wang2025openhands} & Research harnesses & Interfaces designed for agents; open platforms & Evaluated on software tasks only\\
     \textcite{wu2023bloomberggpt}; \textcite{yang2023fingpt} & Language models for finance & Knowledge of financial language & A model, not a harness: no data tools, no check of figures\\
-    \textcite{yang2024finrobot} & Open-source financial agent platform & Layers for agents, model choice and data & \TBC{check its coverage of the Vietnamese market}\\
+    \textcite{yang2024finrobot} & Open-source financial agent platform & Layers for agents, model choice and data & Data sources for the US and Chinese stock markets and crypto-assets; no Vietnamese market data\\
     \textcite{zhang2024finagent}; \textcite{yu2024fincon} & Research trading agents & Several agents, memory, reflection & Aim at trading returns in back-tests, not at answers with traced sources\\
-    OpenTrading & Harness for financial analysis & Figures traced to tool results; arithmetic run as commands; market data with units and provenance; Vietnamese market skills & Terminal only; data server on a free plan (\cref{sec:scope})\\
+    OpenTrading & Harness for financial analysis & Figures traced to tool results; arithmetic run as commands; market data with its source and time; Vietnamese market skills & Terminal only; data server on a free plan (\cref{sec:scope})\\
     \bottomrule
   \end{tabularx}
-  \fignote{Source: the cited works; the group for OpenTrading. \TBC{add company, country and year of each product from its official page}}
+  \fignote{Note: the company and year of each commercial product are given by its citation, and the country is that of the company. Source: the cited works and official pages; the group for OpenTrading.}
 \end{table}
 
 \section{Gaps in the Literature/Technology}\label{sec:gaps}
-\guide{Identify gaps or limitations in the current research or technological systems, and how your project intends to address or improve upon these issues.}
 The review shows four gaps.
 \begin{enumerate}
   \item Among the systems in \cref{tab:systems}, none checks financial figures. They show tool results to the model but do not test whether the figures in the final answer came from them.
   \item Financial work centres on models, benchmarks and trading returns. Few systems aim at answers whose every figure can be traced to a source.
-  \item Evaluations of agents rarely hold the model fixed, report cost or allow the study to be repeated \parencite{kapoor2024agents}.
+  \item Benchmarks of agents usually compare models in fixed environments \parencite{liu2024agentbench}, and the harness around the model is rarely the variable; evaluations also rarely report cost or allow the study to be repeated \parencite{kapoor2024agents}.
   \item The Vietnamese market is little covered; its data follows local accounting standards that general tools handle poorly \parencite{nguyen2025finstat2sql}.
 \end{enumerate}
 Agentic systems also raise risks when they act on their own \parencite{chan2023harms}, which matters when the domain is money.
 
 \section{Justification for the Project}\label{sec:justification}
-\guide{Based on the above information, highlight the necessity and uniqueness of your project, and how it differs from or improves upon existing research or systems.}
-\guide{Note: not just a list of studies but an analysis that connects existing work to your project.}
 OpenTrading answers each gap.
 For the first, the harness records which figures in an answer match no tool result, and sends the model back when an answer claims data it never fetched.
 For the second, the data server returns each value with its unit, time and source, and says when a source has failed.

@@ -1,5 +1,4 @@
 %% Part VI, school Report #6. Grading with part VII: 15% on-going, 15% defence. Budget: 7 pages.
-%% Every number needs an entry in rules/05-evidence.md.
 \chapter{Results and Discussion}\label{ch:results}
 
 \section{Results and Analysis}\label{sec:results}
@@ -170,6 +169,28 @@ OpenTrading, by contrast, failed one memory task and needed only a few requests 
 The third objective of the project (\cref{sec:objective}) asked whether a harness designed for financial analysis answers better than a general one when the model and the data are the same.
 The results answer yes, but only for some kinds of question, and this section explains where the difference comes from and how it relates to earlier work.
 
+\subsection{Answers to the Research Questions}\label{sec:rq-answers}
+RQ1 asked which parts a harness must add around a model so that its analysis stays grounded, follows the investor's constraints and keeps actions under the user's control.
+The answer of this project is the set of rules in \cref{sec:algorithm}: the stop gate and the grounding rules, figure tracing with arithmetic in the shell, tool search with a check of tool inputs, memory that only the user can change, the permission gate, and sub-agents for long tasks.
+The automated tests show that each rule does what it was designed to do (\cref{sec:testing}).
+The benchmark measured only part of this answer.
+OpenTrading had one answer rejected for a number outside the tolerance, gave no number on any of the 11 tasks whose data does not exist, and ended one trial without an answer (\cref{tab:reliability}).
+Tool search, the permission gate, skills and sub-agents were not used in the benchmark, so for them the answer rests on the design and the tests alone.
+%% Evidence: E11, E45.
+
+RQ2 asked how a data server should return its results so that the agent knows the unit, the source and the availability of each figure.
+The data server returns every result in one envelope that states whether the data is available, its source and time, and, when data is missing, the reason and whether a retry may help (\cref{sec:tool-exposure}).
+Units are stated for the price tools whose units have been checked, not yet for every tool.
+A contract check calls the tools with live data and checks the envelope, but it is not part of the automated checks of each change.
+The answer to RQ2 is therefore a working design whose two gaps are the coverage of units and a contract check that does not yet run automatically.
+%% Evidence: E13.
+
+RQ3 asked whether OpenTrading answers more financial tasks correctly than two general-purpose harnesses with the same model, data and scoring, and at what cost.
+On the 300 tasks of the benchmark, OpenTrading answered 279 correctly (\qty{93.0}{\percent}), against 266 for DSH (\qty{88.7}{\percent}) and 245 for OpenCode (\qty{81.7}{\percent}), and both differences were unlikely under equal performance (\cref{sec:accuracy}).
+Its cost per correct answer was about half that of DSH and less than half that of OpenCode, and its median time per trial lay between the two (\cref{sec:speed-cost}).
+The difference came almost entirely from the memory tasks, and the limits of \cref{sec:threats} apply to it.
+%% Evidence: E45, E46.
+
 \subsection{Where the Harness Makes a Difference}\label{sec:harness-difference}
 On 205 of the 300 tasks, the compute, lookup and robustness groups, the three harnesses were within three tasks of each other.
 Once every harness had the same data tools and a shell for arithmetic, fetching a figure and computing with it did not depend on the harness: the model and the data did the work.
@@ -209,7 +230,30 @@ Four limits apply to these results:
 %% Evidence: E17.
 
 \section{Recommendations}\label{sec:recommendations}
-\guide{Offer recommendations based on the findings, including further research, system improvements, or practical applications.}
+The results lead to five recommendations for the harness and its evaluation.
+\begin{enumerate}
+  \item Turn figure tracing into a check. In version 0.5.1 it records figures that match no tool result but blocks an answer only in turns without tools (\cref{sec:figure-tracing}); the records of real use can show how often it would block a correct answer before it is enforced.
+  \item Measure each rule on its own. The benchmark ran every task once and did not use tool search, the permission gate, skills or sub-agents, so repeated runs and runs with one rule switched off at a time are needed to show what each rule adds.
+  \item Test memory with tasks written outside the group. The memory tasks, where the harnesses differed most, were written by the group that built the memory of OpenTrading (\cref{sec:threats}).
+  \item Keep buy, hold and sell calls in their place. No harness did better than a rule that always answers \enquote{sell} in this period (\cref{sec:error-analysis}), so a call should be shown as an analysis of the data with its risks, as the system prompt already requires, not as a forecast.
+  \item Run the contract check of the data server with every change, and extend the stated units from the checked price tools to every tool that returns an amount (\cref{sec:rq-answers}).
+\end{enumerate}
+For users, the practical advice follows from the same results: check each figure against the source that the answer names, and treat a call as one input to a decision that remains theirs.
 
 \section{Personal Reflection (Optional)}\label{sec:reflection}
-\guide{A section reflecting personally on the project process, lessons learned, and how improvements could be made in the future.}
+The group draws four lessons from the project.
+
+First, the choice of language should be made with the first version of the agent loop.
+The harness began as a Python scaffold and was rewritten in TypeScript in week 3 (\cref{sec:stack}); the rewrite was early enough to be cheap, but choosing the language together with the terminal library from the start would have avoided it.
+
+Second, a rule should be measured before and after it changes.
+The first benchmark showed weaknesses in the system prompt and in the calculation tools, and version 0.5.0 replaced the calculation tools with arithmetic in the shell (\cref{sec:stages}).
+From week 11 the group asked for a small paired measurement with each change to a prompt or a tool (\cref{sec:quality}), and earlier changes would have been easier to judge with the same rule.
+
+Third, tests and the benchmark answer different questions.
+The tests show that a rule behaves as designed, while only the benchmark shows whether the answers improve, and even then only for the rules that it uses (\cref{sec:rq-answers}).
+Keeping the two apart made the claims of this report smaller but easier to defend.
+
+Fourth, data sources fail more often than expected.
+A release of the data library was switched off during the project (\cref{sec:risk}), and reporting a failure as a failure, rather than as empty data, turned out to be part of the design rather than an extra.
+In the same way, tracking work as issues only from week 10 left the early decisions spread across pull requests; tracking them from the start would have made the history of the project easier to follow.

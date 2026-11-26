@@ -1,3 +1,16 @@
-%% Supervisor's template: "Project Specification"
 \FrontSection[notoc]{Project Specification}
-\guide{Your project specification goes here. Half a page: the problem, the product the group promised to build, the deliverables and the acceptance criteria agreed with the supervisor.}
+\textbf{Problem.} A general language-model agent is not enough for financial analysis: it can invent figures, it calculates poorly in words, and it cannot tell a failed data source from a valid result.
+
+\textbf{Product.} OpenTrading, a harness for financial analysis and market research on Vietnamese equities.
+The harness runs the agent loop in a terminal, takes every figure from tool results, runs arithmetic as commands, keeps the investor's constraints in a memory that only the user can change, and asks the user before actions that need approval.
+The user connects a model of their choice; the group trains no model.
+
+\textbf{Deliverables.}
+\begin{enumerate}
+  \item OpenTrading version 0.5.1, released under the Apache 2.0 licence with installable versions for Windows, macOS and Linux.
+  \item opentrading-mcp, a market-data server with \num{175} tools whose results state their availability, source and time.
+  \item opentrading-benchmark, a comparison of OpenTrading with two general-purpose harnesses on the same model, data and scoring.
+  \item This report, the time plan and the weekly minutes.
+\end{enumerate}
+
+\textbf{Acceptance criteria.} The three objectives of \cref{sec:objective} and their measures: automated tests of the rules of the harness and its accuracy in the benchmark; a shared answer contract checked on the tools of the data server; and a paired comparison of the three harnesses, tested with an exact sign test and reported with time and cost.
