@@ -1,0 +1,7 @@
+group opentrading opentrading_lo opentrading_hi opencode opencode_lo opencode_hi dsh dsh_lo dsh_hi
+Compute 98.73 5.56 1.04 94.94 7.24 3.08 96.20 6.78 2.50
+Investor 52.78 15.77 15.24 44.44 14.90 15.97 44.44 14.90 15.97
+Lookup 98.21 4.49 1.29 98.21 4.49 1.29 98.21 4.49 1.29
+Memory 98.31 7.30 1.40 50.85 12.41 12.31 84.75 11.26 7.02
+Robustness 100.00 21.53 0.00 100.00 21.53 0.00 100.00 21.53 0.00
+Overall 93.00 3.46 2.38 81.67 4.77 3.97 88.67 4.09 3.11
