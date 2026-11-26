@@ -89,6 +89,49 @@ Near the limit, old tool results are first replaced by short notes that, for MCP
 If that is not enough, the model writes a summary of the older turns, and the latest turns are kept (step 8).
 %% Evidence: E34.
 
+\subsection{Writing and Reading Memory}\label{sec:memory-flow}
+\Cref{fig:memory-flow} shows the paths by which memory is written and read.
+Memory entries are kept in the store, a single SQLite file on the user's machine inside the OpenTrading data folder, and on systems that support it only the owner can read the file.
+The store holds five kinds of entry: constraints, presentation styles, investment theses, lessons and decisions.
+%% Evidence: E48.
+%% TODO(IV.3.4): add \cref{sec:memory}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics{memory-flow}
+  \caption{Paths by which memory is written and read}\label{fig:memory-flow}
+  \fignote{Note: solid arrows write, dashed arrows read, the dotted arrow is a proposal from the model. Source: the group, based on OpenTrading version 0.5.1 \parencite{group2026opentrading}.}
+\end{figure}
+
+Only the user writes memory.
+Four commands open a form: \texttt{/nho} (\enquote{remember}) for a constraint or a presentation style, \texttt{/luandiem} (\enquote{thesis}) for the investment thesis on one subject, such as a ticker, \texttt{/baihoc} (\enquote{lesson}) for a lesson and \texttt{/quyetdinh} (\enquote{decision}) for a decision.
+The \texttt{/memory} screen lists the entries for viewing and editing.
+%% Evidence: E48.
+Every save passes one shared text check, which normalises Unicode, rejects empty or over-long text and refuses strings that look like an API key or a private key.
+The model has no tool for writing; at most it ends an answer with a suggestion card, which opens the same form.
+The entry takes effect only when the user saves it, unless the user has switched on automatic saving for cards that quote the user word for word.
+
+Constraints take a path of their own.
+At the start of every turn the harness opens the store in read-only mode, takes the constraints and closes it again, whether the notebook is on or off.
+The constraints go into the system part of the main agent and of every sub-agent and are never cut, and a failed read holds the turn, as \cref{sec:question-flow} describes.
+%% Evidence: E48.
+
+Presentation styles, theses and lessons reach the model through the notebook (\texttt{Sổ ghi nhớ}), a memory provider that the user turns on in the settings, either in \texttt{/config} or in the settings tab of \texttt{/memory}.
+Only the main agent receives them.
+%% Evidence: E48.
+On each turn the provider adds the presentation styles to the system part and an index, with the names and status of the theses and the titles of the lessons, to the context part.
+The index is kept fixed during a session and rebuilt only in a few cases, such as when one of its entries is deleted.
+The text sent therefore stays the same from turn to turn, and the model provider's prompt cache can still be used.
+When the user names a subject that has a thesis, in this turn or in the two turns before it, the thesis block is added to the reminder for that turn, unless the same version is already in the conversation.
+The harness then shows which memory it used.
+%% Evidence: E48.
+The text of lessons and the details of theses reach the model only when it calls the read-only tool \texttt{memory\_read}.
+Decisions are never sent to the model; they appear only on the \texttt{/memory} screen and, when the user asks for them, in an export.
+
+Memory blocks sent in earlier turns stay in the conversation history.
+Before each turn the harness checks them against the store and masks the entries that the user has deleted, which is step 2 of \cref{fig:question-flow}.
+When the conversation is compacted, memory blocks in the summarised part keep only their labels, and the model can read them again with \texttt{memory\_read}; suggestion cards are removed from the history on every turn.
+
 \section{Deployment Strategy}\label{sec:deployment}
 \guide{Detail how the system is deployed, including the deployment environment and deployment procedures.}
 
