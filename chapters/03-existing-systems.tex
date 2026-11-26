@@ -47,7 +47,7 @@ Third, in finance the gap is about figures: a strong model with a retrieval syst
     \textcite{kang2023deficiency} & Measurement of hallucination & Financial tasks & Off-the-shelf models hallucinate seriously & Tasks do not cover all of finance; mitigations are task-specific\\
     \textcite{chen2023program} & Computation written as a program & Math and financial question sets & About \qty{12}{\percent} average gain over chain of thought & Running generated code carries risk; weak on complex algebra\\
     \textcite{zhang2024finagent} & Multimodal trading agent with tools & Six stock and crypto datasets & Over \qty{36}{\percent} average profit gain over nine baselines & No limitation stated; portfolio management left for future work\\
-    \textcite{nguyen2025finstat2sql} & Multi-agent text-to-SQL under Vietnamese accounting standards & Synthetic questions on financial statements & Fine-tuned 7B model \qty{61.33}{\percent} accuracy & Only large listed firms under Vietnamese standards; relies on closed models\\
+    \textcite{nguyen2025finstat2sql} & Multi-agent text-to-SQL under Vietnamese accounting standards & Synthetic questions on financial statements & Fine-tuned 7B model \qty{61.33}{\percent} accuracy & Only VN30 and HNX30 firms; closed models costly to deploy\\
     \bottomrule
   \end{tabularx}
   \fignote{Source: the cited studies.}
@@ -61,7 +61,7 @@ OpenTrading relies on it for every figure: the model fetches data and runs arith
 
 The Model Context Protocol defines how a program offers tools and data to a model \parencite{modelcontextprotocol2025specification}.
 It let the group build the data server once and use it from any harness, which also made a fair comparison of harnesses possible.
-The protocol brings new security risks, such as tool descriptions that carry hidden instructions \parencite{hou2025model}.
+The protocol brings new security risks, such as tool descriptions that carry hidden instructions \parencite{hou2026model}.
 
 Agent harnesses have become platforms in their own right, with loops, context management and several agents \parencite{wang2025openhands}.
 Long contexts remain a weakness, because models use information in the middle of a long input poorly \parencite{liu2024lost}.
