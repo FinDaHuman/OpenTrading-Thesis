@@ -2,7 +2,7 @@
 \chapter{Results and Discussion}\label{ch:results}
 
 \section{Results and Analysis}\label{sec:results}
-This section reports the comparison described in \cref{sec:validation}: OpenTrading 0.5.0 against OpenCode and DSH, on 300 tasks with the same model and data.
+This section reports the comparison described in \cref{sec:validation}: OpenTrading 0.5.1 against OpenCode and DSH, on 300 tasks with the same model and data.
 Accuracy comes first, then speed and cost, reliability, and an analysis of the errors.
 
 \subsection{Accuracy}\label{sec:accuracy}
@@ -42,11 +42,12 @@ On the investor tasks all three were weak, near one half.
 
 Compared on the same tasks with the sign test of \cref{eq:sign-test}, OpenTrading was ahead of OpenCode on 40 tasks and behind on 6 ($p=3.1\times10^{-7}$), and ahead of DSH on 19 and behind on 6 ($p=0.015$).
 Both differences are unlikely if the harnesses were equally good.
-%% Evidence: E45.
+The difference with DSH depends on the corrections of the grading described in \cref{sec:bench-scoring}: on the 181 tasks of the first block that the judge graded alone, OpenTrading was ahead of DSH on 19 tasks and behind on 12 before them ($p=0.28$), and ahead on 18 and behind on 5 after them ($p=0.011$).
+%% Evidence: E40, E43, E45.
 
 \subsection{Speed and Cost}\label{sec:speed-cost}
 \Cref{tab:speed} reports how long a trial took and how much work and money it needed.
-A typical trial took about half a minute in every harness: the median was 36 seconds for OpenTrading, 47 for OpenCode and 31 for DSH.
+A typical trial took under a minute in every harness: the median was 36 seconds for OpenTrading, 47 for OpenCode and 31 for DSH.
 The harnesses differed in their slow trials.
 The slowest tenth of OpenTrading's trials took more than 97 seconds, against 228 for DSH and 300 for OpenCode, and only one OpenTrading trial took more than five minutes, against 17 for DSH and 30 for OpenCode.
 OpenTrading also needed fewer model requests, 3.8 per trial against about 7 for the others, and its cost per correct answer was less than half that of OpenCode and about half that of DSH.
@@ -75,7 +76,7 @@ OpenTrading also needed fewer model requests, 3.8 per trial against about 7 for 
 The picture depends on the kind of task (\cref{tab:speed-group}).
 On short lookups OpenTrading was the slowest, with a median of 29 seconds against 17 and 18, because it typically made one more model request (3 against 2), each taking about ten seconds.
 On memory tasks it was the fastest by far, 69 seconds against 165 for DSH and 226 for OpenCode, because it needed a median of 4 model requests there, against 15 for OpenCode and 20 for DSH.
-Its advantage in time therefore appears on long tasks with many steps, which are also the tasks where a user waits longest.
+Its advantage in time therefore lies in the memory tasks; on the investor tasks it was as fast as DSH, and on the compute tasks slightly slower.
 
 \begin{table}[H]
   \centering
@@ -99,7 +100,7 @@ Its advantage in time therefore appears on long tasks with many steps, which are
 \subsection{Reliability}\label{sec:reliability}
 OpenTrading returned an answer in a valid format in 299 of 300 trials and never refused a task that had an answer (\cref{tab:reliability}).
 OpenCode refused ten answerable tasks, all in the memory group, and gave 15 numbers outside the tolerance, against one for OpenTrading.
-No harness gave a number on a task whose correct answer is a refusal, so none of them invented data that does not exist.
+No harness gave a number on a task whose correct answer is a refusal, so none of them invented data on these 11 tasks.
 
 \begin{table}[H]
   \centering
@@ -189,7 +190,7 @@ The answer to RQ2 is therefore a working design whose two gaps are the coverage 
 RQ3 asked whether OpenTrading answers more financial tasks correctly than two general-purpose harnesses with the same model, data and scoring, and at what cost.
 On the 300 tasks of the benchmark, OpenTrading answered 279 correctly (\qty{93.0}{\percent}), against 266 for DSH (\qty{88.7}{\percent}) and 245 for OpenCode (\qty{81.7}{\percent}), and both differences were unlikely under equal performance (\cref{sec:accuracy}).
 Its cost per correct answer was about half that of DSH and less than half that of OpenCode, and its median time per trial lay between the two (\cref{sec:speed-cost}).
-The difference came almost entirely from the memory tasks, and the limits of \cref{sec:threats} apply to it.
+The difference came mostly from the memory tasks, and the limits of \cref{sec:threats} apply to it.
 %% Evidence: E45, E46.
 
 \subsection{Where the Harness Makes a Difference}\label{sec:harness-difference}
@@ -200,7 +201,7 @@ The difference came from the memory group, where OpenTrading answered 58 of 59 t
 These tasks depend on what the user said in an earlier session, which a model cannot recover from the data.
 In OpenTrading memory is part of the harness: at the start of every turn the user's constraints are placed in the system part of the prompt (\cref{sec:memory,sec:memory-flow}), so the model does not need to search for them.
 This group therefore favours OpenTrading by design: the benchmark's controller saved each rule through the same path as the user's form, in the user's exact words, while OpenCode could only resume the earlier session and DSH could resume it and search past sessions.
-The other harnesses had to find the rules in the earlier session; they spent 15 to 20 requests on a typical memory task, against 4 for OpenTrading, and still often kept an outdated rule or refused because they found none.
+The other harnesses had to find the rules in the earlier session; they spent 15 to 20 requests on a typical memory task, against 4 for OpenTrading, and still often kept an outdated rule, gave no answer or, in the case of OpenCode, refused because they found none.
 The same difference explains most of OpenTrading's lead in speed and cost: fewer requests meant a shorter wait in the slowest trials and about half the cost per correct answer.
 %% Evidence: E45, E46.
 
@@ -222,7 +223,7 @@ Finally, \textcite{kapoor2024agents} argued that evaluations of agents should ho
 
 
 \subsection{Threats to Validity}\label{sec:threats}
-Seven limits apply to these results:
+Six limits apply to these results:
 \begin{enumerate}
   \item Every task ran once in each harness, so the results do not show how stable the answers are across runs.
   \item The memory tasks, where most of the difference lies, were written by the group that built OpenTrading's memory, and their form may suit its design.
@@ -230,7 +231,6 @@ Seven limits apply to these results:
   \item The judge was checked only on clearly correct and clearly wrong answers.
   \item For 119 tasks, the answers of OpenCode and DSH come from an earlier run with the same model and data but older versions of these harnesses; most of these tasks are lookups on which the three harnesses scored almost the same.
   \item The model was served by two hosting providers, and the trials are not split evenly between them.
-  \item The harness measured was OpenTrading 0.5.0 with an early revision of a change released in version 0.5.1, not the version 0.5.1 described in \cref{ch:methodology,ch:design}.
 \end{enumerate}
 %% Evidence: E15, E16, E17, E37.
 

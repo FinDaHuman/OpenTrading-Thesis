@@ -2,11 +2,64 @@
 \chapter{Conclusion}\label{ch:conclusion}
 
 \section{Summary of Findings}\label{sec:summary}
-\guide{Summarize the main findings, including how the research questions have been answered and how the project goals were achieved.}
+The project set out to learn how to build a harness for financial analysis, with three objectives (\cref{sec:objective}) turned into three research questions (\cref{sec:rq}).
+\Cref{sec:rq-answers} answers each question in detail; this section draws the answers together.
+
+The first and main objective was met in the harness itself.
+OpenTrading 0.5.1 adds to the model the rules of \cref{sec:algorithm}, and its test suite passed, with \num{2249} of \num{2253} tests passing and 4 skipped.
+%% Evidence: E11.
+In the benchmark, which measured the same version, OpenTrading had one answer rejected for a number outside the tolerance in 300 tasks, gave no number on any of the 11 tasks whose data does not exist, and followed the rules that the user had given in an earlier session in 58 of 59 memory tasks, a group designed around its memory.
+%% Evidence: E16, E45.
+
+The second objective was met in part.
+The data server returns its results in one envelope that states whether the data is available, where it came from and when (\cref{sec:tool-exposure}), and \num{1338} of its tests passed.
+Units are stated for the price tools whose units have been checked, not yet for every tool, and the check that calls the tools with live data is not yet part of the automated checks.
+%% Evidence: E13.
+
+The third objective, the comparison, gave a positive but limited result.
+With the same model and data, OpenTrading answered 279 of 300 tasks correctly (\qty{93.0}{\percent}), against 266 for DSH (\qty{88.7}{\percent}) and 245 for OpenCode (\qty{81.7}{\percent}), at about half the cost per correct answer, a cost that is partly estimated for the other two harnesses.
+A lead as large as the one over OpenCode would be unlikely under equal performance ($p=3.1\times10^{-7}$), while the lead over DSH ($p=0.015$) depends on corrections of the grading that were made after the results had been seen (\cref{sec:accuracy}).
+The difference came mostly from the memory group; on the other groups the three harnesses were close (\cref{sec:harness-difference}).
+On the 16 buy, hold or sell calls, no harness did better than a rule that always answers \enquote{sell} in this falling market.
+%% Evidence: E18, E40, E43, E45, E46.
+
+Taken together, the findings suggest that, in this benchmark, a harness changed the answers most where the task needed information that the model cannot recover from the data, such as the rules a user gave earlier.
+Where every harness had the same structured data tools and a shell for arithmetic, the model and the data did most of the work.
 
 \section{Contributions and Reflections on the Project}\label{sec:contributions}
-\guide{Highlight the specific contributions of the project to the field of study, community, or industry.}
-\guide{Reflect on the project process; provide some final thoughts.}
+The project makes three contributions.
+\begin{enumerate}
+  \item An open-source harness for research on Vietnamese equities.
+  OpenTrading is released under the Apache 2.0 licence and was published in public versions from 0.2.1 on 23 October 2026 to 0.5.1 on 25 November 2026.
+  Its rules ask the model to take each figure from a tool result and trace the figures of an answer; the harness has no tool that places orders, and only the user decides what it remembers (\cref{sec:algorithm,ch:design}).
+  \item A market-data server whose results say whether data is available and where it came from.
+  The opentrading-mcp server is released under the MIT licence and returns its results in one envelope, so that a missing figure is reported as missing rather than as an empty result (\cref{sec:tool-exposure}).
+  \item A controlled comparison of three harnesses on financial tasks.
+  The benchmark held the model and the data fixed, reported cost next to accuracy, and recorded ties and losses as well as wins, with each figure linked to a source in the group's evidence register (\cref{sec:validation,sec:results}).
+\end{enumerate}
+%% Evidence: E53.
+For the study of agents, the comparison adds a case from finance to the view that the interface around a model matters \parencite{yang2024sweagent} and that long-term memory belongs to the system around the model \parencite{packer2023memgpt}, with the caveat that the memory tasks were designed around OpenTrading (\cref{sec:related-results}).
+
+The lessons that the group draws from the process are given in \cref{sec:reflection}.
+One further thought links them.
+Much of the engineering effort of making an agent reliable lay outside the model: in what the model is shown, what it is allowed to do, and how its claims are checked afterwards.
+The same habit of checking was applied to this report, where claims were traced to the code or a result file at a fixed version where possible, and claims that could not be traced were made smaller or left out.
 
 \section{Limitations and Future Work}\label{sec:future}
-\guide{Acknowledge any limitations of the project and how they affect the results; suggest directions for future work.}
+The limitations of the benchmark (\cref{sec:threats}) bound what the findings can claim.
+Because each task ran once, and because 119 answers of the other two harnesses came from an earlier run, the figures describe this run rather than a stable ranking.
+Because the memory tasks were written by the group that built the memory of OpenTrading, the lead in that group is an estimate for tasks of this kind, not a general result about memory.
+Because the investor tasks cover one falling market over about three weeks, the results say little about the value of the calls for investing.
+%% Evidence: E15, E16.
+
+The scope of the project adds further limits (\cref{sec:scope}).
+OpenTrading serves one user in a terminal, mainly for Vietnamese equities, and places no orders.
+Tool search, the permission gate, skills and sub-agents were tested but not measured in the benchmark, so their effect on the answers is not known.
+Whether the data server can be offered publicly depends on the terms of its data sources (\cref{sec:ethics}).
+
+\Cref{sec:recommendations} lists five next steps for the harness and its evaluation.
+Beyond them, three directions follow from the limits above.
+First, the benchmark designed a set of held-out tasks that has not yet been run; running it, together with version 0.5.1 itself and several runs per task, would show how stable the results are.
+%% Evidence: E09.
+Second, a sample of answers graded by people would show how far the language-model judge can be trusted beyond clearly correct and clearly wrong answers.
+Third, a study with real users over several weeks would test memory in the setting it was built for, where rules are written in a user's own words and change over time.

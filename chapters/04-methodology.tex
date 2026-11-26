@@ -12,6 +12,7 @@ Each RQ states what is measured and where it is answered, so that \cref{sec:summ
   The permission gate decides which actions need the user's approval.
   The automated tests check that each of these rules does the job it was designed for (\cref{sec:testing}).
   The benchmark measures the first aim: the secondary metrics of \cref{sec:metrics} count answers rejected for a figure outside the tolerance, figures given on tasks that should have been refused, and trials that end without an answer.
+  Its memory group, run with the notebook of OpenTrading switched on, also measures the second aim: whether an answer follows the rules that the user gave in an earlier session (\cref{sec:harness-difference}).
   \item[RQ2.~] How should a market-data server return its results so that the agent knows the unit, the source and the availability of each figure?
   The measure is whether every tool of the data server replies in one shape that states whether the data is available and where and when it was taken.
   A contract check calls the tools of the server with live data and checks this shape, and a test checks that a listed set of tools that return prices or amounts of money state their units.
@@ -435,7 +436,7 @@ The environment was set up so that no harness had an advantage outside its desig
     {Item} & {Setting}\\
     \midrule
     Model & DeepSeek V4.1 Flash, temperature 0, reasoning not requested\\
-    Harnesses & OpenTrading 0.5.0 with the change that allows buy and sell recommendations, machine profile; OpenCode; DSH\\
+    Harnesses & OpenTrading 0.5.1, machine profile; OpenCode; DSH\\
     Grading & Rule-based checks, a language-model judge and a manual review\\
     \bottomrule
   \end{tabularx}
