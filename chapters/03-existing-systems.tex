@@ -48,11 +48,11 @@ Third, in finance the gap is about figures \parencite{islam2023financebench,kang
 \end{table}
 
 \section{Technological Advancements}\label{sec:advances}
-Three advances shape this project.
-Tool calling lets a model ask the program to run a function and read its result \parencite{qin2024tool}; OpenTrading relies on it for every figure, so the model fetches data and runs arithmetic through tools instead of recalling or computing in words.
-MCP defines how a program offers tools and data to a model \parencite{modelcontextprotocol2025specification}.
+Three advances shape this project: tool calling, MCP and agent harnesses.
+First, tool calling lets a model ask the program to run a function and read its result \parencite{qin2024tool}; OpenTrading relies on it so that the model fetches data and runs arithmetic through tools instead of recalling or computing in words.
+Second, MCP defines how a program offers tools and data to a model \parencite{modelcontextprotocol2025specification}.
 It let the group build the data server once and use it from any harness, which also made a fair comparison possible, but it brings new security risks, such as tool descriptions that carry hidden instructions \parencite{hou2026model}.
-Finally, agent harnesses have become platforms in their own right, with loops, context management and several agents \parencite{wang2025openhands}.
+Third, agent harnesses have become platforms in their own right, with loops, context management and several agents \parencite{wang2025openhands}.
 Long contexts remain a weakness, because models use the middle of a long input poorly \parencite{liu2024lost}.
 
 \section{Comparison of Existing Systems}\label{sec:comparison}
@@ -81,11 +81,13 @@ Long contexts remain a weakness, because models use the middle of a long input p
 \section{Gaps in the Literature/Technology}\label{sec:gaps}
 The review shows four gaps.
 First, apart from OpenTrading, none of the systems in \cref{tab:systems} tests whether the figures in the final answer came from tool results.
-Second, financial work centres on models, benchmarks and trading returns; few systems aim at answers whose every figure can be traced to a source.
+Second, financial work centres on models, benchmarks and trading returns; few systems aim at answers whose figures can be traced to a source.
 Third, benchmarks of agents usually compare models, not harnesses \parencite{liu2024agentbench}, and rarely report cost \parencite{kapoor2024agents}.
 Fourth, the Vietnamese market, with its local accounting standards, is little covered \parencite{nguyen2025finstat2sql}.
 
 \section{Justification for the Project}\label{sec:justification}
-OpenTrading answers each gap: the harness traces figures to tool results and sends the model back when an answer claims data it never fetched; the data server returns each result with its source and time and says when a source has failed; the benchmark compares three harnesses under the same conditions and reports cost; skills cover the Vietnamese market.
-Its tools cannot place orders, which limits the risks of agents acting alone \parencite{chan2023harms}.
-A prompt cannot check its own sources, so OpenTrading moves part of these rules into code.
+OpenTrading answers each gap: the harness traces figures to tool results and sends the model back when an answer claims data it never fetched.
+The data server returns its results with their source and time and says when a source has failed.
+The benchmark reports cost as well as accuracy, and skills cover the Vietnamese market.
+Its built-in tools cannot place orders, which limits the risks of agents acting alone \parencite{chan2023harms}.
+A prompt can ask for cited figures but cannot check them, so OpenTrading moves part of these rules into code.

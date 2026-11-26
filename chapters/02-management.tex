@@ -14,11 +14,11 @@ The team has four members and one supervisor; each member leads one area of the 
     \midrule
     Đoàn Duy Long & Team leader & Market-data server (opentrading-mcp), benchmark (opentrading-benchmark), analysis skills\\
     Trần Huy Tuấn & Member & Harness core, terminal interface, releases\\
-    Đoàn Minh Hiếu & Member & Memory of the harness; later tools, permissions and the agent loop: tool search, skills, chart units, the stop gate and the auto-mode reviewer\\
-    Hoàng Hiếu Trung & Member & Fixes to the MCP client, web search and fetch tools, the stop gate and compaction; evaluation thresholds; Parts I to III of this report\\
+    Đoàn Minh Hiếu & Member & Memory of the harness; later tools, permissions and the agent loop\\
+    Hoàng Hiếu Trung & Member & Fixes to the MCP client, web search and fetch tools, the stop gate and compaction; evaluation thresholds\\
     \bottomrule
   \end{tabularx}
-  \fignote{Source: authors of merged pull requests in the three repositories; thesis assignment in the group's tracking issue.}
+  \fignote{Source: authors of merged pull requests in the three repositories.}
 \end{table}
 
 \label{sec:communication}
@@ -92,47 +92,24 @@ Most of them came from outside the group: data providers, model providers and pa
 \end{table}
 
 \label{sec:quality}
-For quality management, almost every change to the product goes through a pull request, and \cref{tab:quality-checks} lists the automated checks run on it.
+For quality management, almost every change to the product goes through a pull request.
+Each pull request runs a type check and tests on Ubuntu and Windows, shell tests on macOS and with mawk, a build check and a secret scan for known key patterns; releases also run installer checks on three operating systems.
+The test counts are in \cref{sec:testing}, and the benchmark repository has \num{1199} passing tests of the current study.
+%% Evidence: E11, E13, E35, E59.
 On OpenTrading, a member without administrator rights cannot merge a change until it has one approval and the tests on Ubuntu and Windows and the secret scan pass.
 %% Evidence: E63.
-From week 11, a change to a prompt or a tool also needs a small paired measurement, run before and after the change.
-\Cref{ch:results} reports the validation of the product as a whole.
-
-%% Evidence: E11, E13, E59.
-\begin{table}[H]
-  \centering
-  \caption{Automated checks run on each change}\label{tab:quality-checks}
-  \begin{tabularx}{\textwidth}{@{}p{0.22\textwidth} p{0.26\textwidth} L@{}}
-    \toprule
-    {Check} & {When it runs} & {What it verifies}\\
-    \midrule
-    Type check and tests & Every pull request to OpenTrading, on Ubuntu and Windows & \num{2249} of \num{2253} tests pass on Ubuntu, 4 skipped, none fail\\
-    Shell tests & Every pull request, on macOS and Ubuntu & Arithmetic commands give the same result on each shell\\
-    Build check & Every pull request & The program builds and passes its self-check\\
-    Secret scan & Every pull request & No key or token appears in the history\\
-    Installer checks & Releases and installer changes & Install, update and uninstall on three operating systems\\
-    Data-server tests & Every pull request to opentrading-mcp & \num{1338} tests pass; \qty{71.69}{\percent} line coverage\\
-    Benchmark tests & Every pull request to opentrading-benchmark & \num{1199} tests of the current study pass\\
-    \bottomrule
-  \end{tabularx}
-  \fignote{Source: automated check runs of the three repositories.}
-\end{table}
+From week 11, a change to a prompt or a tool also needs a small paired measurement, run before and after the change; \cref{ch:results} reports the validation of the product as a whole.
 
 \label{sec:budget}
 The project had no external funding.
 %% Evidence: E60, E66.
 The group kept costs low with free model tiers, one prepaid key and a free hosting plan for the data server.
-The main use of models was the benchmark, whose 900 trials used about 75.6 million tokens: 15.6 million input and 0.84 million output tokens for OpenTrading, 27.1 million and 1.77 million for OpenCode, and 28.6 million and 1.64 million for DSH.
-The cost per correct answer of each harness is reported in \cref{sec:speed-cost}.
+The main use of models was the benchmark, whose 900 trials used about 75.6 million tokens; the cost per correct answer of each harness is in \cref{sec:speed-cost}.
 
 \label{sec:change}
-For change management, larger decisions are written down as short decision records with their reason; for example, the first scaffold of the harness was written in Python, and in week 3 the group chose TypeScript on Bun for the core and the interface.
-From week 10, a change of scope also starts as an issue that states the problem and the proposed change.
+For change management, larger decisions are written down as short decision records with their reason.
 Changes that affect the core of the harness need the agreement of its lead before they are merged.
-Changes to the benchmark plan after the plan was fixed are recorded as amendments, so that planned and later analyses stay apart (\cref{ch:methodology}).
-
+Changes to the benchmark plan after it was fixed are recorded as amendments, apart from the grading corrections of \cref{sec:bench-scoring}, so that planned and later analyses stay apart.
 \label{sec:closure}
-At closure, each version of the product ends with a tagged release and its release notes.
-After measurements in week 10, the group listed what to improve, chiefly the system prompt and the calculation tools; version 0.5.0 shortened the system prompt and replaced the calculation tools with arithmetic shell commands.
-The project closes after Review 1.1: the group will apply the board's feedback and submit the final report.
-Lessons learned are summarised in \cref{sec:reflection}.
+At closure, each version of the product ends with a tagged release and its release notes (\cref{sec:stages}).
+The project closes after Review 1.1, when the group will apply the board's feedback and submit the final report; lessons learned are in \cref{sec:reflection}.

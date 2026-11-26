@@ -19,7 +19,6 @@ It produces a stream of events, and every interface reads the same events, so th
 The design follows three questions.
 The first is what the model sees.
 The system prompt is built in layers: the core rules and working rules, then the user's profile and constraints, then the style and the list of skills.
-Of the 43 skills in OpenTrading, described later in this section, only those that the model loads or the user switches on are added in full.
 The earlier layers rarely change, so the provider can reuse its cache; reminders such as the current trading session are sent with the messages.
 %% Evidence: E10.
 
@@ -48,8 +47,11 @@ OpenTrading reads market data through MCP (\cref{sec:data}), whose specification
 Its MCP client connects to the group's data server, which offers \num{175} tools and 6 prepared analysis workflows \parencite{group2026opentradingmcp}, and gives the model these tools next to its own, prefixed with the server's name so that two servers cannot clash.
 Above a threshold the model receives only the tool names and loads tools through the search of \cref{sec:tool-search}, and the workflows appear to the user as commands.
 %% Evidence: E12, E21.
-Every answer of the server uses the same envelope, which states whether the data is available, its source and time, the units of prices for the tools whose units have been checked and, when data is missing, the reason and whether a retry may help.
+
+The server returns its answers in one envelope.
+The envelope states whether the data is available, its source and time and, for the tools whose units have been checked, the units of prices; when data is missing, it gives the reason and whether a retry may help.
 OpenTrading relies on this envelope: the model can choose its next step instead of stopping or guessing, and the final answer can cite where each number came from.
+
 Each tool of the data server declares whether it only reads data or also writes, for example to save a watch list.
 The permission gate of \cref{sec:permissions} usually lets reading tools run without asking, and treats writing tools, and tools that declare neither, according to the permission mode.
 When the user allows a tool permanently, the permission is tied to the exact server, so a different server that offers a tool with the same name is asked again.
@@ -127,7 +129,7 @@ The kinds of entry, their limits and the rules that decide which agent reads the
   \fignote{Note: solid arrows write, dashed arrows read, the dotted arrow is a proposal from the model. Source: the group, based on OpenTrading version 0.5.1 \parencite{group2026opentrading}.}
 \end{figure}
 
-Only the user writes memory.
+Only the user decides what memory holds.
 Four commands open a form: \texttt{/nho} (\enquote{remember}) for a constraint or a presentation style, \texttt{/luandiem} (\enquote{thesis}) for the investment thesis on one subject, such as a ticker, \texttt{/baihoc} (\enquote{lesson}) for a lesson and \texttt{/quyetdinh} (\enquote{decision}) for a decision.
 The \texttt{/memory} screen lists the entries for viewing and editing.
 %% Evidence: E48.
@@ -144,8 +146,7 @@ Presentation styles, theses and lessons reach the model through the notebook (\t
 Only the main agent receives them.
 %% Evidence: E48.
 On each turn the provider adds the presentation styles to the system part and an index, with the names and status of the theses and the titles of the lessons, to the context part.
-The index is kept fixed during a session and rebuilt only in a few cases, such as when one of its entries is deleted.
-The text sent therefore stays the same from turn to turn, and the model provider's prompt cache can still be used.
+The index is kept fixed during a session and rebuilt only in a few cases, such as when one of its entries is deleted, so the prompt cache can still be used.
 When the user names a subject that has a thesis, in this turn or in the two turns before it, the thesis block is added to the reminder for that turn, unless the same version is already in the conversation.
 The harness then shows which memory it used.
 %% Evidence: E48.
@@ -159,10 +160,11 @@ When the conversation is compacted, the model that writes the summary sees only 
 \label{sec:mcp-lifecycle}
 When OpenTrading calls a data tool, the server checks the caller's access and limits, reuses a recent answer to the same question where the market allows, and otherwise asks the provider, stopping for a while after repeated failures of that provider.
 The result is cleaned by the rules of \cref{sec:data} and returned in the envelope of \cref{sec:tool-exposure}.
-For OpenTrading this means that a failed source returns a clear reason quickly, which the harness lists after the answer (step 7 of \cref{fig:question-flow}).
+For OpenTrading this means that a failed source returns a clear reason quickly (step 7 of \cref{fig:question-flow}).
 
 \section{Deployment Strategy}\label{sec:deployment}
 
+This section covers the release of the harness and the deployment of the data server.
 \label{sec:release}
 OpenTrading runs on the user's computer.
 An automated workflow builds program files for Windows, macOS and Linux, each with its own runtime, and publishes them on GitHub and npm.
@@ -178,13 +180,15 @@ Provider credentials and access tokens are given as environment settings and nev
 
 \section{Scalability and Maintenance}\label{sec:scalability}
 
+This section covers how the data server copes with many calls and how both programs are tested.
 \label{sec:scaling}
-The data server is designed to stay responsive when many calls arrive together: connections to providers are reused, identical calls are merged, and above a bound new calls are refused at once with a retry time, so OpenTrading is told to retry later instead of waiting on an overloaded server.
+The data server is designed to stay responsive when many calls arrive together: connections to providers are reused, identical calls are merged, and above a bound new calls are refused at once with a retry time.
+OpenTrading is therefore told to retry later instead of waiting on an overloaded server.
 No new load test was run for this version, so no throughput figure is claimed.
 
 \label{sec:testing}
-Each pull request is tested automatically on Linux and Windows.
-At version 0.5.1, \num{2249} of \num{2253} tests passed on Linux; the four others, which need macOS or Windows, were skipped.
+Each pull request is tested automatically on Ubuntu and Windows.
+At version 0.5.1, \num{2249} of \num{2253} tests passed on Ubuntu; the four others were skipped.
 Instead of a paid model, the tests use a simulated one that returns prepared answers, including broken ones.
 For the stop gate the tests contain both endings that must be caught and answers that must be left alone.
 These tests show that a rule does what it was designed to do; they do not show that it improves the answers.
