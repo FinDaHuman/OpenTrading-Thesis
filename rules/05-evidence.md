@@ -7,7 +7,7 @@ PR thêm số mới phải thêm dòng vào bảng dưới. Ghi "đo" khi tự �
 
 | ID | Phát biểu được phép | Nguồn | Loại | Giới hạn bắt buộc ghi kèm |
 |---|---|---|---|---|
-| E01 | or16: OpenTrading 385/400 (96.25%), DSH 362/400 (90.50%), OpenCode 352/400 (88.00%) | benchmark `3be3e1b`, or16 MAIN-REPORT.md | báo cáo, đã đối chiếu JSONL | Bản OT đo là `38f8adb` (v0.4.0 + 36 commit), **không phải** bản hiện tại |
+| E01 | or16: OpenTrading 385/400 (96.25%), DSH 362/400 (90.50%), OpenCode 352/400 (88.00%) | benchmark `3be3e1b`, or16 MAIN-REPORT.md | báo cáo, đã đối chiếu JSONL | Bản OT đo là `38f8adb` (v0.4.0 + 36 commit), **không phải** bản hiện tại; trong bài viết "a development build after version 0.4.0", không ghi mã |
 | E02 | Chênh lệch so với OT: OpenCode −8.25 pp [−12.75, −4.25]; DSH −5.75 pp [−9.25, −2.75] | như trên | báo cáo | Bootstrap ghép cặp theo bài, 2000 lần, CI 95% |
 | E03 | Core 272/271/271 trên 280 (OT/OpenCode/DSH) | như trên | báo cáo | Ba harness **ngang nhau** ở phần core |
 | E04 | Compute 53/54/43 trên 60 (OT/OpenCode/DSH) | như trên | báo cáo | OT còn `calculate`/`compute`; shell của hai đối thủ tắt |
@@ -47,7 +47,6 @@ PR thêm số mới phải thêm dòng vào bảng dưới. Ghi "đo" khi tự �
 | E41 | Khối A: JSON hợp lệ 200/188/186; không trả lời 0/6/6; từ chối sai 0/10/0 trên 192; số ở câu bẫy 0/0/0 trên 8; loại vì sai số 1/15/5; grader xác định 173/140/161 | run `deepinfra-20261125` (máy Long, chưa commit vào repo benchmark) `FINAL-300-metrics.json`, `FINAL-300-report.json` | đo | |
 | E42 | Khối A: chi phí mỗi trial 0.0030/0.0061/0.0058 USD, mỗi lần đạt 0.0033/0.0084/0.0070; thời gian p50 46/72/47 s, p90 117/401/297 s; gọi tool MCP trung bình 4.4/5.9/5.4; tổng 300 task 0.68/1.29/1.23 USD | run `deepinfra-20261125` (máy Long, chưa commit vào repo benchmark) `Results.md`; thời gian và số lần gọi khớp `FINAL-300-metrics.json` | báo cáo | Chi phí chưa đối chiếu được file; token trung bình lệch giữa `Results.md` (74k/166k/169k) và `FINAL-300-metrics.json` (69k/130k/138k): chưa dùng trong bài |
 | E43 | Sửa bảng kết quả sau khi chạy: (1) 17 trial có verdict judge không đọc được được chấm lại: 16 correct, 1 incorrect (OT 8, OpenCode 4, DSH 5); (2) 14 trial chạy lại vì lỗi hạ tầng bị ghép sai thành không đạt, lấy lại verdict của chính chúng: 7 đạt. Tổng 22 trial đổi sang đạt (OT 11, OpenCode 6, DSH 5) | so `FINAL-300-with-primary.json` (07:18) với `FINAL-300-corrected.json` (07:44), trường `p.judge_verdict` và `source` | đo | Luật áp dụng cho mọi arm, không chọn theo kết quả, nhưng làm sau khi thấy kết quả và chưa có amendment: phải nêu là sửa sau |
-| E43 | Chấm lại 22 trial có verdict judge thiếu hoặc không đọc được (OT 11, OpenCode 6, DSH 5); cả 22 đều thành đạt | so `FINAL-300-with-primary.json` (07:18) với `FINAL-300-corrected.json` (07:44) | đo | Làm sau khi thấy kết quả, chưa có amendment: phải nêu là sửa sau |
 | E44 | 13 skill ngành VN; skill ẩn khi thiếu tool khai báo trong `requires_tools`; mỗi skill có `match_text` tiếng Việt; agent định giá phải làm DCF và so sánh cùng ngành | OpenTrading `7319264` `skills/`, `agents/dinh-gia.md`, `src/core/tools/builtin/load-skill.ts`; PR OpenTrading#116 | đo | |
 | E33 | 20 kiểu biểu đồ; số lấy theo nhãn kết quả; model nhận bản tóm tắt | OpenTrading `7319264` `src/core/tools/chart/render.ts` (đếm từ schema), `summary.ts` | đo | |
 | E34 | Tool: 60 s, 30,000 ký tự, sổ bằng chứng 64 MiB; nén ngữ cảnh ở 95% của (cửa sổ − dự phòng tối đa 20,000 token) | OpenTrading `7319264` `src/core/tools/types.ts:197-198`, `src/core/tools/evidence.ts:26`, `src/core/compact.ts:27-70` | đo | 60 s và 30,000 là mặc định, tool đặt được mức riêng |
@@ -57,6 +56,7 @@ PR thêm số mới phải thêm dòng vào bảng dưới. Ghi "đo" khi tự �
 
 ## Luật riêng
 
+- Mã commit và đường dẫn file chỉ nằm trong sổ này; trong bài ghi tên phiên bản và trích dẫn phần mềm.
 - Ghi phiên bản được đo ngay cạnh kết quả. Không gán kết quả v0.4.0 cho v0.5.x.
 - Nêu cả kết quả kém và hòa, không chỉ chỗ thắng.
 - Phân biệt: đăng ký trước, sửa đổi sau khi thấy kết quả, và phân tích thăm dò.
