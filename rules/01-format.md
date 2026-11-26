@@ -14,7 +14,7 @@
 | Thân bài | Times New Roman 11, giãn dòng đơn, căn đều, cách đoạn 12 pt, không thụt đầu dòng, không ngắt từ | GV |
 | H1 (phần) | Arial đậm 16, số La Mã, sang trang mới | GV, trường (số) |
 | H2 (mục) | Arial đậm 13 | GV |
-| H3 (tiểu mục) | Arial đậm 11; tối đa ba cấp | GV |
+| H3 (tiểu mục) | Không dùng: chỉ hai cấp tiêu đề (GVHD, 26/11/2026) | GVHD |
 | Header | Times New Roman 9; tên đề tài bên trái, nhóm bên phải; không kẻ | GV |
 | Footer | Times New Roman 9; "N of M" bên trái, ngày bên phải; chỉ từ phần I | GV |
 | Số trang | Ả Rập, đếm từ bìa; bìa và phần đầu không in số | GV |
@@ -31,7 +31,7 @@ bảng số liệu kiểu ba đường kẻ ngang, chữ 10; ghi chú dưới h�
 
 ## Cấm trong `chapters/`, `appendices/`, `frontmatter/`
 
-Đổi font, cỡ chữ, màu, giãn dòng, lề; chèn khoảng trắng hoặc ngắt trang thủ công; `\usepackage`; heading không số hoặc sâu hơn ba cấp.
+Đổi font, cỡ chữ, màu, giãn dòng, lề; chèn khoảng trắng hoặc ngắt trang thủ công; `\usepackage`; heading không số hoặc sâu hơn hai cấp (`\subsection` bị `check.py` báo lỗi).
 Cần một kiểu trình bày mới thì mở issue, sửa `tex/fptthesis.cls` trong PR riêng.
 
 ## Cách kiểm tra

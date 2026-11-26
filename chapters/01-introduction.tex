@@ -2,9 +2,9 @@
 \chapter{Project Introduction}\label{ch:introduction}
 
 \section{Overview}\label{sec:overview}
-This section gives the basic information of the project and an overview of its products and of this report.
+This section introduces the project, its three products and the structure of this report.
 
-\subsection{Project Information}\label{sec:project-information}
+\label{sec:project-information}
 \Cref{tab:project-info} gives the basic information of the project.
 
 \begin{table}[htb]
@@ -26,14 +26,14 @@ This section gives the basic information of the project and an overview of its p
   \fignote{Source: the group.}
 \end{table}
 
-\subsection{Project Overview}\label{sec:project-overview}
+\label{sec:project-overview}
 OpenTrading is a harness for financial analysis and market research on Vietnamese equities.
 A harness is the program around a large language model (LLM) that decides what the model sees, what it may do, and when its answer counts as finished.
 The group does not train a model; the user connects a model from a provider of their choice.
 The project consists of three products.
 OpenTrading is the harness: a terminal program that runs the agent loop, the tools and the checks on figures.
 opentrading-mcp is a market-data server that offers its data tools through the Model Context Protocol (MCP), an open standard for connecting models to tools and data \parencite{anthropic2024introducing}.
-opentrading-benchmark compares OpenTrading with two general-purpose harnesses on the same model, data and scoring.
+opentrading-benchmark compares OpenTrading with two general-purpose harnesses on the same model and data.
 
 The report then covers the management of the work (\cref{ch:management}), existing systems (\cref{ch:existing}), the methods (\cref{ch:methodology}), the design (\cref{ch:design}), the results (\cref{ch:results}) and the conclusion (\cref{ch:conclusion}).
 
@@ -46,17 +46,17 @@ Financial analysis, however, rests on figures.
 A price, a ratio or a growth rate is either right or wrong, and the reader must be able to trace it to a source.
 Studies report that language models still invent financial figures \parencite{kang2023deficiency} and fall short of human experts in multi-step reasoning over financial reports \parencite{chen2021finqa,zhu2021tatqa}.
 Vietnamese financial data follows local accounting standards that general tools do not handle well \parencite{nguyen2025finstat2sql}.
-The group chose this topic because it lies where these trends meet: an agent that reads Vietnamese market data and answers only with figures it has fetched.
+The group chose this topic because it lies where these trends meet: an agent that reads Vietnamese market data and answers with figures it has fetched.
 
 \section{Project Objective}\label{sec:objective}
 The project is above all a learning project: its aim is to learn how to design and build a harness, not to produce a system that outperforms existing ones.
 It has three objectives, ordered by weight.
 \begin{enumerate}
-  \item Harness (main objective): build a harness for financial analysis whose answers use only figures taken from tool results, with an agent loop, grounding rules, memory, permissions and coordination of several agents.
+  \item Harness (main objective): build a harness for financial analysis whose answers take their figures from tool results, with an agent loop, grounding rules, memory, permissions and coordination of several agents.
   Measure: the share of correct answers in the benchmark (\cref{ch:results}), and automated tests of the stop gate and figure tracing (\cref{sec:testing}).
   \item Data: build a market-data server whose results state their unit, provenance and availability.
   Measure: tool results follow the shared answer contract, checked by a contract check that calls the tools of the server.
-  \item Evaluation: compare the harness with two general-purpose harnesses on the same model, data and scoring.
+  \item Evaluation: compare the harness with two general-purpose harnesses on the same model and data.
   Measure: a comparison on the same tasks whose differences are tested with an exact sign test and reported with time and cost.
 \end{enumerate}
 
@@ -64,15 +64,16 @@ It has three objectives, ordered by weight.
 A general agent is not enough for financial analysis, for three reasons.
 First, models invent figures: with a retrieval system, a strong model answered wrongly or refused \qty{81}{\percent} of questions on public company filings \parencite{islam2023financebench}, and hallucination remains serious in financial tasks \parencite{kang2023deficiency,huang2025hallucination}.
 Second, models calculate poorly when they reason in words, and writing the computation as a program gives more reliable results \parencite{chen2023program}.
-Third, data sources fail, and a general agent cannot tell a failure from a valid result; the group met outages, an expired data library and stale prices during the project (\cref{sec:risk}).
-An investor who acts on a wrong figure can lose money, so the challenge is not a stronger model but a harness that traces every figure to a tool result, runs arithmetic as commands and reports missing data as missing.
+Third, data sources fail, and a general agent cannot tell a failure from a valid result; the group met an expired data library during the project (\cref{sec:risk}).
+An investor who acts on a wrong figure can lose money, so the challenge is not a stronger model but a harness that traces figures to tool results, runs arithmetic as commands and reports missing data as missing.
 
 \section{Significance of the Project}\label{sec:significance}
-In theory, the project gives a controlled comparison in which the model, the data snapshot and the scoring stay the same, which shows which parts of an agent's result come from the harness (\cref{ch:results}).
+In theory, the project gives a controlled comparison in which the model and the data snapshot stay the same, which isolates the effect of the harness as a whole (\cref{ch:results}).
 In practice, it gives Vietnamese retail investors a research assistant whose figures can be checked against their sources, released under the Apache 2.0 licence and usable with free model tiers.
 
 \section{Project Scope \& Limitations}\label{sec:scope}
-The project covers a research assistant that runs in a terminal for one user on one machine and analyses Vietnamese equities, with selected global market and macroeconomic data; its tools only read data unless the user allows more, and none can place an order.
+The project covers a research assistant that runs in a terminal for one user on one machine and analyses Vietnamese equities, with selected global market and macroeconomic data.
+Its tools only read data unless the user allows more, and no built-in tool can place an order.
 It does not manage portfolios, train models or serve many users; when asked, it may give a buy, hold or sell recommendation from the figures of its tools, and the user decides (\cref{sec:ethics}).
-Its limitations are that it depends on external data providers and a free-plan data server, free model tiers allow few requests per day, shell commands are not isolated on Windows, and each benchmark task ran once per harness.
+It has four limitations: it depends on external data providers and on a data server hosted on a free plan; free model tiers allow few requests per day; shell commands are not isolated on Windows; and each harness ran every benchmark task only once.
 %% Evidence: E37.
