@@ -10,8 +10,8 @@ The third line studies the harness itself, the program that gives the model its 
 
 \section{Historical Context}\label{sec:history}
 The path to today's agents took about four years.
-In 2022, prompting a model to write its reasoning step by step, called chain of thought, improved arithmetic and logic tasks \parencite{wei2022chain}.
-In 2023, models learned to alternate reasoning with actions \parencite{yao2023react}, to decide when to call a tool \parencite{schick2023toolformer}, to search over several lines of reasoning \parencite{yao2023tree} and to learn from their own failures \parencite{shinn2023reflexion}.
+In 2022, prompting a model to write its reasoning step by step improved arithmetic and logic tasks \parencite{wei2022chain}.
+In 2023, models learned to interleave reasoning with actions \parencite{yao2023react}, to decide when to call a tool \parencite{schick2023toolformer}, to search over several lines of reasoning \parencite{yao2023tree} and to learn from their own failures \parencite{shinn2023reflexion}.
 The same year brought systems of several agents that split roles or debate an answer \parencite{hong2024metagpt,wu2024autogen,du2024improving}.
 From 2024, research harnesses for software tasks showed that the design of the interface between model and tools changes how well an agent performs \parencite{yang2024sweagent}, and open platforms for such agents followed \parencite{wang2025openhands}.
 In November 2024, the Model Context Protocol gave tools a common way to reach any model \parencite{anthropic2024introducing}.
@@ -22,7 +22,7 @@ From 2024, research moved to financial agents with tools, memory and several rol
 
 \section{Key Studies and Theories}\label{sec:studies}
 \Cref{tab:key-studies} summarises the studies closest to this project; together with the other works cited here, they point to three lessons.
-First, models make mistakes when they calculate in words, and moving the calculation into a program works better \parencite{chen2023program}.
+First, arithmetic in words fails, and moving the computation into a program works better \parencite{chen2023program}.
 Second, tools extend what a model can do \parencite{schick2023toolformer,qin2024toolllm}, yet in 2023 agents were still far behind people on realistic tasks, at \qty{15}{\percent} against \qty{92}{\percent} on questions for general assistants \parencite{mialon2024gaia}.
 Third, in finance the main weakness is wrong figures, invented or not found in the documents \parencite{islam2023financebench,kang2023deficiency}.
 
@@ -34,7 +34,7 @@ Third, in finance the main weakness is wrong figures, invented or not found in t
     {Study} & {Technique} & {Data} & {Main result} & {Limitation stated by the authors}\\
     \midrule
     \textcite{yao2023tree} & Search over several reasoning paths & Game of 24, creative writing, crosswords & Game of 24 solved in \qty{74}{\percent} of cases, against \qty{4}{\percent} with chain of thought & Only three simple tasks; search costs more than sampling\\
-    \textcite{schick2023toolformer} & Model learns when to call tools, a calculator among them & Self-labelled tool calls & Better results on many tasks without examples & Cannot chain tools or use them interactively\\
+    \textcite{schick2023toolformer} & Model learns when to call tools, a calculator among them & Self-labelled tool calls & Better zero-shot results on many tasks & Cannot chain tools or use them interactively\\
     \textcite{zhou2024webarena} & Realistic web environment for agents & Web tasks & Best agent \qty{14.41}{\percent} success, humans \qty{78.24}{\percent} & No limitations section; calls for more robust agents\\
     \textcite{zhu2021tatqa} & Question answering over tables and text & Financial reports & Best model F1 \qty{58.0}{\percent}, experts \qty{90.8}{\percent} & Most errors come from evidence not found in the table or text\\
     \textcite{islam2023financebench} & Open-book financial question answering & Public company filings & Model with retrieval wrong or refused on \qty{81}{\percent} of questions & Single-turn questions on one listed company; some questions simple or ambiguous\\
@@ -66,14 +66,14 @@ Long contexts remain a weakness, because models use the middle of a long input p
     \toprule
     {System} & {Type} & {Strengths} & {Gap for financial analysis}\\
     \midrule
-    Claude Code, USA \parencite{anthropic2025claudecode}; Codex CLI, USA \parencite{openai2025codexcli}; Cursor, USA \parencite{anysphere2026cursor} & Commercial coding harnesses & Tool-calling loop, shortening of long conversations, helper agents, external tool servers & Built for code; no documented check of figures against tool results\\
+    Claude Code, USA \parencite{anthropic2025claudecode}; Codex CLI, USA \parencite{openai2025codexcli}; Cursor, USA \parencite{anysphere2026cursor} & Commercial coding harnesses & Agent loop, context compaction, sub-agents, tool servers & Built for code; no documented check of figures against tool results\\
     OpenCode \parencite{anomaly2025opencode} & Open-source coding harness & Open source; connects to MCP servers & No memory tool; prompts written for code\\
     DeepSeek Harness \parencite{deepseekai2026harness} & Open-source general-purpose harness & Plugin architecture; resumes and searches earlier sessions & Not built for financial analysis\\
     \textcite{yang2024sweagent}; \textcite{wang2025openhands} & Research harnesses & Interfaces designed for agents; open platforms & Built for software development\\
     \textcite{wu2023bloomberggpt}; \textcite{yang2023fingpt} & Language models for finance & Knowledge of financial language & A model, not a harness: no data tools when it answers, no check of figures\\
     \textcite{yang2024finrobot} & Open-source financial agent platform & Layers for agents, models and data & No Vietnamese market data\\
-    \textcite{zhang2024finagent}; \textcite{yu2024fincon} & Research trading agents & Several agents, memory, learning from past trades & Aim at profit in simulated trading on past prices, not at answers with traceable figures\\
-    OpenTrading & Harness for financial analysis & Figures checked against fetched data; calculation by a program; data with its source and time; methods for the Vietnamese market & Terminal only; data server on a free plan (\cref{sec:scope})\\
+    \textcite{zhang2024finagent}; \textcite{yu2024fincon} & Research trading agents & Several agents, memory, reflection & Aim at returns in back-tests, not at traced answers\\
+    OpenTrading & Harness for financial analysis & Figures traced to tool results; arithmetic as commands; sourced market data; Vietnamese skills & Terminal only; data server on a free plan (\cref{sec:scope})\\
     \bottomrule
   \end{tabularx}
   \fignote{Note: the company of each commercial product is given by its citation, and the country is that of the company. Source: the cited works and official pages; the group for OpenTrading.}

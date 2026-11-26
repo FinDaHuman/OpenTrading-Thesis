@@ -82,10 +82,10 @@ For risk management, the group tracked risks from week 10 as GitHub issues with 
     \toprule
     {Risk} & {What happened} & {Response}\\
     \midrule
-    Release failure & Version 0.2.0 was never published: the package registry refused its name & Republished as version 0.2.1 under a name inside the group's own namespace\\
-    Data library expiry & A preview version of the vnstock data library was switched off on 11 November 2026 & Moved to version 6.0.0, valid until 10 November 2027\\
+    Release failure & Version 0.2.0 was never published: the package registry refused its name & Republished as version 0.2.1 under a scoped package name\\
+    Data library expiry & A release candidate of the vnstock data library was switched off on 11 November 2026 & Moved to version 6.0.0, valid until 10 November 2027\\
     Provider quota & Free model tiers allow as few as 20 requests per day & Limits documented for users; a paid key planned as fallback\\
-    Credential expiry & The publishing token expires by 21 January 2027 & Publish from the release workflow without a stored token before then\\
+    Credential expiry & The publishing token expires by 21 January 2027 & Move to trusted publishing before then\\
     \bottomrule
   \end{tabularx}
   \fignote{Source: release notes and documentation of OpenTrading; documentation of opentrading-mcp.}
@@ -93,20 +93,20 @@ For risk management, the group tracked risks from week 10 as GitHub issues with 
 
 \label{sec:quality}
 For quality management, almost every change to the product goes through a pull request.
-Each pull request is checked automatically: the code is tested on Ubuntu and Windows, the arithmetic commands on several shells, the program is built, and the change is scanned for leaked keys; each release is also installed on the three operating systems.
+Each pull request runs a type check and tests on Ubuntu and Windows, shell tests on macOS and Linux, a build check and a secret scan for known key patterns; releases also run installer checks on three operating systems.
 The test counts are in \cref{sec:testing}, and the benchmark repository has \num{1199} passing tests of the current study.
 %% Evidence: E11, E13, E35, E59.
 On OpenTrading, a member without administrator rights cannot merge a change until it has one approval and the tests on Ubuntu and Windows and the secret scan pass.
 %% Evidence: E74.
 Some cases were also tested by hand in the terminal or offline, with a simulated model and a simulated data server, and their reports were written on the issues of the harness.
 %% Evidence: E63.
-From week 11, a change to a prompt or a tool also needs a small measurement of the answers with and without the change; \cref{ch:results} reports the validation of the product as a whole.
+From week 11, a change to a prompt or a tool also needs a small paired measurement, run before and after the change; \cref{ch:results} reports the validation of the product as a whole.
 
 \label{sec:budget}
 The project had no external funding.
 %% Evidence: E60, E66.
 The group kept costs low with free model tiers and a free hosting plan for the data server, although the data server reads financial statements through a paid API key (\cref{sec:data}) and the model calls of the benchmark were paid.
-The benchmark, 300 tasks for each of the three harnesses, used about 75.6 million tokens and cost \num{3.20} USD in total; the cost of each harness is in \cref{sec:speed-cost}.
+The 900 trials of the benchmark used about 75.6 million tokens and cost \num{3.20} USD in total; the cost of each harness is in \cref{sec:speed-cost}.
 
 \label{sec:change}
 For change management, larger decisions are written down as short decision records with their reason.
