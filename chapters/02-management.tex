@@ -20,9 +20,9 @@ The report is divided by part, and each member writes and defends their own part
     {Member} & {Role} & {Main areas of work}\\
     \midrule
     Đoàn Duy Long & Team leader & Market-data server (opentrading-mcp), benchmark (opentrading-benchmark), analysis skills\\
-    Trần Huy Tuấn & \TBC{confirm that the FinDaHuman account is Tuấn} & Harness core, terminal interface, releases\\
-    Đoàn Minh Hiếu & Member & Memory of the harness; later tools, permissions and the agent loop\\
-    Hoàng Hiếu Trung & Member & MCP client, web search and fetch tools, stop gate, compaction, evaluation thresholds; Parts I to III of this report\\
+    Trần Huy Tuấn & Member & Harness core, terminal interface, releases\\
+    Đoàn Minh Hiếu & Member & Memory of the harness; later tools, permissions and the agent loop: tool search, skills, chart units, the stop gate and the auto-mode reviewer\\
+    Hoàng Hiếu Trung & Member & Fixes to the MCP client, web search and fetch tools, the stop gate and compaction; evaluation thresholds; Parts I to III of this report\\
     \bottomrule
   \end{tabularx}
   \fignote{Source: authors of merged pull requests in the three repositories; thesis assignment in the group's tracking issue.}
@@ -33,9 +33,8 @@ The report is divided by part, and each member writes and defends their own part
 The group met the supervisor every Thursday, with all four members present, and the supervisor's feedback is recorded in the weekly minutes.
 Two demonstrations, in weeks 4 and 7, showed the working product to the supervisor.
 Between meetings, members discussed each change in writing in its pull request on GitHub.
-%% Evidence: E46.
+%% Evidence: E62.
 From week 10, tasks were also tracked as GitHub issues, so that each decision sits next to the change it affects.
-\TBC{meeting dates, attendees and the chat channel used by the group}
 
 \section{Project Management Approach}\label{sec:approach}
 
@@ -54,7 +53,7 @@ The harness depends on the data server only through the Model Context Protocol, 
     \toprule
     {Package} & {Main tasks} & {Output} & {Lead}\\
     \midrule
-    Agent harness & Agent loop, system prompt, tools, permissions, sub-agents, ultradesk, terminal interface & OpenTrading version 0.5.1 & \TBC{Tuấn}\\
+    Agent harness & Agent loop, system prompt, tools, permissions, sub-agents, ultradesk, terminal interface & OpenTrading version 0.5.1 & Tuấn\\
     Memory & Memory store, investor constraints, recall & Memory of OpenTrading & Hiếu\\
     Market-data server & Market-data tools, shared answer contract, cloud deployment & opentrading-mcp & Long\\
     Evaluation & Task set, frozen data snapshot, comparison of three harnesses & opentrading-benchmark & Long\\
@@ -64,7 +63,7 @@ The harness depends on the data server only through the Model Context Protocol, 
   \fignote{Source: the group's time plan and tracking issue.}
 \end{table}
 
-%% Evidence: E36, E37.
+%% Evidence: E52, E53, E37.
 \begin{table}[htb]
   \centering
   \caption{Milestones of the project}\label{tab:milestones}
@@ -75,8 +74,7 @@ The harness depends on the data server only through the Model Context Protocol, 
     0 & 31 Aug -- 6 Sep & Topic chosen: multi-agent systems for financial analysis\\
     4 & 28 Sep -- 4 Oct & Demo I: first data server, first skills, basic memory\\
     7 & 19 Oct -- 25 Oct & Demo II; version 0.2.1, the first public release, on 23 October\\
-    10 & 9 Nov -- 15 Nov & Benchmark study or16 completed\\
-    12 & 23 Nov -- 29 Nov & Versions 0.5.0 and 0.5.1; Review 1.1 documents submitted\\
+    12 & 23 Nov -- 29 Nov & Versions 0.5.0 and 0.5.1; benchmark v4.7 completed (300 tasks); Review 1.1 documents submitted\\
     13 & 30 Nov -- 3 Dec & Review 1.1\\
     \bottomrule
   \end{tabularx}
@@ -85,12 +83,12 @@ The harness depends on the data server only through the Model Context Protocol, 
 
 \subsection{Risk Management}\label{sec:risk}
 \guide{Describe potential risks during the project execution and preventive measures or response plans for each risk.}
-%% Evidence: E46.
+%% Evidence: E62.
 From week 10, the group tracked risks as GitHub issues with a priority label from P0 (critical) to P3 (low).
 \Cref{tab:risks} lists risks that occurred during the project and the response to each.
 Most of them came from outside the group: data providers, model providers and package registries.
 
-%% Evidence: E38--E42.
+%% Evidence: E54--E58.
 \begin{table}[htb]
   \centering
   \caption{Risks that occurred and the response to each}\label{tab:risks}
@@ -101,22 +99,22 @@ Most of them came from outside the group: data providers, model providers and pa
     Release failure & Version 0.2.0 was never published: the package registry refused its name & Republished as version 0.2.1 under a scoped package name\\
     Data library expiry & A release candidate of the vnstock data library was switched off on 11 November 2026 & Moved to version 6.0.0, valid until 10 November 2027\\
     Provider quota & Free model tiers allow as few as 20 requests per day & Limits documented for users; a paid key planned as fallback\\
-    Infrastructure fault & 132 benchmark trials of OpenTrading failed before calling the model, after a broken link during disk clean-up & Trials rerun and the rerun recorded in the study report\\
+    Infrastructure fault & In a benchmark run, 132 trials of OpenTrading failed before calling the model, after a broken link during disk clean-up & Trials rerun and the rerun recorded in the study report\\
     Credential expiry & The publishing token expires by 21 January 2027 & Move to trusted publishing before then\\
     \bottomrule
   \end{tabularx}
-  \fignote{Source: release notes and documentation of OpenTrading; documentation of opentrading-mcp; report of study or16.}
+  \fignote{Source: release notes and documentation of OpenTrading; documentation of opentrading-mcp; report of the first benchmark study.}
 \end{table}
 
 \subsection{Quality Management}\label{sec:quality}
 \guide{Details on the measures and processes applied to ensure the quality of the project, including testing and validation of the product or project outcomes.}
 Almost every change to the product goes through a pull request, and \cref{tab:quality-checks} lists the automated checks run on it.
 On OpenTrading, a member without administrator rights cannot merge a change until the tests on Ubuntu and Windows and the secret scan pass.
-%% Evidence: E47.
+%% Evidence: E63.
 From week 11, a change to a prompt or a tool also needs a small paired measurement, run before and after the change.
 \Cref{ch:results} reports the validation of the product as a whole.
 
-%% Evidence: E11, E13, E43.
+%% Evidence: E11, E13, E59.
 \begin{table}[htb]
   \centering
   \caption{Automated checks run on each change}\label{tab:quality-checks}
@@ -124,7 +122,7 @@ From week 11, a change to a prompt or a tool also needs a small paired measureme
     \toprule
     {Check} & {When it runs} & {What it verifies}\\
     \midrule
-    Type check and tests & Every pull request to OpenTrading, on Ubuntu and Windows & \num{2253} tests pass, none fail\\
+    Type check and tests & Every pull request to OpenTrading, on Ubuntu and Windows & \num{2249} of \num{2253} tests pass on Ubuntu, 4 skipped, none fail\\
     Shell tests & Every pull request, on macOS and Ubuntu & Arithmetic commands give the same result on each shell\\
     Build check & Every pull request & The program builds and passes its self-check\\
     Secret scan & Every pull request & No key or token appears in the history\\
@@ -139,9 +137,9 @@ From week 11, a change to a prompt or a tool also needs a small paired measureme
 \subsection{Budget and Funding (Optional)}\label{sec:budget}
 \guide{If applicable, describe the project budget and funding sources, with estimated costs and financial management throughout the project.}
 The project had no external funding.
-%% Evidence: E07, E44, E45.
+%% Evidence: E07, E60, E61.
 The group kept costs low with free model tiers and a free hosting plan for the data server.
-The largest recorded cost is model use in study or16: 1.498 USD for OpenTrading, 0.972 USD for OpenCode and 0.944 USD for DeepSeek Harness, where the first value is a lower bound because one trial has no recorded cost.
+The largest recorded cost is model use in the first benchmark study: 1.498 USD for OpenTrading, 0.972 USD for OpenCode and 0.944 USD for DeepSeek Harness, where the first value is a lower bound because one trial has no recorded cost.
 A paid key of 10 to 15 USD was also planned in week 8.
 \TBC{reconcile the 8 USD in the week-10 minutes with these costs}
 
@@ -156,5 +154,5 @@ Changes to the benchmark plan after the plan was fixed are recorded as amendment
 \guide{Describe the process for closing and evaluating the project upon completion, including how experiences and lessons learned will be summarized.}
 Each version of the product closes with a tagged release and its release notes.
 After the first benchmark, the group listed what to improve, chiefly the system prompt and the calculation tools; version 0.5.0 shortened the system prompt and replaced the calculation tools with arithmetic shell commands.
-The project closes after Review 1.1: the group will apply the board's feedback, run the locked benchmark again and submit the final report.
+The project closes after Review 1.1: the group will apply the board's feedback and submit the final report.
 Lessons learned are summarised in \cref{sec:reflection}.
