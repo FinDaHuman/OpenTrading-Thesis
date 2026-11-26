@@ -11,69 +11,43 @@ It produces a stream of events, and every interface reads the same events, so th
 
 \begin{figure}[H]
   \centering
-  \includegraphics{harness-architecture}
+  \includegraphics[scale=0.85]{harness-architecture}
   \caption{Architecture of the OpenTrading harness}\label{fig:architecture}
   \fignote{Note: dashed boxes are outside the harness. Source: the group, based on OpenTrading version 0.5.1 \parencite{group2026opentrading}.}
 \end{figure}
 
-The design follows three questions.
-The first is what the model sees.
-The system prompt is built in layers: the core rules and working rules, then the user's profile and constraints, then the style and the list of skills.
-The earlier layers rarely change, so the provider can reuse its cache; reminders such as the current trading session are sent with the messages.
-%% Evidence: E10.
-
-The second question is what the model can do.
-All tools, whether built in or offered by an MCP server, are registered in the same form.
-The permission gate decides on each call; reading tools may run in parallel, and a writing tool runs alone.
-Most calls have a time limit, and by default a result longer than \num{30000} characters is shortened.
-
-The third question is what remains as evidence.
-During a session the results of MCP tools are normally kept in full in a file of up to \qty{64}{\mebi\byte}, so a figure can still be traced after the conversation has been shortened.
-A JSON result that holds numbers also receives a label; for many kinds of chart the model can pass this label instead of copying the numbers.
-%% Evidence: E34.
+The design answers three questions.
+What the model sees: a system prompt built in layers, from the core rules to the user's profile and constraints and the list of skills, whose earlier layers rarely change so that the provider can reuse its cache.
+What the model can do: built-in tools and tools of MCP servers are registered in the same form, and the permission gate decides on each call.
+What remains as evidence: during a session the results of MCP tools are kept in full in a file, so a figure can still be traced after the conversation has been shortened, and a JSON result with numbers receives a label that a chart can use instead of copied numbers.
+%% Evidence: E10, E34.
 
 \label{sec:model-layer}
-The harness is not tied to one model.
-It reads each model's context size and abilities from a public catalogue \parencite{modelsdevndcatalogue} and connects through 14 provider packages, or through any interface compatible with that of OpenAI.
-The user chooses the reasoning effort in five levels, which the harness translates for the models it knows.
-
-Failed requests are handled according to their cause.
-An exhausted daily quota or a wrong key is reported at once, a request that meets a rate limit is retried up to twice, and an overloaded service or a network error up to four times.
-A request that stays silent for five minutes is cut and reported as an error.
+The harness is not tied to one model: it reads each model's context size and abilities from a public catalogue \parencite{modelsdevndcatalogue}, connects to many providers or to any interface compatible with that of OpenAI, and handles a failed request by its cause, reporting an exhausted quota or a wrong key at once and retrying a rate limit or a network error.
 %% Evidence: E30.
 
 \label{sec:tool-exposure}
 OpenTrading reads market data through MCP (\cref{sec:data}), whose specification defines how tools are listed and called \parencite{modelcontextprotocol2025specification}.
-Its MCP client connects to the group's data server, which offers \num{175} tools and 6 prepared analysis workflows \parencite{group2026opentradingmcp}, and gives the model these tools next to its own, prefixed with the server's name so that two servers cannot clash.
-Above a threshold the model receives only the tool names and loads tools through the search of \cref{sec:tool-search}, and the workflows appear to the user as commands.
+Its MCP client connects to the group's data server, which offers \num{175} tools and 6 prepared analysis workflows \parencite{group2026opentradingmcp}, and gives the model these tools next to its own, prefixed with the server's name and deferred as in \cref{sec:tool-search}.
 %% Evidence: E12, E21.
 
 The server returns its answers in one envelope, the shared answer contract of the second objective (\cref{sec:objective}).
 The envelope states whether the data is available, its source and time and, for the tools whose units have been checked, the units of prices; when data is missing, it gives the reason and whether a retry may help.
 OpenTrading relies on this envelope: the model can choose its next step instead of stopping or guessing, and the final answer can cite where each number came from.
 
-Each tool of the data server declares whether it only reads data or also writes, for example to save a watch list.
-The permission gate of \cref{sec:permissions} usually lets reading tools run without asking, and treats writing tools, and tools that declare neither, according to the permission mode.
-When the user allows a tool permanently, the permission is tied to the exact server, so a different server that offers a tool with the same name is asked again.
+Each tool of the data server declares whether it only reads data or also writes; the permission gate (\cref{sec:permissions}) usually lets reading tools run without asking, and a permanent permission is tied to the exact server, so another server with a tool of the same name is asked again.
 
 \label{sec:skills}
 Knowledge of the Vietnamese market is kept outside the model's prompt, in 43 skills and 17 specialist agents.
 %% Evidence: E10.
 A skill is a written method for one kind of analysis, such as a bank's asset quality, a sector's place in its cycle or a valuation; 13 of them cover sectors of the Vietnamese economy.
 %% Evidence: E44.
-The system prompt lists only the name and purpose of each skill, and the model loads the full method when a question needs it; a skill may also bring reference tables, which are read only on request.
-Each skill declares the data tools it needs, and a skill whose tools are missing is hidden, so the model is not offered a method it cannot carry out.
-Because users ask in Vietnamese while the methods are written in English, each skill also keeps Vietnamese phrases; when a question matches them, the harness reminds the model of the skill, and the model decides whether to load it.
-
-A specialist agent, for example for valuation, technical analysis, macroeconomics or one side of a bull-and-bear debate, is a sub-agent with its own instructions and, for most of them, only the tools that read data.
-The valuation agent, for instance, must compute both a simple discounted cash flow and a comparison with peers, test how far the value moves with its main assumption, and give every figure with its source and time.
-How the main agent hands work to these agents is described in \cref{sec:multi-agent}.
+The system prompt lists only the name and purpose of each skill, and the model loads the full method when a question needs it; a skill whose data tools are missing is hidden, and Vietnamese phrases kept with each skill let the harness remind the model of a matching skill.
+A specialist agent, for example for valuation, technical analysis or one side of a bull-and-bear debate, is a sub-agent (\cref{sec:multi-agent}) with its own instructions and, for most of them, only tools that read data; the valuation agent, for instance, must compute both a simple discounted cash flow (DCF) and a comparison with peers and test how far the value moves with its main assumption.
 
 \label{sec:interface}
-The user works in a Vietnamese terminal interface.
-Besides the answer, it shows information that does not depend on the model: the permission mode, the share of the context in use, the running tools and sub-agents, and the data tools whose source failed.
-Charts are drawn in the terminal as well.
-When a chart is made from a labelled result, the harness reads the numbers itself and the model receives only a short summary.
+The user works in a Vietnamese terminal user interface (TUI), which shows, besides the answer, information that does not depend on the model: the permission mode, the share of the context in use, the running tools and sub-agents, and the data tools whose source failed.
+Charts are drawn in the terminal from labelled results, so the harness reads the numbers itself and the model receives only a short summary.
 \Cref{fig:tui} shows two parts of the screen during a real question about a share price.
 %% Evidence: E33.
 
@@ -88,7 +62,7 @@ When a chart is made from a labelled result, the harness reads the numbers itsel
     \caption{The input line, the permission mode, the model with its effort, and the connected data server}
   \end{subfigure}
   \caption{Parts of the terminal interface}\label{fig:tui}
-  \fignote{Note: the question was \enquote{Phân tích giá cổ phiếu FPT gần đây} (analyse the recent price of FPT shares), asked on 26 November 2026. Source: screenshots of OpenTrading version 0.5.1 \parencite{group2026opentrading}.}
+  \fignote{Note: o, h, l and c are the open, high, low and close (OHLC) prices of a bar. The question was \enquote{Phân tích giá cổ phiếu FPT gần đây} (analyse the recent price of FPT shares), asked on 26 November 2026. Source: screenshots of OpenTrading version 0.5.1 \parencite{group2026opentrading}.}
 \end{figure}
 
 \section{Data Flow and Processing}\label{sec:dataflow}
@@ -102,7 +76,7 @@ Steps 4 to 6 are the loop of \cref{sec:agent-loop}.
 
 \begin{figure}[H]
   \centering
-  \includegraphics{question-flow}
+  \includegraphics[scale=0.85]{question-flow}
   \caption{Path of one question through the harness}\label{fig:question-flow}
   \fignote{Source: the group, based on OpenTrading version 0.5.1 \parencite{group2026opentrading}.}
 \end{figure}
@@ -116,11 +90,9 @@ If that is not enough, the model writes a summary of the older turns, and the la
 %% Evidence: E34.
 
 \label{sec:memory-flow}
-\Cref{fig:memory-flow} shows the paths by which memory is written and read.
-Memory entries are kept in the store, a single SQLite file on the user's machine inside the OpenTrading data folder, and on systems that support it only the owner can read the file.
-The store holds five kinds of entry: constraints, presentation styles, investment theses, lessons and decisions.
+\Cref{fig:memory-flow} shows the paths by which memory is written and read; the kinds of entry and the rules behind these paths are given in \cref{sec:memory}.
+The store is a single SQLite file in the OpenTrading data folder, readable only by its owner on systems that support it.
 %% Evidence: E48.
-The kinds of entry, their limits and the rules that decide which agent reads them are given in \cref{sec:memory}.
 
 \begin{figure}[H]
   \centering
@@ -129,33 +101,11 @@ The kinds of entry, their limits and the rules that decide which agent reads the
   \fignote{Note: solid arrows write, dashed arrows read, the dotted arrow is a proposal from the model. Source: the group, based on OpenTrading version 0.5.1 \parencite{group2026opentrading}.}
 \end{figure}
 
-Only the user decides what memory holds.
-Four commands open a form: \texttt{/nho} (\enquote{remember}) for a constraint or a presentation style, \texttt{/luandiem} (\enquote{thesis}) for the investment thesis on one subject, such as a ticker, \texttt{/baihoc} (\enquote{lesson}) for a lesson and \texttt{/quyetdinh} (\enquote{decision}) for a decision.
-The \texttt{/memory} screen lists the entries for viewing and editing.
+Only the user writes memory, through four commands that open a form (\texttt{/nho}, \texttt{/luandiem}, \texttt{/baihoc} and \texttt{/quyetdinh}) and the \texttt{/memory} screen; every save passes one text check that refuses over-long text and text that has the form of a key, and the model can at most end an answer with a suggestion card that opens the same form.
+Constraints are read from the store at the start of every turn, read-only, and go to the main agent and every sub-agent.
+Presentation styles, theses and lessons reach the main agent only through the notebook (\texttt{Sổ ghi nhớ}), a memory provider that the user turns on, and the text of lessons and the details of theses only through the read-only tool \texttt{memory\_read}.
+Before each turn, memory blocks of earlier turns are checked against the store and deleted entries are masked (step 2 of \cref{fig:question-flow}).
 %% Evidence: E48.
-Every save passes one shared text check, which normalises Unicode, rejects empty or over-long text and refuses text that has the form of a known API key or a private key.
-The model has no tool for writing; at most it ends an answer with a suggestion card, which opens the same form.
-The entry takes effect only when the user saves it, unless the user has switched on automatic saving, which applies only to constraint and style cards whose rule the user typed word for word.
-
-Constraints take a path of their own.
-At the start of every turn the harness opens the store in read-only mode, takes the constraints and closes it again, whether the notebook is on or off.
-The constraints go into the system part of the main agent and of every sub-agent and are never cut, and a failed read holds the turn (step 2 of \cref{fig:question-flow}).
-%% Evidence: E48.
-
-Presentation styles, theses and lessons reach the model through the notebook (\texttt{Sổ ghi nhớ}), a memory provider that the user turns on in the settings, either in \texttt{/config} or in the settings tab of \texttt{/memory}.
-Only the main agent receives them.
-%% Evidence: E48.
-On each turn the provider adds the presentation styles to the system part and an index, with the names and status of the theses and the titles of the lessons, to the context part.
-The index is kept fixed during a session and rebuilt only in a few cases, such as when one of its entries is deleted, so the prompt cache can still be used.
-When the user names a subject that has a thesis, in this turn or in the two turns before it, the thesis block is added to the reminder for that turn, unless the same version is already in the conversation.
-The harness then shows which memory it used.
-%% Evidence: E48.
-The text of lessons and the details of theses reach the model only when it calls the read-only tool \texttt{memory\_read}.
-Decisions are never sent to the model; they appear only on the \texttt{/memory} screen and, when the user asks for them, in an export.
-
-Memory blocks sent in earlier turns stay in the conversation history.
-Before each turn the harness checks them against the store and masks the entries that the user has deleted, which is step 2 of \cref{fig:question-flow}.
-When the conversation is compacted, the model that writes the summary sees only the labels of the memory blocks, and the main agent can read them again with \texttt{memory\_read}; suggestion cards are removed from the history on every turn.
 
 \label{sec:mcp-lifecycle}
 When OpenTrading calls a data tool, the server checks the caller's access and limits, reuses a recent answer to the same question where the market allows, and otherwise asks the provider, stopping for a while after repeated failures of that provider.
@@ -167,10 +117,8 @@ For OpenTrading this means that a failed source returns a clear reason quickly (
 This section covers the release of the harness and the deployment of the data server.
 \label{sec:release}
 OpenTrading runs on the user's computer.
-An automated workflow builds program files for Windows, macOS and Linux, each with its own runtime, and publishes them on GitHub and npm.
-After publication, the release is installed on six test machines; for version 0.5.1, published on 25 November 2026, all six installations passed.
-An update of a script installation is checked against its checksum and started once before it replaces the old version.
-The files do not carry a publisher's certificate yet, so the operating system may show a warning.
+An automated workflow builds program files for Windows, macOS and Linux and publishes them on GitHub and npm, and each release is then installed on six test machines; for version 0.5.1, published on 25 November 2026, all six installations passed.
+The files do not yet carry a publisher's certificate, so the operating system may show a warning.
 %% Evidence: E31.
 
 \label{sec:mcp-deployment}
@@ -184,15 +132,11 @@ On the server, provider credentials and the token are environment settings, neve
 
 This section covers how the data server copes with many calls and how both programs are tested.
 \label{sec:scaling}
-The data server is designed to stay responsive when many calls arrive together: connections to providers are reused, identical calls are merged, and above a bound new calls are refused at once with a retry time.
-OpenTrading is therefore told to retry later instead of waiting on an overloaded server.
-No new load test was run for this version, so no throughput figure is claimed.
+The data server is designed to stay responsive when many calls arrive together: connections to providers are reused, identical calls are merged, and above a bound new calls are refused at once with a retry time; no load test was run for this version, so no throughput figure is claimed.
 
 \label{sec:testing}
-Each pull request is tested automatically on Ubuntu and Windows.
-At version 0.5.1, \num{2249} of \num{2253} tests passed on Ubuntu; the four others were skipped.
-Instead of a paid model, the tests use a simulated one that returns prepared answers, including broken ones.
-For the stop gate the tests contain both endings that must be caught and answers that must be left alone.
+Each PR is tested automatically on Ubuntu and Windows; at version 0.5.1, \num{2249} of \num{2253} tests passed on Ubuntu and the four others were skipped.
+The tests use a simulated model that returns prepared answers, including broken ones, and for the stop gate they hold both endings that must be caught and answers that must be left alone.
 These tests show that a rule does what it was designed to do; they do not show that it improves the answers.
 %% Evidence: E11, E35.
 
