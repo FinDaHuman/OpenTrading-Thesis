@@ -427,7 +427,7 @@ Speed and cost are measured for every trial and reported separately, never added
 Reliability is described by the trials without an answer, false refusals of answerable tasks, numbers given where the correct answer is a refusal, and numbers outside the tolerance.
 
 \section{Implementation Plan}\label{sec:implementation-plan}
-The group implemented the method as three programs, whose work packages are given in \cref{sec:wbs}; this section describes their technologies (\cref{tab:stack}), the stages in which the harness was built, and how a rule moves from a problem to a release.
+The group implemented the method as three programs (\cref{sec:wbs}); this section gives their technologies (\cref{tab:stack}), the stages of the harness and how a rule reaches a release.
 \label{sec:stack}
 
 \begin{table}[H]
@@ -459,21 +459,17 @@ Version 0.2.1 (23 October) was the first public release, and version 0.3.0 (31 O
 Version 0.4.0 (8 November) added the mode without a user for the benchmark and the notebook memory, and version 0.5.0 (24 November) shortened the system prompt and replaced the calculation tools with arithmetic in the shell (\cref{sec:figure-tracing}).
 Version 0.5.1 (25 November), the version described in this report, lets the model recommend buying, holding or selling when asked.
 %% Evidence: E50.
-The loop, the access to data and the permissions came first, because the other rules run inside them; the mode without a user came before the benchmark, so that the benchmark drives the same agent loop as the terminal.
 
 \label{sec:workflow}
-From week 10, problems found in use or in test reports have been opened as issues on GitHub, and choices with lasting effect are written as short decision records with their reason.
+From week 10, problems found in use or in test reports have been opened as issues on GitHub.
 %% Evidence: E50.
-Each rule is written as code in the harness core, which does not depend on the interface (\cref{fig:architecture}), covered by tests with a simulated model, and merged through a pull request that passes the automated checks (\cref{sec:quality,sec:testing}).
-A release workflow then builds and checks the installable versions (\cref{sec:release}).
+Each rule is written as code in the harness core, which does not depend on the interface (\cref{fig:architecture}), tested with a simulated model, merged through a pull request that passes the automated checks (\cref{sec:quality,sec:testing}) and released by a workflow that builds and checks the installable versions (\cref{sec:release}).
 
 \section{Ethical Considerations}\label{sec:ethics}
 OpenTrading produces analysis that a user may act on with real money, so its main ethical risks are a recommendation that is wrong or misread, the exposure of private data, and a biased comparison with other harnesses.
-The paragraphs below cover recommendations, accuracy, privacy, bias, licences and the use of AI tools.
 
-Since version 0.5.1, the harness may give a buy, hold or sell recommendation when a question calls for one, replacing an earlier ban, and the system prompt states that the user always makes the final decision.
-When the user asks the model to choose, the system prompt tells it to fetch the data and give a choice within the user's risk tolerance, horizon and constraints.
-The choice comes with the reason, the main risks and what would make it wrong.
+Since version 0.5.1, the harness may give a buy, hold or sell recommendation when a question calls for one, and the system prompt states that the user always makes the final decision.
+When the user asks the model to choose, the system prompt tells it to fetch the data and give a choice within the user's risk tolerance, horizon and constraints, with the reason, the main risks and what would make it wrong.
 The prompt also tells the model to say so instead of picking when data is missing or too thin, and to give no call when the user has ruled out recommendations.
 A target price, a buy or sell zone or a stop-loss is derived only from tool figures of the conversation, with the method, and views on future prices are given as scenarios with a likelihood (\cref{sec:grounding-rules}).
 Requests to place an order, manipulate prices, trade on inside information, spread rumours or evade regulations are refused.
@@ -489,22 +485,19 @@ On accuracy, the grounding rules and figure tracing (\cref{sec:algorithm}) check
 On privacy, the data of the harness, including API keys, sessions, configuration and the memory store, is stored on the user's machine in its data folder.
 Where the operating system allows, only its owner can read the file of API keys.
 Shell commands run by the agent receive an environment from which variables whose names mark them as keys or tokens have been removed, and reading a key file asks the user in every mode, or is refused when no user is present (\cref{sec:permissions}).
-Some data does leave the machine.
-The question, the tool results and the memory placed in the prompt go to the model provider that the user has chosen, and data requests go to the data server.
-Web searches go to DuckDuckGo or to a search service whose key the user has set, either of which can learn which tickers interest the user; two further hosted search servers are switched off by default.
+Some data does leave the machine: the question, the tool results and the memory placed in the prompt go to the model provider that the user has chosen, and data requests go to the data server.
+Web searches go to DuckDuckGo or to a search service whose key the user has set, either of which can learn which tickers interest the user.
 The memory store rejects text that has the form of a known key (\cref{sec:memory-flow}), and the investor's decisions are not sent to the model.
-Deleting a memory entry is a logical delete; backups and content already sent to a provider are out of the harness's reach, so the interface does not promise physical deletion.
 
 The group built both OpenTrading and the benchmark that compares it with other harnesses, which creates a risk of bias.
 To limit it, the three harnesses used the same model and the same data (\cref{sec:validation}), and the results report ties and losses as well as wins (\cref{sec:accuracy}).
-The memory group was designed around what OpenTrading can do, a limit discussed in \cref{sec:threats}.
+The memory group was designed around what OpenTrading can do, a limit noted in \cref{sec:threats}.
 %% Evidence: E15, E16, E45.
 
 As for licences, the harness is released under the Apache 2.0 licence and the data server under the MIT licence.
 The market data comes from the third-party sources of \cref{sec:data}, some through the free tier of a library or through keys held by the group.
-The terms of each source govern how its data may be used, and the software licences give no right to the data itself.
-The group uses the data only for research and study.
+The terms of each source govern how its data may be used, and the software licences give no right to the data itself; the group uses the data only for research and study.
 
 Finally, the group used AI tools, namely Claude Code, OpenAI Codex and ChatGPT, mainly to write and fix code.
-The code reached the main branch through pull requests, which need one approval and passing automated checks, although administrators can bypass these rules (\cref{sec:quality}); the group is responsible for all code and text in the project.
+The code reached the main branch through pull requests that need one approval and passing automated checks, although administrators can bypass these rules (\cref{sec:quality}); the group is responsible for all code and text.
 %% Evidence: E35.

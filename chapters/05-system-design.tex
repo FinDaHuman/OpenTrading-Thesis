@@ -176,7 +176,9 @@ The files do not carry a publisher's certificate yet, so the operating system ma
 \label{sec:mcp-deployment}
 The data server can run in two ways.
 For a single user it runs on the same computer as a process that OpenTrading starts, without a token; for the group it runs from one container image as a web service with a PostgreSQL database and a Redis cache.
-Provider credentials and access tokens are given as environment settings and never stored in the repository.
+%% Evidence: E70.
+The web service answers only calls that carry an access token issued by the group, which the user enters once in OpenTrading and which is kept in its key file.
+On the server, provider credentials and the token are environment settings, never stored in the repository.
 
 \section{Scalability and Maintenance}\label{sec:scalability}
 
