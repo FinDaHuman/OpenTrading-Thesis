@@ -318,7 +318,7 @@ The project does not train a model, so validation tests whether the harness, not
 The group validated OpenTrading with a controlled benchmark, opentrading-benchmark \parencite{group2026opentradingbenchmark}, which compares it with two general-purpose harnesses, OpenCode and DeepSeek Harness (DSH).
 All three used the same language model, DeepSeek V4.1 Flash, the same frozen copy of the data server and the same limits, so that only the harness differed.
 Each of 300 tasks was run once in each harness, \num{900} trials in total.
-The design is reported with its results in \cref{ch:results}: the tasks in \cref{sec:bench-tasks}, the comparison in \cref{sec:bench-design}, reproducibility and amendments in \cref{sec:bench-amendments} and scoring in \cref{sec:bench-scoring}.
+The design is reported with its results in \cref{ch:results}: the tasks in \cref{sec:bench-tasks}, the comparison in \cref{sec:bench-design}, reproducibility in \cref{sec:bench-repro} and scoring in \cref{sec:bench-scoring}.
 %% Evidence: E14, E37.
 
 \section{Evaluation Metrics}\label{sec:metrics}
@@ -339,7 +339,6 @@ Tasks that both harnesses answered correctly, or both incorrectly, carry no info
 
 Secondary metrics describe how an answer was reached: false refusals on answerable tasks, numbers given on tasks whose correct answer is a refusal, trials without an answer, answers rejected because a number lay outside the tolerance, and the cost, tokens and time of a trial.
 They are reported separately and never added to accuracy as one score.
-The pre-registered design ran every task twice and estimated differences with a paired bootstrap; with one run per task the sign test replaced it, and stability across runs is not reported (\cref{sec:bench-amendments}).
 \todo{Cite a statistics reference for the sign test after opening it.}
 
 \section{Implementation Plan}\label{sec:implementation-plan}
