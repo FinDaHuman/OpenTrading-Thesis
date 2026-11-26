@@ -10,14 +10,38 @@
 
 \section{Overview of the Field}\label{sec:field}
 \guide{Provide an overview of the field of study related to your project. This helps place your project within the broader context of that field.}
+This project sits where three lines of work meet: agentic AI, language models for finance, and agent harnesses.
+
+An agent senses its environment, decides and acts; with an LLM as its core, it can plan, call tools and read their results \parencite{xi2025rise,wang2024survey}.
+Recent surveys separate single AI agents, which complete one bounded task, from agentic AI, where several agents share goals, memory and plans \parencite{sapkota2026agents,acharya2025agentic}.
+Systems with several cooperating agents now form a field of their own \parencite{guo2024multiagent}.
+
+Finance was an early domain for language models, from models trained on financial text to agents that trade \parencite{li2023large,ding2026large}.
+The third line studies the harness itself: the program that gives the model its tools, context and rules \parencite{yang2024sweagent}.
+OpenTrading belongs to this third line, applied to the second.
 
 \section{Historical Context}\label{sec:history}
 \guide{Provide some historical background or developments in the field, especially those directly related to your project.}
+The path to today's agents took about four years.
+In 2022, prompting a model to write its reasoning step by step improved arithmetic and logic tasks \parencite{wei2022chain}.
+In 2023, models learned to interleave reasoning with actions \parencite{yao2023react}, to decide when to call a tool \parencite{schick2023toolformer}, to search over several lines of reasoning \parencite{yao2023tree} and to learn from their own failures \parencite{shinn2023reflexion}.
+The same year brought systems of several agents that split roles or debate an answer \parencite{hong2024metagpt,wu2024autogen,du2024improving}.
+From 2024, research harnesses for software tasks showed that the interface between model and tools matters as much as the model \parencite{yang2024sweagent,wang2025openhands}.
+In November 2024, the Model Context Protocol gave tools a common way to reach any model \parencite{anthropic2024introducing}.
+
+Finance followed a parallel path.
+Benchmarks of numerical reasoning over financial reports appeared in 2021 \parencite{chen2021finqa,zhu2021tatqa}.
+Models trained for finance followed in 2023 \parencite{wu2023bloomberggpt,yang2023fingpt}, together with benchmarks to compare them \parencite{xie2023pixiu,xie2024finben}.
+From 2024, research moved to financial agents with tools, memory and several roles \parencite{zhang2024finagent,yu2024fincon,yang2024finrobot}.
 
 \section{Key Studies and Theories}\label{sec:studies}
 \guide{Describe and assess key studies, theories, and published works related to your topic, both fundamental and applied research.}
 \guide{Supervisor’s table columns: title, authors, year, technique, dataset, result, limitation/future work, further information.}
 \Cref{tab:key-studies} summarises the studies closest to this project.
+Three lessons stand out.
+First, reasoning in words helps, but arithmetic in words fails; moving the computation into a program works better \parencite{chen2023program}.
+Second, tools extend what a model can do \parencite{schick2023toolformer,qin2024toolllm}, yet agents still fail most realistic tasks \parencite{zhou2024webarena,mialon2024gaia,liu2024agentbench}.
+Third, in finance the gap is about figures: models answer wrongly or refuse most questions on company filings \parencite{islam2023financebench} and invent figures when data is missing \parencite{kang2023deficiency}.
 
 \begin{table}[htb]
   \centering
@@ -42,11 +66,26 @@
 
 \section{Technological Advancements}\label{sec:advances}
 \guide{Discuss recent or significant technological advancements in your field, and how they affect your project.}
+Three advances shape this project.
+
+Tool calling lets a model ask the program to run a function and read its result \parencite{qin2024tool}.
+OpenTrading relies on it for every figure: the model fetches data and runs arithmetic through tools instead of recalling or computing in words.
+
+The Model Context Protocol defines how a program offers tools and data to a model \parencite{modelcontextprotocol2025specification}.
+It let the group build the data server once and use it from any harness, which also made a fair comparison of harnesses possible.
+The protocol brings new security risks, such as tool descriptions that carry hidden instructions \parencite{hou2025model}.
+
+Agent harnesses have become products in their own right, with loops, context management and sub-agents \parencite{wang2025openhands}.
+Long contexts remain a weakness, because models use information in the middle of a long input poorly \parencite{liu2024lost}.
+This is why OpenTrading searches for tools only when needed and keeps a table of verified figures when it compacts a conversation.
 
 \section{Comparison of Existing Systems}\label{sec:comparison}
 \guide{Compare and contrast existing systems or technologies, including their advantages and disadvantages compared to your project.}
 \guide{Supervisor’s table columns: product, company, country, year, features, advantages, limitations, further information.}
 \Cref{tab:systems} compares OpenTrading with general harnesses and with systems built for finance.
+General harnesses are strong at running tools but treat a figure like any other text.
+Financial models know the language of finance but are not harnesses: they have no data tools and no check of figures.
+Financial agents in research aim at trading returns in back-tests rather than at answers a reader can verify.
 
 %% Evidence: E05.
 \begin{table}[htb]
@@ -70,7 +109,25 @@
 
 \section{Gaps in the Literature/Technology}\label{sec:gaps}
 \guide{Identify gaps or limitations in the current research or technological systems, and how your project intends to address or improve upon these issues.}
+The review shows four gaps.
+\begin{enumerate}
+  \item No harness checks financial figures. Existing harnesses show tool results to the model but do not test whether the figures in the final answer came from them.
+  \item Financial work centres on models, benchmarks and trading returns. Few systems aim at answers whose every figure can be traced to a source.
+  \item Evaluations of agents rarely hold the model fixed, report cost or allow the study to be repeated \parencite{kapoor2024agents}.
+  \item The Vietnamese market is little covered; its data follows local accounting standards that general tools handle poorly \parencite{nguyen2025finstat2sql}.
+\end{enumerate}
+Agentic systems also raise risks when they act on their own \parencite{chan2023harms}, which matters when the domain is money.
 
 \section{Justification for the Project}\label{sec:justification}
 \guide{Based on the above information, highlight the necessity and uniqueness of your project, and how it differs from or improves upon existing research or systems.}
 \guide{Note: not just a list of studies but an analysis that connects existing work to your project.}
+OpenTrading answers each gap.
+For the first, the harness records which figures in an answer match no tool result, and sends the model back when an answer claims data it never fetched.
+For the second, the data server returns each value with its unit, time and source, and says when a source has failed.
+For the third, the benchmark compares three harnesses on one model, one frozen data snapshot and one scoring method, and reports cost (\cref{ch:methodology}).
+For the fourth, the harness carries skills for Vietnamese sectors and the trading sessions of Vietnamese exchanges.
+For the risks of acting alone, its tools only read data by default and none can place an order (\cref{sec:scope}).
+
+One might ask whether a general agent with a custom prompt would be enough.
+A prompt can ask the model to cite its figures, but it cannot check that it did.
+OpenTrading moves these rules from the prompt into code, where they hold whatever the model writes.
