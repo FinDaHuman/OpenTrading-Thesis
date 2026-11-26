@@ -25,7 +25,7 @@
     Products & OpenTrading (harness), opentrading-mcp (market-data server), opentrading-benchmark (evaluation)\\
     \bottomrule
   \end{tabularx}
-  \fignote{Source: the group. \TBC{confirm the student codes with the school list}}
+  \fignote{Source: the group.}
 \end{table}
 
 \subsection{Project Overview}\label{sec:project-overview}
@@ -60,14 +60,15 @@ The group chose this topic because it lies where these trends meet: an agent tha
 \section{Project Objective}\label{sec:objective}
 \guide{The specific objectives of the project. Objectives should be clear, measurable, and achievable.}
 \guide{Supervisor: 2--3 objectives, short, simple and feasible; weights 50--60\%, 30--40\%, 0--20\%.}
-The project has three objectives, ordered by weight. \TBC{objectives, weights and measures still to be approved by the supervisor}
+The project is above all a learning project: its aim is to learn how to design and build a harness, not to produce a system that outperforms existing ones.
+It has three objectives, ordered by weight.
 \begin{enumerate}
   \item Harness (main objective): build a harness for financial analysis whose answers use only figures taken from tool results, with an agent loop, grounding rules, memory, permissions and coordination of several agents.
-  Measure: the share of correct answers and the number of figures that match no tool result, both counted in the benchmark.
+  Measure: the share of correct answers in the benchmark (\cref{ch:results}), and automated tests of the stop gate and figure tracing (\cref{sec:testing}).
   \item Data: build a market-data server whose results state their unit, provenance and availability.
   Measure: every tool result follows the shared answer contract, checked by the server's automated tests. \TBC{confirm with Long that the tests cover every tool}
   \item Evaluation: compare the harness with two general harnesses on the same model, data and scoring.
-  Measure: a comparison whose plan is fixed before the run and whose differences are reported with \qty{95}{\percent} confidence intervals and cost.
+  Measure: a comparison on the same tasks whose differences are tested with an exact sign test and reported with time and cost.
 \end{enumerate}
 \Cref{ch:results} reports how far each objective was met.
 
@@ -111,4 +112,4 @@ It depends on external data providers and on a data server hosted on a free plan
 Free model tiers allow few requests per day.
 On Windows, shell commands are not isolated from the rest of the system.
 %% Evidence: E09.
-Finally, the second study (version 4.7) has no results yet, so \cref{ch:results} relies on the first study, which measured a development build rather than version 0.5.1.
+Finally, each harness ran every task of the benchmark only once, so the stability of its answers is not measured (\cref{ch:results}).
