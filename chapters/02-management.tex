@@ -3,7 +3,7 @@
 
 \section{Team Work}\label{sec:teamwork}
 \label{sec:roles}
-The team has four members and one supervisor; each member leads one area of the product and writes and defends their own parts of this report (\cref{tab:roles}).
+The team has four members and one supervisor; each member works on the areas listed in \cref{tab:roles} and writes and defends their own parts of this report.
 
 \begin{table}[H]
   \centering
@@ -15,10 +15,10 @@ The team has four members and one supervisor; each member leads one area of the 
     Đoàn Duy Long & Team leader & Market-data server (opentrading-mcp), benchmark (opentrading-benchmark), analysis skills\\
     Trần Huy Tuấn & Member & Harness core, terminal interface, releases\\
     Đoàn Minh Hiếu & Member & Memory of the harness; later tools, permissions and the agent loop\\
-    Hoàng Hiếu Trung & Member & Fixes to the MCP client, web search and fetch tools, the stop gate and compaction; evaluation thresholds\\
+    Hoàng Hiếu Trung & Member & Quality assurance and control: manual and offline test cases of the harness and their reports; fixes to the MCP client, web search and fetch tools, the stop gate and compaction; evaluation thresholds\\
     \bottomrule
   \end{tabularx}
-  \fignote{Source: authors of merged pull requests in the three repositories.}
+  \fignote{Source: merged pull requests and test reports on issues in the group's repositories.}
 \end{table}
 
 \label{sec:communication}
@@ -29,9 +29,10 @@ From week 10, tasks were also tracked as GitHub issues, so that each decision si
 
 \section{Project Management Approach}\label{sec:approach}
 \label{sec:wbs}
-This section covers the work breakdown structure (WBS), risk management, quality management, budget, change management and closure.
+This section covers the work breakdown structure (WBS), risk, quality, budget, change management and closure.
 \Cref{tab:wbs} breaks the project into five work packages, and \cref{tab:milestones} places their milestones in time.
-Each product package has one lead, and the harness depends on the data server only through the Model Context Protocol, which let the two be developed and tested separately.
+Each product package has one lead.
+The harness depends on the data server only through the Model Context Protocol, which let the two be developed and tested separately.
 
 \begin{table}[H]
   \centering
@@ -71,8 +72,7 @@ Each product package has one lead, and the harness depends on the data server on
 \label{sec:risk}
 %% Evidence: E62.
 For risk management, the group tracked risks from week 10 as GitHub issues with a priority label from P0 (critical) to P3 (low).
-\Cref{tab:risks} lists the risks that occurred or became pressing during the project and the response to each.
-Most of them came from outside the group: data providers, model providers and package registries.
+\Cref{tab:risks} lists the risks that occurred or became pressing during the project, most of them from outside the group, and the response to each.
 
 %% Evidence: E54--E56, E58.
 \begin{table}[H]
@@ -103,7 +103,7 @@ From week 11, a change to a prompt or a tool also needs a small paired measureme
 \label{sec:budget}
 The project had no external funding.
 %% Evidence: E60, E66.
-The group kept costs low with free model tiers, one prepaid key and a free hosting plan for the data server.
+The group kept costs low with free model tiers and a free hosting plan for the data server.
 The main use of models was the benchmark, whose 900 trials used about 75.6 million tokens; the cost per correct answer of each harness is in \cref{sec:speed-cost}.
 
 \label{sec:change}

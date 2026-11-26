@@ -72,10 +72,14 @@ One step of a turn is one request to the model together with the tool calls it m
 The basic loop comes from a library \parencite{vercelndloop}; the group added the rules shown in \cref{alg:turn}.
 
 By default the main agent has no limit on steps, because a research question may need many tool calls.
-Two rules keep it from going round in circles.
-When eight steps in a row contain failed calls and no successful one, the tools are switched off for a step, so the model has to answer with what it has.
+Three rules keep it from going round in circles.
+When four steps in a row contain failed calls and no successful one, the model is reminded of the failures, on the model interfaces that accept such reminders; after eight such steps, the tools are switched off for a step, so the model has to answer with what it has.
 When the model makes the same call with the same arguments three times in a row, the user is asked whether to go on.
-%% Evidence: E25, E26.
+A data server whose connection fails three times in a row is not called for a minute, after which one call tests it; a failed tool or a timeout does not count, because it comes from a server that still works.
+%% Evidence: E25, E26, E69.
+These thresholds of four, eight and three can be changed only by the evaluation runner, which records when each of them fires.
+In a small sweep on free models, the models gave up after at most three failed steps and an earlier reminder did not change their answers, so the thresholds were kept.
+%% Evidence: E69.
 
 \begin{algorithm}[H]
   \caption{One turn of the agent loop}\label{alg:turn}
@@ -97,7 +101,7 @@ When the model makes the same call with the same arguments three times in a row,
 
 A model that stops calling tools has not always answered, and the stop gate looks for such endings.
 In one run recorded during development, a small model wrote a price-to-earnings ratio and a revenue under a source line although no tool had run.
-It consists of rules in code and asks no second model, so accepting an answer costs no extra request.
+The stop gate consists of rules in code and asks no second model, so accepting an answer costs no extra request.
 Its ten cases fall into four groups, shown in \cref{tab:stop-gate}.
 
 \begin{table}[H]
@@ -497,7 +501,7 @@ The memory group was designed around what OpenTrading can do, a limit discussed 
 %% Evidence: E15, E16, E45.
 
 As for licences, the harness is released under the Apache 2.0 licence and the data server under the MIT licence.
-The market data comes from the third-party sources of \cref{sec:data}: vnstock through its free tier, downloaded from its provider's own package index rather than the Python Package Index; Vietstock through a paid API key; DNSE and FRED through keys held by the group; and public sources.
+The market data comes from the third-party sources of \cref{sec:data}, some through the free tier of a library or through keys held by the group.
 The terms of each source govern how its data may be used, and the software licences give no right to the data itself.
 The group uses the data only for research and study.
 
