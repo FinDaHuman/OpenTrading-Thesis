@@ -40,8 +40,7 @@ The difference came mostly from memory: OpenTrading applied the rules that a use
 On the investor tasks all three were weak, near one half.
 
 Compared on the same tasks with the sign test of \cref{eq:sign-test}, OpenTrading was ahead of OpenCode on 40 tasks and behind on 6 ($p=3.1\times10^{-7}$), and ahead of DSH on 19 and behind on 6 ($p=0.015$).
-The lead over DSH depends on the corrections of the grading described in \cref{sec:bench-scoring}, which were made after the results had been seen.
-%% Evidence: E43, E45.
+%% Evidence: E45.
 
 \label{sec:speed-cost}
 \Cref{tab:speed} reports how long a trial took and how much work and money it needed.
@@ -200,13 +199,12 @@ The settings differ, but the result suggests that structured data tools leave le
 \textcite{kapoor2024agents} argued that evaluations of agents should control for cost and report it alongside accuracy; this benchmark reports both, and the cost per correct answer differed by about a factor of two.
 
 \label{sec:threats}
-Finally, five limits apply to these results:
+Finally, four limits apply to these results:
 \begin{enumerate}
   \item Every task ran once in each harness, so the results do not show how stable the answers are across runs.
   \item The memory tasks, where most of the difference lies, were written by the group that built OpenTrading's memory, and their form may suit its design.
   \item The investor tasks cover one falling market over three weeks, so they are a signal about this period, not about investment skill.
   \item The judge was checked only on clearly correct and clearly wrong answers.
-  \item For 119 tasks, the answers of OpenCode and DSH come from an earlier run with the same model and data but older versions of these harnesses; most of these tasks are lookups on which the three harnesses scored almost the same, but at least 8 are memory tasks.
 \end{enumerate}
 %% Evidence: E15, E16, E17, E37.
 

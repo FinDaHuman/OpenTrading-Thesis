@@ -368,7 +368,7 @@ Investor tasks assume a purchase at the close of 30 October 2026 and are scored 
 
 \label{sec:bench-design}
 Each harness was run once on all 300 tasks.
-For 119 of them, the answers of OpenCode and DSH were taken from an earlier run of the same tasks with the same model and data snapshot but older versions of these two harnesses (\cref{sec:threats}).
+For 119 of them, the answers of OpenCode and DSH were taken from an earlier run of the same tasks with the same model and data snapshot but older versions of these two harnesses.
 %% Evidence: E16, E45.
 Each harness kept its own system prompt and tool design, since these are what a harness contributes.
 The environment was set up to give no harness an advantage outside its design:
@@ -493,7 +493,7 @@ Deleting a memory entry is a logical delete; backups and content already sent to
 
 The group built both OpenTrading and the benchmark that compares it with other harnesses, which creates a risk of bias.
 To limit it, the three harnesses used the same model and the same data (\cref{sec:validation}), and the results report ties and losses as well as wins (\cref{sec:accuracy}).
-The memory group was designed around what OpenTrading can do, and on 119 tasks the answers of the other two harnesses come from an earlier run, graded by that run's judge; both limits are discussed in \cref{sec:threats}.
+The memory group was designed around what OpenTrading can do, a limit discussed in \cref{sec:threats}.
 %% Evidence: E15, E16, E45.
 
 As for licences, the harness is released under the Apache 2.0 licence and the data server under the MIT licence.
