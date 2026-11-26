@@ -30,16 +30,16 @@ The harness is judged on whether its figures and conclusions match the data, not
 
 \section{Data Collection and Preprocessing}\label{sec:data}
 OpenTrading does not store market data itself.
-It reads the data through the Model Context Protocol (MCP), an open standard for connecting a model to tools and data, from the group's data server \enquote{opentrading-mcp}, which offers \num{175} tools \parencite{group2026opentradingmcp}.
+It reads the data through MCP (\cref{sec:project-overview}) from the group's data server \enquote{opentrading-mcp}, which offers \num{175} tools \parencite{group2026opentradingmcp}.
 %% Evidence: E12.
-The data comes from public sources and from paid data services bought by the author: prices and indices of the Vietnamese exchanges through the \enquote{vnstock} library, financial statements from \enquote{Vietstock}, global indices and commodities from \enquote{Yahoo Finance}, crypto-assets from \enquote{Binance}, macroeconomic series from \enquote{FRED} and the \enquote{World Bank}, and news events from \enquote{GDELT}.
+The data comes from public sources and from data services used under the group's accounts: prices and indices of the Vietnamese exchanges through the \enquote{vnstock} library, financial statements from \enquote{Vietstock}, global indices and commodities from \enquote{Yahoo Finance}, crypto-assets from \enquote{Binance}, macroeconomic series from \enquote{FRED} and the \enquote{World Bank}, and news events from \enquote{GDELT}.
 
 The providers disagree on units, periods and dates, so the data is cleaned by four rules before the model reads it:
 \begin{enumerate}
-  \item Each result states the units of its numbers. One provider gives Vietnamese share prices in thousands of đồng and another in đồng, and an early version of OpenTrading reported a price \num{1000} times too small.
-  \item Reporting periods are given in one order, and trading days follow the calendar of the Vietnamese market, so no date is invented for a day without trading.
+  \item Each result states the units of its numbers. One provider gives Vietnamese share prices in thousands of đồng and another in đồng, and an early version of OpenTrading labelled a price in thousands of đồng as đồng, a reading \num{1000} times too small.
+  \item Reporting periods are given in one order, from oldest to newest, and a price bar without a date is dropped, so no date is invented.
   \item Missing data is reported as missing, with a reason, rather than filled with an estimate.
-  \item Statistics over today's listed companies warn that companies which left the market are not included, a bias known as survivorship bias.
+  \item Statistics of sector cycles, which are computed over today's listed companies, warn that companies which left the market are not included, a bias known as survivorship bias.
 \end{enumerate}
 
 \section{Algorithm Design}\label{sec:algorithm}
@@ -140,14 +140,15 @@ The gate checks the form of an answer, not its truth.
 
 \subsection{Grounding Rules in the System Prompt}\label{sec:grounding-rules}
 The system prompt sets the rules that the model applies at every step, and OpenTrading puts them in a fixed order of priority.
-Core rules come first, then the working rules of the system, then the user's own request, so that a user cannot ask the model to break a core rule.
-Two core rules target the main risk of a financial assistant, a confident answer with a wrong number \parencite{kang2023deficiency}.
+Core rules come first, then the working rules of the system, then the user's own request, and after it the default presentation, the investor profile, the active skill and memory.
+This order is an instruction in the prompt, not a check in the code: the prompt tells the model that a request of the user does not override a core rule.
+Two rules target the main risk of a financial assistant, a confident answer with a wrong number \parencite{kang2023deficiency}.
 First, every figure on prices, volumes, financial statements or the economy must come from a tool result in the same conversation; when data is missing, the model must say which part is missing instead of estimating it or using a figure it remembers.
-Second, the model may not calculate in its head; calculations go to a program, as \cref{sec:figure-tracing} explains.
+Second, a working rule tells the model not to calculate in its head but to run each calculation in the shell, as \cref{sec:figure-tracing} explains.
 Views on the future must be given as scenarios, each with its assumptions, the conditions that would prove it wrong and a likelihood.
 
 The prompt is assembled from blocks rather than written as one text.
-A line that describes a tool is included only when that tool is available, and the machine profile, used when another program rather than a person reads the answer, replaces the guidance on style with a strict answer format.
+Lines about some tools, such as the shell, are included only when that tool is available, and the machine profile, used when another program rather than a person reads the answer, drops the guidance on style and follows the answer format that the calling program gives.
 In the first request of the benchmark tasks, the system prompt of the machine profile therefore ranged from 917 to \num{1645} words, depending on the tools and features of the task.
 %% Evidence: E22.
 
@@ -183,7 +184,7 @@ On some model interfaces this reminder is not sent.
 With \num{175} data tools and the harness's own tools, sending every tool definition in every request would take a large share of the model's context and would make the model choose among many similar tools \parencite{qin2024toolllm}.
 OpenTrading therefore defers some tools: the model receives only their names, and it loads a tool through a search tool when it needs it, as \cref{alg:tool-search} shows.
 In the default mode, rarely used local tools are always deferred, and all deferrable tools are deferred once there are more than 40 tools or once their definitions would take more than 10\% of the model's context.
-Sub-agents, which run short focused tasks, receive their tools directly.
+For sub-agents, which run short focused tasks, the rarely used local tools are not deferred, but the limits of 40 tools and 10\% of the context still apply.
 
 \begin{algorithm}[H]
   \caption{Ranking of deferred tools for a search query}\label{alg:tool-search}
@@ -198,7 +199,7 @@ Sub-agents, which run short focused tasks, receive their tools directly.
       \Statex \hspace{\algorithmicindent}\hspace{\algorithmicindent} $+4$ if in the search hint; $+2$ if in the description; $+2$ if a parameter name )
       \If{a required word scores 0 for $d$} \State discard $d$ \EndIf
     \EndFor
-    \State \Return tools with $s_d>0$, by decreasing $s_d$, then by name
+    \State \Return at most 5 tools (by default) with $s_d>0$ and $s_d \ge \tfrac{1}{2}\max_{e\in D} s_e$, by decreasing $s_d$, then by name
   \end{algorithmic}
 \end{algorithm}
 
@@ -209,9 +210,9 @@ Partial matches are allowed only for words of three letters or more, because sho
 
 Once a tool is chosen, its arguments can still be wrong, for example a period written in the wrong form \parencite{yao2024taubench}.
 If the server then returns no data, the model may conclude that the data does not exist and report it as missing, which is a false answer.
-In its grounded mode, OpenTrading checks every argument of a data tool against the schema that the server declares, before the call is sent.
+In the grounded mode, an option of the harness core that the benchmark runner switches on and that is not a user setting, OpenTrading checks every argument of a data tool against the schema that the server declares, before the call is sent.
 An invalid call is not executed; the model receives the reason, and an explicit statement that a rejected input is not evidence that the data is missing, so it corrects the call instead of giving up.
-A stricter optional policy, which also traces each reported figure back to the tool result it came from, exists for automated use; in the benchmark only the input check was enabled.
+A stricter optional policy for automated use adds one round of correction and checks of the answer format; in the benchmark only the input check was enabled.
 %% Evidence: E24.
 
 \subsection{Permissions and Safe Execution}\label{sec:permissions}
@@ -335,7 +336,7 @@ Each harness kept its own system prompt and tool design, since these are what a 
 Everything else was locked, so that no harness had an advantage outside its design:
 \begin{enumerate}
   \item The same model with the same settings answered in every harness.
-  \item Every harness saw only the same data tools; OpenTrading's other tools and its tool search were switched off.
+  \item Every harness saw the same data tools and a shell. OpenTrading also kept its tool for reading a stored result and its read-only memory tool; its other tools and its tool search were switched off.
   \item Every command ran in the same isolated sandbox without network access.
   \item The clock of every harness was set to the snapshot date, so no harness could mistake the snapshot for live data.
   \item Questions that a harness normally asks its user, such as a request for permission, were answered automatically in the same way.
@@ -350,7 +351,7 @@ Everything else was locked, so that no harness had an advantage outside its desi
     \toprule
     {Item} & {Setting}\\
     \midrule
-    Model & DeepSeek V4.1 Flash, temperature 0, reasoning off\\
+    Model & DeepSeek V4.1 Flash, temperature 0, reasoning not requested\\
     Harnesses & OpenTrading 0.5.0 with the change that allows buy and sell recommendations, machine profile; OpenCode 2.4.1; DSH 0.2.2-rc.5\\
     Limits per trial & 24 model requests (48 for memory tasks), \num{4.6} million tokens, \qty{1800}{\second}\\
     Grading & Rule-based checks, a language-model judge (Claude Haiku 5.5) and a manual review\\
@@ -364,7 +365,7 @@ Everything else was locked, so that no harness had an advantage outside its desi
 A trial counts as correct only if all four conditions hold:
 \begin{enumerate}
   \item The judge accepts the answer against the correct answer.
-  \item Every number lies within the tolerance of the correct value.
+  \item Every requested number lies within the tolerance of the correct value.
   \item A task whose correct answer is a refusal, because the data does not exist, receives no number.
   \item A manual review does not reject it; the review may reject a trial but never accept one.
 \end{enumerate}
@@ -380,6 +381,7 @@ The primary metric is accuracy, the share of tasks that a harness $a$ answered c
 \end{equation}
 where $T$ is a set of tasks and $y_{a,t}$ is 1 when the trial of task $t$ in harness $a$ is correct under the rules of \cref{sec:bench-scoring} and 0 otherwise.
 A trial that ended without an answer counts as incorrect.
+Each accuracy is reported with a 95\% Wilson score interval \parencite{wilson1927probable}.
 
 Two harnesses are compared on the same tasks.
 Let $w$ be the number of tasks that OpenTrading answered correctly and the other harness did not, $l$ the reverse, and $n=w+l$.
