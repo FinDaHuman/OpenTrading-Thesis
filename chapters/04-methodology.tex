@@ -483,7 +483,85 @@ Speed and cost are measured for every trial and reported separately, never added
 Reliability is described by the trials without an answer, false refusals of answerable tasks, numbers given where the correct answer is a refusal, and numbers outside the tolerance.
 
 \section{Implementation Plan}\label{sec:implementation-plan}
-\guide{Describe in detail how the method is implemented, and the tools or technologies used to support this process.}
+The group implemented the method as three programs: the OpenTrading harness, the opentrading-mcp data server and the opentrading-benchmark suite.
+The work packages and their leads are given in \cref{sec:wbs}.
+This section describes the technologies behind each program, the stages in which the harness was built, and how one rule of the method moves from a problem to a release.
+
+\subsection{Technologies}\label{sec:stack}
+\Cref{tab:stack} lists the language and the main libraries of each program, and how each is checked.
+
+\begin{table}[H]
+  \centering
+  \caption{Technologies used to implement each component}\label{tab:stack}
+  \begin{tabularx}{\textwidth}{@{}l L L@{}}
+    \toprule
+    {Component} & {Language and main libraries} & {Checked or reported in}\\
+    \midrule
+    Harness (OpenTrading) & TypeScript on the Bun runtime; Vercel AI SDK for model providers; MCP SDK for the data tools; OpenTUI with SolidJS for the terminal interface & automated tests with a simulated model, on Ubuntu and Windows (\cref{sec:testing})\\
+    \addlinespace[2pt]
+    Data server (opentrading-mcp) & Python; the MCP library; vnstock libraries for Vietnamese market data; pandas & automated tests, and a separate check, run outside the automated tests, that calls the tools with live data\\
+    \addlinespace[2pt]
+    Benchmark (opentrading-benchmark) & Python, with TypeScript runners for OpenTrading & design and results in \cref{ch:results}\\
+    \bottomrule
+  \end{tabularx}
+  \fignote{Source: the group, based on OpenTrading version 0.5.1 \parencite{group2026opentrading} and the source code of opentrading-mcp and opentrading-benchmark.}
+\end{table}
+
+The harness started on 12 September 2026 as a Python scaffold.
+A planning document had recommended Rust for the core and the terminal interface.
+On 27 September the group chose TypeScript on Bun for both instead, so that the part that runs on every turn, namely the agent loop, the model providers and the interface, stays in one language.
+OpenTUI ships prebuilt binaries for Windows, macOS and Linux, and the AI SDK provides packages for many model providers.
+Quantitative libraries and Vietnamese market data are available mainly in Python, so they live in the data server, whose tools the harness calls through MCP.
+%% Evidence: E50.
+
+\subsection{Stages of the Harness}\label{sec:stages}
+The harness was built in the stages shown in \cref{tab:releases}, each closed by a release.
+
+\begin{table}[H]
+  \centering
+  \caption{Releases of OpenTrading and what each added to the method}\label{tab:releases}
+  \begin{tabularx}{\textwidth}{@{}l l L@{}}
+    \toprule
+    {Version} & {Date (2026)} & {Added to the method}\\
+    \midrule
+    0.1.0 & 22 October & Rewrite in TypeScript, not published: agent loop with tool search and compaction, MCP client, skills, investor profile, a first memory, sub-agents and ultradesk, permission modes\\
+    \addlinespace[2pt]
+    0.2.1 & 23 October & First public release, installable without Bun\\
+    \addlinespace[2pt]
+    0.3.0 & 31 October & Checks so that a turn ends with an answer or a statement that there is none; auto mode reviewed end to end\\
+    \addlinespace[2pt]
+    0.3.1 & 3 November & Fixes from the group's test reports\\
+    \addlinespace[2pt]
+    0.4.0 & 8 November & Mode without a user for the benchmark; calculation tool that checks units; the notebook memory\\
+    \addlinespace[2pt]
+    0.5.0 & 24 November & Text for the model in English and shorter requests; arithmetic through the shell instead of the calculation tool; data results as files; a stricter auto mode\\
+    \addlinespace[2pt]
+    0.5.1 & 25 November & The model may recommend buying, holding or selling when asked, with the reasoning based on tool figures; no order is ever placed and the user decides; the version described in this report\\
+    \bottomrule
+  \end{tabularx}
+  \fignote{Source: the group, based on the release notes of OpenTrading \parencite{group2026opentrading}.}
+\end{table}
+%% Evidence: E50.
+
+The order follows the method.
+The loop, the access to data and the permissions came first, because the other rules run inside them.
+Rules prompted by real use came next, such as the checks that make a turn end with an answer or a statement that there is none.
+The mode without a user came before the benchmark, so that the benchmark drives the same agent loop as the terminal.
+The last stage reduced the cost of each request and replaced the calculation tool with arithmetic in the shell (\cref{sec:figure-tracing}).
+
+\subsection{From a Problem to a Release}\label{sec:workflow}
+A rule of \cref{sec:algorithm} typically goes through the following steps.
+Since 14 November 2026, problems found in use or in test reports have been opened as issues on GitHub.
+Choices with lasting effect are written as short decision records with their reason, such as the accepted choice of language and the proposed rules of memory.
+%% Evidence: E50.
+The rule is then written as code in the harness core, which does not depend on the interface, so the terminal and the benchmark run the same loop (\cref{sec:architecture}).
+The rules are covered by tests in which a simulated model returns scripted answers, including broken ones.
+Changes normally reach the main branch through pull requests that pass the automated checks on Ubuntu and Windows and a scan for secrets (\cref{sec:quality,sec:testing}).
+A release workflow then builds the installable versions and checks that they install (\cref{sec:release}).
+The data server follows its own cycle, because the harness depends on it only through MCP.
+
+The method as a whole is checked in the two steps set out in \cref{sec:rq}: tests for each rule, and the benchmark for the answers.
+The benchmark of \cref{ch:results} measures a fixed build of the harness on a frozen copy of the data.
 
 \section{Ethical Considerations}\label{sec:ethics}
 \guide{Discuss ethical issues: data privacy, accuracy, fairness, data licences, responsible use of financial recommendations, and the use of AI tools in the project.}
