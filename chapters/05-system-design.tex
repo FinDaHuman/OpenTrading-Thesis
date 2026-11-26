@@ -16,37 +16,47 @@ It produces a stream of events, and every interface reads the same events, so th
   \fignote{Note: dashed boxes are outside the harness. Source: the group, based on OpenTrading version 0.5.1 \parencite{group2026opentrading}.}
 \end{figure}
 
-The design answers three questions.
-What the model sees: a system prompt built in layers, from the core rules to the user's profile and constraints and the list of skills, whose earlier layers rarely change so that the provider can reuse its cache.
-What the model can do: built-in tools and tools of MCP servers are registered in the same form, and the permission gate decides on each call.
-What remains as evidence: during a session the results of MCP tools are kept in full in a file, so a figure can still be traced after the conversation has been shortened, and a JSON result with numbers receives a label that a chart can use instead of copied numbers.
+The design answers three questions: what the model sees, what it can do, and what remains as evidence.
+The model sees a system prompt built in layers, from the core rules to the user's profile and constraints and the list of skills.
+The earlier layers rarely change, so the provider can reuse its cache.
+The model can use built-in tools and the tools of MCP servers, which are registered in the same form, and the permission gate decides on each call.
+As evidence, the results of MCP tools are kept in full in a file during a session, so a figure can still be traced after the conversation has been shortened.
+A JSON result with numbers also receives a label, which a chart can use instead of numbers copied by the model.
 %% Evidence: E10, E34.
 
 \label{sec:model-layer}
-The harness is not tied to one model: it reads each model's context size and abilities from a public catalogue \parencite{modelsdevndcatalogue}, connects to many providers or to any interface compatible with that of OpenAI, and handles a failed request by its cause, reporting an exhausted quota or a wrong key at once and retrying a rate limit or a network error.
+The harness is not tied to one model.
+It reads each model's context size and abilities from a public catalogue \parencite{modelsdevndcatalogue} and connects to many providers or to any interface compatible with that of OpenAI.
+It handles a failed request by its cause: it reports an exhausted quota or a wrong key at once, and it retries a rate limit or a network error.
 %% Evidence: E30.
 
 \label{sec:tool-exposure}
 OpenTrading reads market data through MCP (\cref{sec:data}), whose specification defines how tools are listed and called \parencite{modelcontextprotocol2025specification}.
-Its MCP client connects to the group's data server, which offers \num{175} tools and 6 prepared analysis workflows \parencite{group2026opentradingmcp}, and gives the model these tools next to its own, prefixed with the server's name and deferred as in \cref{sec:tool-search}.
+Its MCP client connects to the group's data server, which offers \num{175} tools and 6 prepared analysis workflows \parencite{group2026opentradingmcp}.
+The model sees these tools next to its own, prefixed with the server's name and deferred as in \cref{sec:tool-search}.
 %% Evidence: E12, E21.
 
 The server returns its answers in one envelope, the shared answer contract of the second objective (\cref{sec:objective}).
-The envelope states whether the data is available, its source and time and, for the tools whose units have been checked, the units of prices; when data is missing, it gives the reason and whether a retry may help.
+The envelope states whether the data is available, its source and its time and, for the tools whose units have been checked, the units of prices.
+When data is missing, it gives the reason and whether a retry may help.
 OpenTrading relies on this envelope: the model can choose its next step instead of stopping or guessing, and the final answer can cite where each number came from.
 
-Each tool of the data server declares whether it only reads data or also writes; the permission gate (\cref{sec:permissions}) usually lets reading tools run without asking, and a permanent permission is tied to the exact server, so another server with a tool of the same name is asked again.
+Each tool of the data server declares whether it only reads data or also writes, and the permission gate (\cref{sec:permissions}) usually lets reading tools run without asking.
+A permanent permission is tied to the exact server, so another server with a tool of the same name is asked again.
 
 \label{sec:skills}
 Knowledge of the Vietnamese market is kept outside the model's prompt, in 43 skills and 17 specialist agents.
 %% Evidence: E10.
 A skill is a written method for one kind of analysis, such as a bank's asset quality, a sector's place in its cycle or a valuation; 13 of them cover sectors of the Vietnamese economy.
 %% Evidence: E44.
-The system prompt lists only the name and purpose of each skill, and the model loads the full method when a question needs it; a skill whose data tools are missing is hidden, and Vietnamese phrases kept with each skill let the harness remind the model of a matching skill.
-A specialist agent, for example for valuation, technical analysis or one side of a bull-and-bear debate, is a sub-agent (\cref{sec:multi-agent}) with its own instructions and, for most of them, only tools that read data; the valuation agent, for instance, must compute both a simple discounted cash flow (DCF) and a comparison with peers and test how far the value moves with its main assumption.
+The system prompt lists only the name and purpose of each skill, and the model loads the full method when a question needs it.
+A skill whose data tools are missing is hidden, and Vietnamese phrases kept with each skill let the harness remind the model of a matching skill.
+A specialist agent, for example for valuation, technical analysis or one side of a bull-and-bear debate, is a sub-agent (\cref{sec:multi-agent}) with its own instructions; most of them have only tools that read data.
+The valuation agent, for instance, must compute both a simple discounted cash flow (DCF) and a comparison with peers, and must test how far the value moves with its main assumption.
 
 \label{sec:interface}
-The user works in a Vietnamese terminal user interface (TUI), which shows, besides the answer, information that does not depend on the model: the permission mode, the share of the context in use, the running tools and sub-agents, and the data tools whose source failed.
+The user works in a Vietnamese terminal user interface (TUI).
+Besides the answer, it shows information that does not depend on the model: the permission mode, the share of the context in use, the running tools and sub-agents, and the data tools whose source failed.
 Charts are drawn in the terminal from labelled results, so the harness reads the numbers itself and the model receives only a short summary.
 \Cref{fig:tui} shows two parts of the screen during a real question about a share price.
 %% Evidence: E33.
@@ -101,14 +111,18 @@ The store is a single SQLite file in the OpenTrading data folder, readable only 
   \fignote{Note: solid arrows write, dashed arrows read, the dotted arrow is a proposal from the model. Source: the group, based on OpenTrading version 0.5.1 \parencite{group2026opentrading}.}
 \end{figure}
 
-Only the user writes memory, through four commands that open a form (\texttt{/nho}, \texttt{/luandiem}, \texttt{/baihoc} and \texttt{/quyetdinh}) and the \texttt{/memory} screen; every save passes one text check that refuses over-long text and text that has the form of a key, and the model can at most end an answer with a suggestion card that opens the same form.
+Only the user writes memory, through four commands that open a form (\texttt{/nho}, \texttt{/luandiem}, \texttt{/baihoc} and \texttt{/quyetdinh}) and through the \texttt{/memory} screen.
+Every save passes one text check, which refuses over-long text and text that has the form of a key.
+The model can at most end an answer with a suggestion card that opens the same form.
 Constraints are read from the store at the start of every turn, read-only, and go to the main agent and every sub-agent.
-Presentation styles, theses and lessons reach the main agent only through the notebook (\texttt{Sổ ghi nhớ}), a memory provider that the user turns on, and the text of lessons and the details of theses only through the read-only tool \texttt{memory\_read}.
+Presentation styles, theses and lessons reach the main agent only through the notebook (\texttt{Sổ ghi nhớ}), a memory provider that the user turns on.
+The text of lessons and the details of theses reach it only through the read-only tool \texttt{memory\_read}.
 Before each turn, memory blocks of earlier turns are checked against the store and deleted entries are masked (step 2 of \cref{fig:question-flow}).
 %% Evidence: E48.
 
 \label{sec:mcp-lifecycle}
-When OpenTrading calls a data tool, the server checks the caller's access and limits, reuses a recent answer to the same question where the market allows, and otherwise asks the provider, stopping for a while after repeated failures of that provider.
+When OpenTrading calls a data tool, the server first checks the caller's access and limits.
+It reuses a recent answer to the same question where the market allows, and otherwise asks the provider; after repeated failures of a provider it stops calling it for a while.
 The result is cleaned by the rules of \cref{sec:data} and returned in the envelope of \cref{sec:tool-exposure}.
 For OpenTrading this means that a failed source returns a clear reason quickly (step 7 of \cref{fig:question-flow}).
 
@@ -117,13 +131,15 @@ For OpenTrading this means that a failed source returns a clear reason quickly (
 This section covers the release of the harness and the deployment of the data server.
 \label{sec:release}
 OpenTrading runs on the user's computer.
-An automated workflow builds program files for Windows, macOS and Linux and publishes them on GitHub and npm, and each release is then installed on six test machines; for version 0.5.1, published on 25 November 2026, all six installations passed.
+An automated workflow builds program files for Windows, macOS and Linux and publishes them on GitHub and npm, and each release is then installed on six test machines.
+For version 0.5.1, published on 25 November 2026, all six installations passed.
 The files do not yet carry a publisher's certificate, so the operating system may show a warning.
 %% Evidence: E31.
 
 \label{sec:mcp-deployment}
 The data server can run in two ways.
-For a single user it runs on the same computer as a process that OpenTrading starts, without a token; for the group it runs from one container image as a web service with a PostgreSQL database and a Redis cache.
+For a single user it runs on the same computer, as a process that OpenTrading starts, without a token.
+For the group it runs from one container image as a web service with a PostgreSQL database and a Redis cache.
 %% Evidence: E70.
 The web service answers only calls that carry an access token issued by the group, which the user enters once in OpenTrading and which is kept in its key file.
 On the server, provider credentials and the token are environment settings, never stored in the repository.
@@ -132,7 +148,9 @@ On the server, provider credentials and the token are environment settings, neve
 
 This section covers how the data server copes with many calls and how both programs are tested.
 \label{sec:scaling}
-The data server is designed to stay responsive when many calls arrive together: connections to providers are reused, identical calls are merged, and above a bound new calls are refused at once with a retry time; no load test was run for this version, so no throughput figure is claimed.
+The data server is designed to stay responsive when many calls arrive together.
+Connections to providers are reused, identical calls are merged, and above a bound new calls are refused at once with a retry time.
+No load test was run for this version, so no throughput figure is claimed.
 
 \label{sec:testing}
 Each PR is tested automatically on Ubuntu and Windows; at version 0.5.1, \num{2249} of \num{2253} tests passed on Ubuntu and the four others were skipped.
@@ -140,5 +158,8 @@ The tests use a simulated model that returns prepared answers, including broken 
 These tests show that a rule does what it was designed to do; they do not show that it improves the answers.
 %% Evidence: E11, E35.
 
-The data server is tested in the same way: at the version described here, \num{1338} tests passed, covering \qty{71.69}{\percent} of its lines; the check that calls the tools with live data is not part of these automated checks.
+The data server is tested in the same way: at the version described here, \num{1338} tests passed, covering \qty{71.69}{\percent} of its lines.
+A separate contract check calls every registered tool once over MCP with live data and checks that each reply has the shape of the envelope.
+An automated test confirms that this check covers every registered tool, but the live check itself is left out of the automated checks, because it depends on outside providers, and the group has no recorded run of it for the version described here.
+%% Evidence: E76.
 %% Evidence: E13.

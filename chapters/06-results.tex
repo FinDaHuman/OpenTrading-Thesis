@@ -7,44 +7,51 @@ Accuracy comes first, then speed and cost, reliability, and an analysis of the e
 
 \label{sec:accuracy}
 OpenTrading answered 279 of the 300 tasks correctly (\qty{93.0}{\percent}), DeepSeek Harness 266 (\qty{88.7}{\percent}) and OpenCode 245 (\qty{81.7}{\percent}), as \cref{tab:accuracy} and \cref{fig:accuracy} show.
+The total over all 300 tasks is the result planned before the run.
+The investor group, however, measures a judgement about later prices rather than the use of data, and none of the harnesses did better there than a fixed rule (\cref{sec:error-analysis}).
+\Cref{tab:accuracy} therefore also reports the 264 tasks without the investor group, an analysis added after the results had been seen.
 
-\begin{table}[htb]
+\begin{table}[H]
   \centering
-  \caption{Tasks answered correctly by each harness}\label{tab:accuracy}
-  \begin{tabularx}{\textwidth}{@{}L *{4}{S[table-format=3.0]}@{}}
+  \caption{Tasks answered correctly by each harness, with \qty{95}{\percent} Wilson intervals}\label{tab:accuracy}
+  \begin{tabularx}{\textwidth}{@{}L r l l l@{}}
     \toprule
     {Group} & {Tasks} & {OpenTrading} & {OpenCode} & {DeepSeek Harness}\\
     \midrule
-    Compute & 79 & 78 & 75 & 76\\
-    Investor & 36 & 19 & 16 & 16\\
-    Lookup & 112 & 110 & 110 & 110\\
-    Memory & 59 & 58 & 30 & 50\\
-    Robustness & 14 & 14 & 14 & 14\\
+    Compute & 79 & 78 (93.2--99.8) & 75 (87.7--98.0) & 76 (89.4--98.7)\\
+    Investor & 36 & 19 (37.0--68.0) & 16 (29.5--60.4) & 16 (29.5--60.4)\\
+    Lookup & 112 & 110 (93.7--99.5) & 110 (93.7--99.5) & 110 (93.7--99.5)\\
+    Memory & 59 & 58 (91.0--99.7) & 30 (38.4--63.2) & 50 (73.5--91.8)\\
+    Robustness & 14 & 14 (78.5--100.0) & 14 (78.5--100.0) & 14 (78.5--100.0)\\
     \midrule
-    All tasks & 300 & 279 & 245 & 266\\
+    All tasks & 300 & 279 (89.5--95.4) & 245 (76.9--85.6) & 266 (84.6--91.8)\\
+    All except investor & 264 & 260 (96.2--99.4) & 229 (82.1--90.3) & 250 (91.3--96.8)\\
     \bottomrule
   \end{tabularx}
-  \fignote{Source: the group.}
+  \fignote{Note: each cell gives the tasks answered correctly and, in brackets, the \qty{95}{\percent} Wilson interval of the accuracy in per cent. The last row is an analysis added after the results had been seen. Source: the group.}
 \end{table}
 %% Evidence: E45.
 
-\begin{figure}[htb]
+\begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{benchmark-accuracy}
   \caption{Accuracy by task group, with \qty{95}{\percent} Wilson intervals}\label{fig:accuracy}
   \fignote{Note: number of tasks in brackets. Source: the group.}
 \end{figure}
 
-On compute, lookup and robustness tasks the three harnesses were within three tasks of each other, so plain calculation and retrieval did not separate them.
-The difference came mostly from memory: OpenTrading applied the rules that a user had given in an earlier session, including rules later updated or withdrawn, in 58 of 59 tasks, against 50 for DeepSeek Harness and 30 for OpenCode.
-On the investor tasks all three were near one half.
+On compute, lookup and robustness tasks the three harnesses were within three tasks of each other, and their intervals overlap, so plain calculation and retrieval did not separate them.
+The difference came mostly from memory.
+OpenTrading applied the rules that a user had given in an earlier session, including rules later updated or withdrawn, in 58 of 59 tasks, against 50 for DeepSeek Harness and 30 for OpenCode.
+On the investor tasks all three were near one half, with intervals that overlap widely.
 
 The memory group shows when memory in the harness matters (\cref{tab:memory-kinds-results}).
-When the user's rules were given in the same session, or the user returned to the session in which a portfolio had been given, the three harnesses scored within one task of each other, because the rules were still in the conversation that each of them could read.
-The difference appeared when a rule had to outlast its session: criteria split over two sessions or updated later, a stored criterion that the user did not repeat, a criterion that the user had withdrawn or a price that had gone out of date, and a convention of calculation, such as return on equity (ROE) over the last four quarters, whose thresholds were later changed or removed.
+In two families the rules were still in a conversation that every harness could read: the rules were given in the same session, or the user returned to the session in which a portfolio had been given.
+There the three harnesses scored within one task of each other.
+The difference appeared when a rule had to outlast its session.
+This covers criteria split over two sessions or updated later, a stored criterion that the user did not repeat, a criterion that the user had withdrawn or a price that had gone out of date, and a convention of calculation whose thresholds were later changed or removed, such as return on equity (ROE) over the last four quarters.
 These are the conditions of an investor who keeps a set of screening rules and revises them over weeks, and on these 46 tasks OpenTrading answered all correctly, against 37 for DeepSeek Harness and 17 for OpenCode.
 
-\begin{table}[htb]
+\begin{table}[H]
   \centering
   \caption{Memory tasks answered correctly, by what the user's rule requires}\label{tab:memory-kinds-results}
   \begin{tabularx}{\textwidth}{@{}L *{4}{S[table-format=2.0]}@{}}
@@ -66,19 +73,27 @@ These are the conditions of an investor who keeps a set of screening rules and r
 %% Evidence: E72.
 
 The cause lies in where the current version of a rule comes from.
-OpenTrading reads each constraint from its store at the start of every turn and places it in the system part of the prompt, and entries that the user has deleted are masked (\cref{fig:memory-flow}), so the model does not have to decide which version of a rule is still valid.
-OpenCode and DeepSeek Harness had to find the rules in the record of an earlier session and judge which statement was the latest, and they failed mostly at that step: they kept a replaced rule, applied a withdrawn one or found none (\cref{tab:memory-errors}).
+OpenTrading reads each constraint from its store at the start of every turn and places it in the system part of the prompt, and entries that the user has deleted are masked (\cref{fig:memory-flow}).
+Its model therefore does not have to decide which version of a rule is still valid.
+OpenCode and DeepSeek Harness had to find the rules in the record of an earlier session and judge which statement was the latest (\cref{sec:bench-design}).
+They failed mostly at that step: they kept a replaced rule, applied a withdrawn one or found none (\cref{tab:memory-errors}).
 The search also cost work: on memory tasks they made a median of 15 and 20 model requests, against 4 for OpenTrading, and called the data tools about twice as often (7.0 and 6.5 calls against 3.3).
 %% Evidence: E46, E72.
 
-Compared on the same tasks with the sign test of \cref{eq:sign-test}, OpenTrading was ahead of OpenCode on 40 tasks and behind on 6 ($p=3.1\times10^{-7}$), and ahead of DeepSeek Harness on 19 and behind on 6 ($p=0.015$).
+On the same tasks, the sign test of \cref{eq:sign-test} compares OpenTrading with each of the other harnesses.
+Over all 300 tasks, OpenTrading was ahead of OpenCode on 40 tasks and behind on 6 ($p=3.1\times10^{-7}$), and ahead of DeepSeek Harness on 19 and behind on 6 ($p=0.015$).
 %% Evidence: E45.
+On the 36 investor tasks alone, it was ahead of each of them on 7 tasks and behind on 4 ($p=0.55$), so this group shows no difference.
+Without the investor group, it was ahead of OpenCode on 33 tasks and behind on 2 ($p=3.7\times10^{-8}$), and ahead of DeepSeek Harness on 12 and behind on 2 ($p=0.013$); this split was chosen after the results had been seen, so it supports the planned result but does not replace it.
+%% Evidence: E77.
 
 \label{sec:speed-cost}
-A typical trial took under a minute in every harness (\cref{tab:speed}), but the harnesses differed in their slow trials: only one OpenTrading trial took more than five minutes, against 17 for DeepSeek Harness and 30 for OpenCode.
-OpenTrading also needed fewer model requests, 3.8 per trial against about 7, and its cost per correct answer was about half that of DeepSeek Harness and less than half that of OpenCode.
+A typical trial took under a minute in every harness (\cref{tab:speed}), but the harnesses differed in their slow trials.
+Only one OpenTrading trial took more than five minutes, against 17 for DeepSeek Harness and 30 for OpenCode.
+OpenTrading also needed fewer model requests, 3.8 per trial against about 7.
+Its cost per correct answer was about half that of DeepSeek Harness and less than half that of OpenCode.
 
-\begin{table}[htb]
+\begin{table}[H]
   \centering
   \caption{Time, work and cost per trial, and median time by task group}\label{tab:speed}
   \begin{tabularx}{\textwidth}{@{}L *{3}{S[table-format=3.4, table-alignment-mode=none, group-digits=integer]}@{}}
@@ -105,22 +120,35 @@ OpenTrading also needed fewer model requests, 3.8 per trial against about 7, and
 %% Evidence: E42, E45, E46.
 
 Speed depends on the kind of task, and the work per request shows where OpenTrading gains and loses time.
-It lost time on short lookups: its system prompt and tool set are larger, so a lookup trial read a median of about \num{17000} input tokens against \num{9000} and \num{7500}, and each request took about 10 seconds against 8 and 9; it also typically made one more request (3 against 2).
+It lost time on short lookups, because its system prompt and tool set are larger.
+A lookup trial read a median of about \num{17000} input tokens against \num{9000} and \num{7500}, and each request took about 10 seconds against 8 and 9.
+It also typically made one more request (3 against 2).
 On compute tasks all three made a median of 3 requests, and OpenTrading was slower than DeepSeek Harness (37 against 33 seconds) only because each of its requests took longer.
 It gained time on tasks with many steps.
-On memory tasks it needed a median of 4 requests against 15 for OpenCode and 20 for DeepSeek Harness, because the rules were already in its prompt, and on investor tasks it read fewer input tokens (a median of \num{163000} against \num{231000} and \num{208000}) and was as fast as DeepSeek Harness.
+On memory tasks it needed a median of 4 requests against 15 for OpenCode and 20 for DeepSeek Harness, because the rules were already in its prompt.
+On investor tasks it read fewer input tokens (a median of \num{163000} against \num{231000} and \num{208000}) and was as fast as DeepSeek Harness.
 These tasks decide the slowest trials: all 30 trials of OpenCode and all 17 of DeepSeek Harness that took more than five minutes were memory or investor tasks.
 %% Evidence: E46, E73.
 
 
 \label{sec:reliability}
-OpenTrading returned an answer in a valid format in 299 of 300 trials and never refused a task that had an answer, and no harness gave a number on the 11 tasks whose correct answer is a refusal (\cref{tab:reliability}).
-Most failures of the other two harnesses came from the memory group: 12 of the 15 numbers of OpenCode outside the tolerance, all ten of its false refusals and all six trials of DeepSeek Harness without an answer.
+OpenTrading returned an answer in a valid format in 299 of 300 trials and never refused a task that had an answer (\cref{tab:reliability}).
+No harness gave a number on the 11 tasks whose correct answer is a refusal.
+Most failures of the other two harnesses came from the memory group.
+This group holds 12 of the 15 numbers of OpenCode outside the tolerance, all ten of its false refusals and all six trials of DeepSeek Harness without an answer.
 Outside that group, each harness had between one and three numbers outside the tolerance, so on calculation and lookup the harnesses were about equally reliable.
-Answers in an invalid format came mostly from investor and memory tasks, where the answer is long (6 and 5 for OpenCode, 6 and 6 for DeepSeek Harness); OpenTrading's machine profile follows the format that the calling program gives (\cref{sec:grounding-rules}), and its one invalid answer was the memory trial without an answer.
-%% Evidence: E73.
+Answers in an invalid format came mostly from investor and memory tasks, where the answer is long (6 and 5 for OpenCode, 6 and 6 for DeepSeek Harness).
+OpenTrading's machine profile follows the format that the calling program gives (\cref{sec:grounding-rules}), and its one invalid answer was the memory trial without an answer, which ended on a failed request to the model provider.
+%% Evidence: E73, E75.
 
-\begin{table}[htb]
+The trial records also show how often the stop gate of OpenTrading acted.
+In none of its 300 trials did the gate send an answer back: no recovery was recorded, and the one trial without an answer ended on the failed request, not on the gate.
+With this model and these tasks, the gate was therefore never triggered.
+This means that it raised no false alarm, but also that the benchmark did not test whether it improves answers.
+The records published with the benchmark do not include the figures that tracing found unsupported, so the share of traced figures is not reported here.
+%% Evidence: E75.
+
+\begin{table}[H]
   \centering
   \caption{Reliability of each harness over the 300 tasks}\label{tab:reliability}
   \begin{tabularx}{\textwidth}{@{}L *{3}{S[table-format=3.0]}@{}}
@@ -148,16 +176,18 @@ For example, it recommended buying PV Gas (GAS) on 30 October 2026, and the pric
 No harness found the stock that rose most in the following weeks (0 of 4 for all); with six candidates per task and only four tasks, this says little.
 All three were below the 11 of 16 calls of a rule that always answers \enquote{sell} in this falling market.
 
-Only four errors of OpenTrading lay outside the investor group: a wrong company named although all twelve numbers were correct, a screening that dropped a company with a negative price-to-earnings ratio, a change reported as $-0.61$ instead of $+0.61$, and one memory task without a final answer.
+Only four errors of OpenTrading lay outside the investor group.
+They were a wrong company named although all twelve numbers were correct, a screening that dropped a company with a negative price-to-earnings ratio, a change reported as $-0.61$ instead of $+0.61$, and one memory task without a final answer.
 %% Evidence: E39, E46.
 
 The errors of the other harnesses lay mostly in memory tasks, which give the user's rules in an earlier session, such as \enquote{only shares with a price-to-earnings ratio below 15}, and later update or withdraw them.
 OpenCode failed 29 of the 59 tasks, in four ways (\cref{tab:memory-errors}).
 Most often it applied a rule wrongly, kept a rule that had been replaced, or ignored a rule entirely; nearly as often it refused, saying that it could not find the user's rules.
-In one task the user had replaced the criteria with a price-to-book ratio below 3 and a price-to-earnings ratio below 35; OpenCode kept the old criteria and returned one company, PNJ, instead of the four that met the new ones (KDC, MSN, PNJ and SBT), while OpenTrading answered correctly.
+In one task the user had replaced the criteria with a price-to-book ratio below 3 and a price-to-earnings ratio below 35.
+OpenCode kept the old criteria and returned one company, PNJ, instead of the four that met the new ones (KDC, MSN, PNJ and SBT), while OpenTrading answered correctly.
 DeepSeek Harness failed 9 memory tasks, six of them without an answer.
 
-\begin{table}[htb]
+\begin{table}[H]
   \centering
   \caption{Causes of failure in the 59 memory tasks}\label{tab:memory-errors}
   \begin{tabularx}{\textwidth}{@{}L *{3}{S[table-format=2.0]}@{}}
@@ -182,16 +212,21 @@ This section answers the three research questions of \cref{sec:rq}, explains whe
 \label{sec:rq-answers}
 RQ1 asked which parts a harness must add around a model so that its analysis stays grounded, follows the investor's constraints and keeps actions under the user's control.
 The answer of this project is the set of rules in \cref{sec:algorithm}, which automated tests check against their design (\cref{sec:testing}); the benchmark measured only part of it, through its memory group and reliability measures.
-OpenTrading followed the user's earlier rules in 58 of 59 memory tasks and gave no number on the 11 tasks whose data does not exist, but had one answer rejected and ended one trial without an answer; tool search, the permission gate, skills, sub-agents and ultradesk were not used.
-%% Evidence: E11, E45.
+OpenTrading followed the user's earlier rules in 58 of 59 memory tasks and gave no number on the 11 tasks whose data does not exist.
+It had one answer rejected and ended one trial without an answer.
+The stop gate never acted in the benchmark, and tool search, the permission gate, skills, sub-agents and ultradesk were not used, so their effect on answers remains untested.
+%% Evidence: E11, E45, E75.
 
 RQ2 asked how a data server should return its results so that the agent knows the unit, the source and the availability of each figure.
 The answer is one envelope that states whether the data is available, its source and time, and, when data is missing, the reason and whether a retry may help (\cref{sec:tool-exposure}).
 Its two gaps are that units are stated only for the checked price tools and that the contract check with live data does not yet run automatically.
-%% Evidence: E13.
+The second acceptance criterion of the project is therefore met only in part: the design and its automated tests are in place, but the group has no recorded live run that shows how many of the tools pass the check.
+%% Evidence: E13, E76.
 
 RQ3 asked whether OpenTrading answers more financial tasks correctly than two general-purpose harnesses with the same model and data, and at what cost.
-The answer is yes, but only for some kinds of question (\cref{sec:results}): OpenTrading answered more tasks correctly than DeepSeek Harness and OpenCode, at about half the cost per correct answer of DeepSeek Harness and less than half that of OpenCode.
+The answer is yes, but only for some kinds of question (\cref{sec:results}).
+OpenTrading answered more tasks correctly than DeepSeek Harness and OpenCode, at about half the cost per correct answer of DeepSeek Harness and less than half that of OpenCode.
+On the investor tasks it did not differ from them.
 The difference came mostly from the memory tasks, and the limits listed at the end of this section apply to it.
 %% Evidence: E45, E46.
 
@@ -200,16 +235,20 @@ On the compute, lookup and robustness groups (205 of the 300 tasks) the three ha
 The difference came mostly from the memory group, whose tasks depend on what the user said in an earlier session, which a model cannot recover from the data.
 
 Memory is part of the OpenTrading harness, so the current version of each rule reaches the model without a search, and \cref{tab:memory-kinds-results} shows that this matters only when a rule outlasts its session.
-This group therefore favours OpenTrading by design: the benchmark's controller saved each rule through the same path as the user's form, in the user's exact words, while OpenCode could only resume the earlier session and DeepSeek Harness could resume it and search past sessions.
+This group therefore favours OpenTrading by design, because of how each harness received the earlier session (\cref{sec:bench-design}).
+OpenTrading's rules were saved in its store in the user's exact words, while OpenCode could only resume the earlier session and DeepSeek Harness could resume it and search past sessions.
+The memory result therefore shows the value of keeping rules in the harness, not a general advantage in reasoning.
 %% Evidence: E65, E72.
 
 The investor group shows the opposite limit: no harness beat a rule that always answers \enquote{sell}.
 A harness can help an answer rest on real data, but it cannot give the model foresight, which supports the scope of the project (\cref{sec:scope}).
 
 \label{sec:related-results}
-As research harnesses for software tasks showed \parencite{yang2024sweagent}, the program around the model changed how well the agent performed, here mostly in tasks that need state across sessions, which supports the view that long-term memory belongs to the system around the model \parencite{packer2023memgpt}.
+As research harnesses for software tasks showed \parencite{yang2024sweagent}, the program around the model changed how well the agent performed, here mostly in tasks that need state across sessions.
+This supports the view that long-term memory belongs to the system around the model \parencite{packer2023memgpt}.
 That calculation did not separate the harnesses fits work showing that arithmetic written as a program is more reliable \parencite{gao2023pal,chen2023program}, since all three harnesses calculated through a shell.
-Earlier studies found that language models invent financial figures \parencite{kang2023deficiency,islam2023financebench}; here no harness gave a number on a task whose data does not exist, which suggests, in a different setting, that structured data tools leave less room for invented figures.
+Earlier studies found that language models invent financial figures \parencite{kang2023deficiency,islam2023financebench}.
+Here no harness gave a number on a task whose data does not exist, which suggests, in a different setting, that structured data tools leave less room for invented figures.
 \textcite{kapoor2024agents} argued that evaluations of agents should control for cost and report it alongside accuracy; this benchmark reports both, and the cost per correct answer differed by about a factor of two.
 
 \label{sec:threats}
@@ -227,10 +266,16 @@ The results lead to five recommendations for the harness and its evaluation.
 \begin{enumerate}
   \item Let figure tracing send answers back in every turn.
   In version 0.5.1 it sends an answer back only when no tool ran (\cref{tab:stop-gate}); records of real use should first show how often it would reject a correct answer.
-  \item Measure each rule on its own, with repeated runs and with one rule switched off at a time (\cref{sec:threats}).
+  \item Measure each rule on its own, with repeated runs and with one rule switched off at a time (\cref{sec:threats}), and keep the records of the stop gate and of figure tracing with the published results.
   \item Test memory with tasks written outside the group (\cref{sec:threats}).
   \item Users should treat buy, hold and sell calls as analysis, not as forecasts, and check each figure against the source that the answer names.
   No harness beat a rule that always answers \enquote{sell} in this period (\cref{sec:error-analysis}).
   \item Run the data server's contract check with every change, and state units for every tool that returns an amount (\cref{sec:rq-answers}).
 \end{enumerate}
 
+\section{Personal Reflection (Optional)}\label{sec:reflection}
+The group drew three lessons from the project.
+First, a rule should be measured before and after it changes (\cref{sec:quality}).
+Second, tests show that a rule behaves as designed, while a benchmark is needed to show whether the answers improve (\cref{sec:rq-answers}).
+The stop gate is an example: its tests pass, but in the benchmark it never acted, so its effect on answers is still unknown (\cref{sec:reliability}).
+Third, data sources fail more often than expected, so reporting a failure as a failure is part of the design (\cref{sec:risk}).
