@@ -54,8 +54,7 @@ Financial analysis, however, rests on figures.
 A price, a ratio or a growth rate is either right or wrong, and the reader must be able to trace it to a source.
 Studies report that language models still invent financial figures \parencite{kang2023deficiency} and fall short of human experts in multi-step reasoning over financial reports \parencite{chen2021finqa,zhu2021tatqa}.
 
-Retail investors in Vietnam read prices, statements and news from scattered sources.
-Vietnamese financial data also follows local accounting standards that general tools do not handle well \parencite{nguyen2025finstat2sql}.
+Vietnamese financial data follows local accounting standards that general tools do not handle well \parencite{nguyen2025finstat2sql}.
 The group chose this topic because it lies where these trends meet: an agent that reads Vietnamese market data and answers only with figures it has fetched.
 
 \section{Project Objective}\label{sec:objective}
@@ -64,8 +63,11 @@ The group chose this topic because it lies where these trends meet: an agent tha
 The project has three objectives, ordered by weight. \TBC{objectives, weights and measures still to be approved by the supervisor}
 \begin{enumerate}
   \item Harness (main objective): build a harness for financial analysis whose answers use only figures taken from tool results, with an agent loop, grounding rules, memory, permissions and coordination of several agents.
+  Measure: the share of correct answers and the number of figures that match no tool result, both counted in the benchmark.
   \item Data: build a market-data server whose results state their unit, provenance and availability.
+  Measure: every tool result follows the shared answer contract, checked by the server's automated tests. \TBC{confirm with Long that the tests cover every tool}
   \item Evaluation: compare the harness with two general harnesses on the same model, data and scoring.
+  Measure: a comparison whose plan is fixed before the run and whose differences are reported with \qty{95}{\percent} confidence intervals and cost.
 \end{enumerate}
 \Cref{ch:results} reports how far each objective was met.
 
@@ -80,8 +82,8 @@ With a retrieval system, a strong model answered wrongly or refused \qty{81}{\pe
 Second, models calculate poorly when they reason in words.
 Writing the computation as a program gives more reliable results \parencite{chen2023program}.
 
-Third, data sources fail without warning.
-An outage or a stale price can look like a valid result, and a long context with many tools makes the model miss information \parencite{liu2024lost}.
+Third, data sources fail, and a general agent cannot tell a failure from a valid result.
+An outage, an expired data library or a stale price returns something that looks like data; the group met each of these during the project (\cref{sec:risk}).
 
 The impact is direct: an investor who acts on an invented price or a wrong ratio can lose money.
 The challenge is therefore not a stronger model but a harness that traces every figure to a tool result, runs arithmetic as commands and reports missing data as missing.
@@ -89,10 +91,7 @@ The challenge is therefore not a stronger model but a harness that traces every 
 \section{Significance of the Project}\label{sec:significance}
 \guide{The importance of the project: benefits, both theoretical and practical, and its impact on the scientific community, industry, or society at large.}
 In theory, the project gives a controlled comparison in which only the harness changes, while the model, the data snapshot and the scoring stay the same.
-%% Evidence: E01, E05, E06.
-In the first study, a development build after version 0.4.0 of OpenTrading passed 385/400 trials (\qty{96.25}{\percent}), against 352/400 (\qty{88.00}{\percent}) for OpenCode and 362/400 (\qty{90.50}{\percent}) for DeepSeek Harness.
-Without the memory tasks, OpenTrading and OpenCode tied at 325/340.
-The lead therefore came from the memory tasks, which were designed around the abilities of OpenTrading, while OpenCode has no memory tool.
+Such a comparison shows which parts of an agent's result come from the harness rather than from the model; \cref{ch:results} reports what it found, including where the harnesses tied.
 
 In practice, the project gives Vietnamese retail investors a research assistant whose figures can be checked against their sources.
 The harness is released under the Apache 2.0 licence and works with free model tiers.
