@@ -414,16 +414,16 @@ Investor tasks assume a purchase at the close of 30 October 2026 and are scored 
 \end{table}
 
 \subsection{A Controlled Environment}\label{sec:bench-design}
-Each task was run once in each harness, \num{900} trials in total, and only the harness changed between them (\cref{tab:bench-config}).
+All 300 tasks were run in each of the three harnesses (\cref{tab:bench-config}).
+For 119 of them, the answers of OpenCode and DSH were taken from an earlier run of the same tasks with the same model and data snapshot but older versions of these two harnesses (\cref{sec:threats}).
+%% Evidence: E16, E45.
 Each harness kept its own system prompt and tool design, since these are what a harness contributes.
-Everything else was locked, so that no harness had an advantage outside its design:
+The environment was set up so that no harness had an advantage outside its design:
 \begin{enumerate}
   \item The same model with the same settings answered in every harness.
-  \item Every harness saw only the same data tools; OpenTrading's other tools and its tool search were switched off.
-  \item Every command ran in the same isolated sandbox without network access.
+  \item Every harness saw the same data tools and a shell. OpenTrading also kept its tool for reading a stored result and its read-only memory tool; its other tools and its tool search were switched off.
   \item The clock of every harness was set to the snapshot date, so no harness could mistake the snapshot for live data.
   \item Questions that a harness normally asks its user, such as a request for permission, were answered automatically in the same way.
-  \item The same limits on requests, tokens and time applied to every trial.
 \end{enumerate}
 
 \begin{table}[H]
@@ -434,10 +434,9 @@ Everything else was locked, so that no harness had an advantage outside its desi
     \toprule
     {Item} & {Setting}\\
     \midrule
-    Model & DeepSeek V4.1 Flash, temperature 0, reasoning off\\
-    Harnesses & OpenTrading 0.5.0 with the change that allows buy and sell recommendations, machine profile; OpenCode 2.4.1; DSH 0.2.2-rc.5\\
-    Limits per trial & 24 model requests (48 for memory tasks), \num{4.6} million tokens, \qty{1800}{\second}\\
-    Grading & Rule-based checks, a language-model judge (Claude Haiku 5.5) and a manual review\\
+    Model & DeepSeek V4.1 Flash, temperature 0, reasoning not requested\\
+    Harnesses & OpenTrading 0.5.0 with the change that allows buy and sell recommendations, machine profile; OpenCode; DSH\\
+    Grading & Rule-based checks, a language-model judge and a manual review\\
     \bottomrule
   \end{tabularx}
   \fignote{Source: the group.}
@@ -448,13 +447,14 @@ Everything else was locked, so that no harness had an advantage outside its desi
 A trial counts as correct only if all four conditions hold:
 \begin{enumerate}
   \item The judge accepts the answer against the correct answer.
-  \item Every number lies within the tolerance of the correct value.
+  \item Every requested number lies within the tolerance of the correct value.
   \item A task whose correct answer is a refusal, because the data does not exist, receives no number.
   \item A manual review does not reject it; the review may reject a trial but never accept one.
 \end{enumerate}
 Investor tasks are scored by a fixed rule on the later prices, and a trial without a final answer counts as incorrect.
 Trials that failed for infrastructure reasons, such as a broken network connection, were run again, and judge replies that could not be read were judged again.
-Before the run, the judge classified 200 controlled answers, correct ones and copies made wrong in value, scale or refusal, all as expected (Cohen's $\kappa = 1.0$).
+Both corrections apply the same rule to every harness and were made after the results had been seen.
+Before the run, the main judge, Claude Haiku 5.5, classified 200 controlled answers, correct ones and copies made wrong in value, scale or refusal, all as expected (Cohen's $\kappa = 1.0$).
 %% Evidence: E17, E37, E43.
 
 \section{Evaluation Metrics}\label{sec:metrics}
@@ -464,6 +464,7 @@ The primary metric is accuracy, the share of tasks that a harness $a$ answered c
 \end{equation}
 where $T$ is a set of tasks and $y_{a,t}$ is 1 when the trial of task $t$ in harness $a$ is correct under the rules of \cref{sec:bench-scoring} and 0 otherwise.
 A trial that ended without an answer counts as incorrect.
+Each accuracy is reported with a 95\% Wilson score interval \parencite{wilson1927probable}.
 
 Two harnesses are compared on the same tasks.
 Let $w$ be the number of tasks that OpenTrading answered correctly and the other harness did not, $l$ the reverse, and $n=w+l$.
@@ -629,7 +630,7 @@ Backups and content already sent to a provider are out of the harness's reach, s
 
 \subsection{Fairness of the Comparison}
 The group built both OpenTrading and the benchmark that compares it with other harnesses, which creates a risk of bias.
-To limit it, the three harnesses are run with the same model, the same data and the same scoring (\cref{sec:rq}), following the design of \cref{sec:validation}; for 119 tasks, however, the answers of the other two harnesses come from an earlier run with older versions of those harnesses.
+To limit it, the three harnesses are run with the same model, the same data and the same scoring (\cref{sec:rq}), following the design of \cref{sec:validation}; for 119 tasks, however, the answers of the other two harnesses come from an earlier run with older versions of those harnesses (\cref{sec:threats}).
 %% Evidence: E15, E16.
 The memory group was designed around what OpenTrading can do: OpenTrading received the user's rules from its memory store, while OpenCode could only resume the earlier session and DSH could resume it and search past sessions, so the results of this group favour OpenTrading and are reported with that limitation (\cref{sec:threats}).
 The results include ties and losses as well as wins: on compute, lookup and robustness tasks the three harnesses were within three tasks of each other, and each of the other harnesses answered six tasks that OpenTrading did not (\cref{sec:accuracy}).

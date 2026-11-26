@@ -1,6 +1,6 @@
 """Accuracy of each harness by task group, all 300 tasks of the v4.7 benchmark, with Wilson 95% intervals.
 
-Reads figures/src/data/benchmark-v47.csv (correct trials per group; evidence E38, E39) and writes
+Reads figures/src/data/benchmark-v47.csv (correct trials per group; evidence E45) and writes
 figures/src/data/benchmark-v47-ci.dat for figures/src/benchmark-accuracy.tex. Standard library only.
   python figures/src/benchmark-accuracy.py
 """
