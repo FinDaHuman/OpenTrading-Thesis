@@ -71,7 +71,7 @@ When four steps in a row contain failed calls and no successful one, the model i
 When the model makes the same call with the same arguments three times in a row, the user is asked whether to go on.
 A data server whose connection fails three times in a row is not called for a minute, after which one call tests it; a failed tool or a timeout does not count, because it comes from a server that still works.
 %% Evidence: E25, E26, E69.
-These thresholds of four, eight and three can be changed only by the evaluation runner, which records when each of them fires.
+These thresholds of four, eight and three are not user settings; they can be changed only in OpenTrading's own test runner, which is separate from the benchmark of \cref{sec:validation} and records when each of them fires.
 In a small sweep on free models, the models gave up after at most three failed steps and an earlier reminder did not change their answers, so the thresholds were kept.
 %% Evidence: E69.
 
@@ -231,7 +231,7 @@ Text over a limit is refused when it is saved and is never cut.
     Decision & what was done, reason, expectation, what would change the mind; never edited, only added or deleted & \num{120} action; \num{2000} each for the other three & never sent\\
     \bottomrule
   \end{tabularx}
-  \fignote{Note: limits count characters after Unicode normalisation; presentation styles, theses and lessons are sent only when the user has turned the notebook on. Source: the group, based on OpenTrading version 0.5.1 \parencite{group2026opentrading}.}
+  \fignote{Note: limits count characters after Unicode normalisation; presentation styles, theses and lessons are sent only when the user has turned on the notebook, the memory provider of \cref{sec:memory-flow}. Source: the group, based on OpenTrading version 0.5.1 \parencite{group2026opentrading}.}
 \end{table}
 %% Evidence: E49.
 
@@ -369,7 +369,7 @@ Each harness kept its own system prompt and tool design, since these are what a 
 The environment was set up to give no harness an advantage outside its design:
 \begin{enumerate}
   \item The same model, DeepSeek V4.1 Flash with temperature 0 and no reasoning requested, answered in every harness; OpenTrading 0.5.0 with the change that allows buy and sell recommendations ran with its machine profile.
-  \item Every harness saw the same data tools and a shell. OpenTrading also had its tool for reading a stored result and, in memory tasks, its read-only memory tool; its tool search was off, every command ran without approval inside a sandbox, no reminders were sent after tool results, and of its grounded mode only the input check was on (\cref{sec:algorithm}).
+  \item Every harness saw the same data tools and a shell. OpenTrading also had its tool for reading the full stored result of an earlier data call (\cref{sec:architecture}) and, in memory tasks, its read-only memory tool; its tool search was off, every command ran without approval inside a sandbox, no reminders were sent after tool results, and of its grounded mode only the input check was on (\cref{sec:tool-search}).
 %% Evidence: E24, E32.
   \item The clock of every harness was set to the snapshot date, so that the snapshot looked current to each harness.
   \item Questions that a harness normally asks its user, such as a request for permission, were answered automatically in the same way.

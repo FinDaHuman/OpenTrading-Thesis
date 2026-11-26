@@ -389,11 +389,12 @@
 
 % Acronym table (school: grid, shaded heading)
 \newenvironment{acronymtable}{%
+  \addtocounter{table}{-1}% longtable steps the table counter; the acronym table has no number
   \setlength\LTleft{0pt}\setlength\LTright{0pt}\setlength\LTpre{6bp}\setlength\LTpost{6bp}%
   \renewcommand\arraystretch{1.45}\parskip0pt
   \begin{longtable}{|>{\centering\arraybackslash}m{70.7bp-2\tabcolsep}|m{\dimexpr\textwidth-70.7bp-2\tabcolsep-3\arrayrulewidth}|}
   \hline\rowcolor{fpthead}\textbf{Acronym}&\multicolumn{1}{c|}{\cellcolor{fpthead}\textbf{Definition}}\\\hline\endhead
-}{\end{longtable}\addtocounter{table}{-1}}
+}{\end{longtable}}
 \newcommand\acro[2]{#1 & #2\\\hline}
 
 %% ---- Appendices -------------------------------------------------------------
