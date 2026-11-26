@@ -73,7 +73,7 @@ General-purpose harnesses are strong at running tools but treat a figure like an
 Financial models know the language of finance but are not harnesses: they have no data tools and no check of figures.
 Financial agents in research aim at trading returns in back-tests rather than at answers a reader can verify.
 
-%% Evidence: E05.
+%% Evidence: E67.
 \begin{table}[H]
   \centering
   \caption{Existing systems compared with the needs of financial analysis}\label{tab:systems}
@@ -115,4 +115,4 @@ One might ask whether a general agent with a custom prompt would be enough.
 A prompt can ask the model to cite its figures, but it cannot check that it did.
 OpenTrading moves part of these rules from the prompt into code.
 The stop gate rejects an answer that claims data the model never fetched, and figure tracing records every figure that matches no tool result.
-In version 0.5.1, figure tracing measures but does not yet block such figures; enforcing it is future work (\cref{sec:future}).
+In version 0.5.1, figure tracing blocks such figures only in a turn in which no tool ran; in other turns it records them without blocking, and enforcing it there is future work (\cref{sec:future}).
