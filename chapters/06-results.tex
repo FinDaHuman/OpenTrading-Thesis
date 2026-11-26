@@ -10,7 +10,6 @@ OpenTrading answered 279 of the 300 tasks correctly (93.0\%), DSH 266 (88.7\%) a
 
 \begin{table}[H]
   \centering
-  \renewcommand{\arraystretch}{1.3}
   \caption{Tasks answered correctly by each harness}\label{tab:accuracy}
   \begin{tabularx}{\textwidth}{@{}L S[table-format=3.0] S[table-format=3.0] S[table-format=3.0] S[table-format=3.0]@{}}
     \toprule
@@ -54,7 +53,6 @@ OpenTrading also needed fewer model requests, 3.8 per trial against about 7 for 
 
 \begin{table}[H]
   \centering
-  \renewcommand{\arraystretch}{1.3}
   \caption{Time, work and cost per trial over the 300 tasks}\label{tab:speed}
   \begin{tabularx}{\textwidth}{@{}L S[table-format=3.4] S[table-format=3.4] S[table-format=3.4]@{}}
     \toprule
@@ -80,7 +78,6 @@ Its advantage in time therefore lies in the memory tasks; on the investor tasks 
 
 \begin{table}[H]
   \centering
-  \renewcommand{\arraystretch}{1.3}
   \caption{Median time per trial by task group, in seconds}\label{tab:speed-group}
   \begin{tabularx}{\textwidth}{@{}L S[table-format=3.0] S[table-format=3.0] S[table-format=3.0]@{}}
     \toprule
@@ -104,7 +101,6 @@ No harness gave a number on a task whose correct answer is a refusal, so none of
 
 \begin{table}[H]
   \centering
-  \renewcommand{\arraystretch}{1.3}
   \caption{Reliability of each harness over the 300 tasks}\label{tab:reliability}
   \begin{tabularx}{\textwidth}{@{}L S[table-format=3.0] S[table-format=3.0] S[table-format=3.0]@{}}
     \toprule
@@ -149,7 +145,6 @@ OpenTrading, by contrast, failed one memory task and needed only a few requests 
 
 \begin{table}[H]
   \centering
-  \renewcommand{\arraystretch}{1.3}
   \caption{Causes of failure in the 59 memory tasks}\label{tab:memory-errors}
   \begin{tabularx}{\textwidth}{@{}L S[table-format=2.0] S[table-format=2.0] S[table-format=2.0]@{}}
     \toprule
@@ -168,7 +163,7 @@ OpenTrading, by contrast, failed one memory task and needed only a few requests 
 %% Evidence: E46.
 
 \section{Discussion}\label{sec:discussion}
-RQ3 (\cref{sec:rq}) asked whether a harness designed for financial analysis answers better than a general one when the model and the data are the same.
+RQ3 (\cref{sec:rq}) asked whether a harness designed for financial analysis answers better than a general-purpose harness when the model and the data are the same.
 The results answer yes, but only for some kinds of question, and this section explains where the difference comes from and how it relates to earlier work.
 
 \subsection{Answers to the Research Questions}\label{sec:rq-answers}
