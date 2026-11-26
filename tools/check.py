@@ -99,6 +99,8 @@ def check_text():
                 m = re.search(pat, line)
                 if m:
                     err(f"{rel}:{n}", f"{m.group(0).strip()!r}: {why}")
+            if re.search(r"\\texttt\{[0-9a-f]{7,40}\}", line):
+                warn(f"{rel}:{n}", "commit hash in the text; cite the software version (rules/04)")
             if line.rstrip() != line:
                 warn(f"{rel}:{n}", "trailing spaces")
             for us, gb in GB.items():
