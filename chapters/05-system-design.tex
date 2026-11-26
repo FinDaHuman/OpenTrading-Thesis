@@ -43,6 +43,41 @@ An exhausted daily quota or a wrong key is reported at once, a rate limit is tri
 A request that stays silent for five minutes is cut and reported as an error.
 %% Evidence: E30.
 
+\subsection{From Server Tools to Model Tools}\label{sec:tool-exposure}
+The market data reaches the model through MCP, an open standard for connecting models to tools and data \parencite{modelcontextprotocol2025specification}.
+The data server, opentrading-mcp, offers \num{175} tools and 6 prepared analysis workflows \parencite{group2026opentradingmcp}.
+Each tool is published with a name, a description, the schema of its inputs and a short search hint.
+The MCP client of the harness connects to one or more servers and gives the model their tools next to its own, with the server's name as a prefix so that two servers cannot clash.
+A full list of \num{175} schemas would take a large part of the model's context in every request, so above a threshold the model receives only the names and loads tools through the search of \cref{sec:tool-search}.
+The workflows of the server appear to the user as commands, so that a prepared analysis, such as a risk check of a portfolio, can be started in one line.
+%% Evidence: E12, E21.
+
+\subsection{A Shared Answer Contract}\label{sec:answer-contract}
+A tool call can fail for reasons outside the model's control: a provider is down, a market is closed, or a company has not yet published its report.
+If such a failure is returned as an error, the model often stops or, worse, guesses a value.
+Every answer of the data server therefore uses the same envelope.
+Besides the data, it states whether the data is available, empty or unavailable; for unavailable data it gives the reason, whether a retry may help and after how long, and which other tools may serve the same need.
+It also states the units of every number and the provenance of the data: the source, the time of the data and whether the answer came from the cache.
+With this contract the model can choose its next step itself, and the final answer can cite where each number came from.
+
+\subsection{Control Over Actions}\label{sec:action-control}
+Each tool of the data server declares whether it only reads data or also writes, for example to save a watch list.
+The harness runs reading tools at once and passes writing tools to the permission gate of \cref{sec:permissions}.
+When the user allows a tool permanently, the permission is tied to the exact server, so a different server that offers a tool with the same name is asked again.
+
+\subsection{Skills and Specialist Agents}\label{sec:skills}
+Knowledge of the Vietnamese market is kept outside the model's prompt, in 43 skills and 17 specialist agents.
+%% Evidence: E10.
+A skill is a written method for one kind of analysis, such as a bank's asset quality, a sector's place in its cycle or a valuation; 13 of them cover sectors of the Vietnamese economy.
+%% Evidence: E44.
+The system prompt lists only the name and purpose of each skill, and the model loads the full method when a question needs it; a skill may also bring reference tables, which are read only on request.
+Each skill declares the data tools it needs, and a skill whose tools are missing is hidden, so the model is not offered a method it cannot carry out.
+Because users ask in Vietnamese while the methods are written in English, each skill also keeps Vietnamese phrases that decide when it applies.
+
+A specialist agent is a sub-agent with its own instructions and a limited set of tools, for example valuation, technical analysis, macroeconomics, or the bull and bear sides of a debate.
+The valuation agent, for instance, must compute both a simple discounted cash flow and a comparison with peers, test how far the value moves with its main assumption, and give every figure with its source and time.
+How the main agent hands work to these agents is described in \cref{sec:multi-agent}.
+
 \subsection{Interface and Charts}\label{sec:interface}
 The user works in a Vietnamese terminal interface.
 Besides the answer, it shows information that does not depend on the model: the permission mode, the share of the context in use, the running tools and sub-agents, and the data tools whose source failed.
@@ -89,6 +124,29 @@ Near the limit, old tool results are first replaced by short notes that, for MCP
 If that is not enough, the model writes a summary of the older turns, and the latest turns are kept (step 8).
 %% Evidence: E34.
 
+\subsection{Life Cycle of a Request to the Data Server}\label{sec:mcp-lifecycle}
+\Cref{fig:mcp-lifecycle} follows one tool call from the harness to the data providers and back.
+The call first passes an HTTP layer that protects the server.
+The request is logged; it is refused at once if too many calls are already waiting, so that an overloaded server answers quickly instead of timing out; and it must carry a valid access token, stay within a daily quota and respect a rate limit per client.
+A refused call returns a clear reason and, where relevant, the time after which a retry is useful.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.82\textwidth]{mcp-request-lifecycle}
+  \caption{Life cycle of one tool call through the data server}\label{fig:mcp-lifecycle}
+  \fignote{Source: the group, based on opentrading-mcp \parencite{group2026opentradingmcp}.}
+\end{figure}
+
+The call then enters the tool runtime.
+The runtime first looks for a stored answer to the same question.
+How long an answer may be reused depends on the market: prices are kept only briefly during a trading session and much longer outside it, and an answer that a provider could not give is remembered for a short time, so that the server does not ask a failing provider again and again.
+If an identical call is already running, the new call waits for its result instead of starting a second request to the provider.
+Otherwise the work goes to a pool of workers; long computations, such as backtests, run in a separate pool so that they cannot block short lookups.
+Each provider is wrapped by a circuit breaker: after repeated failures the server stops calling that provider for a while and returns an unavailable answer at once.
+Before the result is returned, the runtime applies the cleaning rules of \cref{sec:data} and builds the answer envelope of \cref{sec:answer-contract}, and the answer is stored for the next identical call.
+Background tasks keep live order-book and trade data during trading hours only; they pause at the lunch break and do not run on public holidays.
+In the benchmark the same tools are called, but their answers come from the frozen recording of \cref{sec:bench-tasks}.
+
 \section{Deployment Strategy}\label{sec:deployment}
 \guide{Detail how the system is deployed, including the deployment environment and deployment procedures.}
 
@@ -100,13 +158,35 @@ An update of a script installation is checked against its checksum and started o
 The files do not carry a publisher's certificate yet, so the operating system may show a warning.
 %% Evidence: E31.
 
+\subsection{Deployment of the Data Server}\label{sec:mcp-deployment}
+The data server is packaged as a container image.
+For development it runs on the developer's computer and talks to the harness directly through standard input and output, without a network or a token.
+For the group it runs as a web service in the cloud, together with a PostgreSQL database for stored statistics and a Redis store for the cache and the shared state of the background tasks.
+A local setup with the same three services is described in one file, so the same image runs in both places.
+Two health addresses support operation: one answers only whether the process is alive, and the other checks the database, the cache and the background worker.
+Credentials for the providers and the access tokens are given to the service as environment settings and are never stored in the repository.
+\todo{Describe the service as public only after the supervisor confirms the data licences.}
+
 \section{Scalability and Maintenance}\label{sec:scalability}
 \guide{Discuss how the system is designed to handle growth and future maintenance, including system updates, scalability, and version management.}
 
-\subsection{Testing and Maintenance of the Harness}\label{sec:testing}
+\subsection{Load on the Data Server}\label{sec:scaling}
+The data server is designed to stay responsive when many calls arrive together, rather than to process an unlimited number of them.
+Three mechanisms serve this goal.
+Connections to providers are shared and reused instead of opened for every call.
+The number of calls that may wait or run at the same time is bounded; above the bound new calls are refused at once with a retry time.
+Identical calls are merged, and answers are reused for as long as the market allows, which avoids asking a provider twice for the same data.
+The group did not run a new load test for this version, so no throughput figure is claimed.
+
+\subsection{Testing and Maintenance}\label{sec:testing}
 Each pull request is tested automatically on Linux and Windows.
 At version 0.5.1, \num{2249} of \num{2253} tests passed on Linux; the four others, which need macOS or Windows, were skipped.
 Instead of a paid model, the tests use a simulated one that returns prepared answers, including broken ones.
 For the stop gate the tests contain both endings that must be caught and answers that must be left alone.
 These tests show that a rule does what it was designed to do; they do not show that it improves the answers.
 %% Evidence: E11, E35.
+
+The data server follows the same process.
+At the version described here, \num{1338} of its tests passed, covering 71.69\% of its lines.
+%% Evidence: E13.
+An audit of its dependencies in November 2026 found that the library used for Vietnamese market data is published only on its vendor's own package index, so a failure of that index would stop every build; this risk and open work on provider sessions and health checks are left for future work (\cref{sec:future}).
