@@ -5,7 +5,7 @@
 This project sits where three lines of work meet: agentic AI, language models for finance, and agent harnesses.
 An agent senses its environment, decides and acts; with an LLM as its core, it can plan, call tools and read their results \parencite{xi2025rise,wang2024survey}.
 One recent survey separates single AI agents, which complete one bounded task, from agentic AI, where several agents share goals, memory and plans \parencite{sapkota2026agents}; another reviews agentic AI for complex goals \parencite{acharya2025agentic}, and systems of cooperating agents now form a field of their own \parencite{guo2024multiagent}.
-Finance was an early domain for language models, from models trained on financial text to agents that trade \parencite{li2023large,ding2026large}.
+In finance, work has moved from models trained on financial text to agents that trade \parencite{li2023large,ding2026large}.
 The third line studies the harness itself, the program that gives the model its tools, context and rules \parencite{yang2024sweagent}; OpenTrading belongs to this line, applied to finance.
 
 \section{Historical Context}\label{sec:history}
@@ -21,9 +21,9 @@ Models trained for finance followed in 2023 \parencite{wu2023bloomberggpt,yang20
 From 2024, research moved to financial agents with tools, memory and several roles \parencite{zhang2024finagent,yu2024fincon,yang2024finrobot}.
 
 \section{Key Studies and Theories}\label{sec:studies}
-\Cref{tab:key-studies} summarises the studies closest to this project, from which three lessons stand out.
+\Cref{tab:key-studies} summarises the studies closest to this project; together with the other works cited here, they point to three lessons.
 First, arithmetic in words fails, and moving the computation into a program works better \parencite{chen2023program}.
-Second, tools extend what a model can do \parencite{schick2023toolformer,qin2024toolllm}, yet agents remain far behind people on realistic tasks, at \qty{15}{\percent} against \qty{92}{\percent} on questions for general assistants \parencite{mialon2024gaia}.
+Second, tools extend what a model can do \parencite{schick2023toolformer,qin2024toolllm}, yet in 2023 agents were still far behind people on realistic tasks, at \qty{15}{\percent} against \qty{92}{\percent} on questions for general assistants \parencite{mialon2024gaia}.
 Third, in finance the gap is about figures \parencite{islam2023financebench,kang2023deficiency}.
 
 \begin{table}[H]
@@ -53,7 +53,7 @@ First, tool calling lets a model ask the program to run a function and read its 
 Second, MCP defines how a program offers tools and data to a model \parencite{modelcontextprotocol2025specification}.
 It let the group build the data server once and use it from any harness, which also made a fair comparison possible, but it brings new security risks, such as tool descriptions that carry hidden instructions \parencite{hou2026model}.
 Third, agent harnesses have become platforms in their own right, with loops, context management and several agents \parencite{wang2025openhands}.
-Long contexts remain a weakness, because models use the middle of a long input poorly \parencite{liu2024lost}.
+Long contexts remain a weakness, because models use the middle of a long input poorly \parencite{liu2024lost}; OpenTrading therefore loads tool definitions only when they are needed and compacts long conversations (\cref{sec:tool-search,sec:dataflow}).
 
 \section{Comparison of Existing Systems}\label{sec:comparison}
 \Cref{tab:systems} compares OpenTrading with general-purpose harnesses, which treat a figure like any other text, and with systems built for finance.
@@ -68,8 +68,9 @@ Long contexts remain a weakness, because models use the middle of a long input p
     \midrule
     Claude Code, USA \parencite{anthropic2025claudecode}; Codex CLI, USA \parencite{openai2025codexcli}; Cursor, USA \parencite{anysphere2026cursor} & Commercial coding harnesses & Agent loop, context compaction, sub-agents, tool servers & Built for code; no documented check of figures against tool results\\
     OpenCode \parencite{anomaly2025opencode} & Open-source coding harness & Open source; connects to MCP servers & No memory tool; prompts written for code\\
-    \textcite{yang2024sweagent}; \textcite{wang2025openhands} & Research harnesses & Interfaces designed for agents; open platforms & Evaluated on software tasks only\\
-    \textcite{wu2023bloomberggpt}; \textcite{yang2023fingpt} & Language models for finance & Knowledge of financial language & A model, not a harness: no data tools, no check of figures\\
+    DeepSeek Harness \parencite{deepseekai2026harness} & Open-source general-purpose harness & Plugin architecture; resumes and searches earlier sessions & Not built for financial analysis\\
+    \textcite{yang2024sweagent}; \textcite{wang2025openhands} & Research harnesses & Interfaces designed for agents; open platforms & Built for software development\\
+    \textcite{wu2023bloomberggpt}; \textcite{yang2023fingpt} & Language models for finance & Knowledge of financial language & A model, not a harness: no data tools when it answers, no check of figures\\
     \textcite{yang2024finrobot} & Open-source financial agent platform & Layers for agents, models and data & No Vietnamese market data\\
     \textcite{zhang2024finagent}; \textcite{yu2024fincon} & Research trading agents & Several agents, memory, reflection & Aim at returns in back-tests, not at traced answers\\
     OpenTrading & Harness for financial analysis & Figures traced to tool results; arithmetic as commands; sourced market data; Vietnamese skills & Terminal only; data server on a free plan (\cref{sec:scope})\\
@@ -81,13 +82,13 @@ Long contexts remain a weakness, because models use the middle of a long input p
 \section{Gaps in the Literature/Technology}\label{sec:gaps}
 The review shows four gaps.
 First, apart from OpenTrading, none of the systems in \cref{tab:systems} tests whether the figures in the final answer came from tool results.
-Second, financial work centres on models, benchmarks and trading returns; few systems aim at answers whose figures can be traced to a source.
+Second, financial work centres on models, benchmarks and trading returns; among the systems of \cref{tab:systems}, only OpenTrading aims at answers whose figures can be traced to a source.
 Third, benchmarks of agents usually compare models, not harnesses \parencite{liu2024agentbench}, and rarely report cost \parencite{kapoor2024agents}.
 Fourth, the Vietnamese market, with its local accounting standards, is little covered \parencite{nguyen2025finstat2sql}.
 
 \section{Justification for the Project}\label{sec:justification}
-OpenTrading answers each gap: the harness traces figures to tool results and sends the model back when an answer claims data it never fetched.
+OpenTrading addresses each gap: the harness compares the figures of an answer with tool results and sends the model back when an answer claims data it never fetched (\cref{sec:figure-tracing}).
 The data server returns its results with their source and time and says when a source has failed.
 The benchmark reports cost as well as accuracy, and skills cover the Vietnamese market.
-Its built-in tools cannot place orders, which limits the risks of agents acting alone \parencite{chan2023harms}.
+Beyond these gaps, its built-in tools cannot place orders, which limits the risks of agents acting alone \parencite{chan2023harms}.
 A prompt can ask for cited figures but cannot check them, so OpenTrading moves part of these rules into code.

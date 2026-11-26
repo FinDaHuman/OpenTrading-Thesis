@@ -44,7 +44,7 @@ Harnesses for software engineering have shown that the program around the model 
 Finance has followed with models trained on financial text \parencite{wu2023bloomberggpt,yang2023fingpt} and with surveys of their use \parencite{li2023large}.
 Financial analysis, however, rests on figures.
 A price, a ratio or a growth rate is either right or wrong, and the reader must be able to trace it to a source.
-Studies report that language models still invent financial figures \parencite{kang2023deficiency} and fall short of human experts in multi-step reasoning over financial reports \parencite{chen2021finqa,zhu2021tatqa}.
+Studies report that language models still invent financial figures \parencite{kang2023deficiency} and, when the first benchmarks of numerical reasoning over financial reports appeared in 2021, models fell short of human experts \parencite{chen2021finqa,zhu2021tatqa}.
 Vietnamese financial data follows local accounting standards that general tools do not handle well \parencite{nguyen2025finstat2sql}.
 The group chose this topic because it lies where these trends meet: an agent that reads Vietnamese market data and answers with figures it has fetched.
 
@@ -53,7 +53,7 @@ The project is above all a learning project: its aim is to learn how to design a
 It has three objectives, ordered by weight.
 \begin{enumerate}
   \item Harness (main objective): build a harness for financial analysis whose answers take their figures from tool results, with an agent loop, grounding rules, memory, permissions and coordination of several agents.
-  Measure: the share of correct answers in the benchmark (\cref{ch:results}), and automated tests of the stop gate and figure tracing (\cref{sec:testing}).
+  Measure: automated tests of the rules of the harness (\cref{sec:testing}), and the memory and reliability results of the benchmark (\cref{ch:results}).
   \item Data: build a market-data server whose results state their unit, provenance and availability.
   Measure: tool results follow the shared answer contract, checked by a contract check that calls the tools of the server.
   \item Evaluation: compare the harness with two general-purpose harnesses on the same model and data.
@@ -62,14 +62,14 @@ It has three objectives, ordered by weight.
 
 \section{Problem Statement}\label{sec:problem}
 A general agent is not enough for financial analysis, for three reasons.
-First, models invent figures: with a retrieval system, a strong model answered wrongly or refused \qty{81}{\percent} of questions on public company filings \parencite{islam2023financebench}, and hallucination remains serious in financial tasks \parencite{kang2023deficiency,huang2025hallucination}.
+First, models invent figures: with a retrieval system, a strong model answered wrongly or refused \qty{81}{\percent} of questions on public company filings \parencite{islam2023financebench}, hallucination is a known problem of language models in general \parencite{huang2025hallucination}, and off-the-shelf models hallucinate seriously on financial tasks \parencite{kang2023deficiency}.
 Second, models calculate poorly when they reason in words, and writing the computation as a program gives more reliable results \parencite{chen2023program}.
 Third, data sources fail, and a general agent cannot tell a failure from a valid result; the group met an expired data library during the project (\cref{sec:risk}).
 An investor who acts on a wrong figure can lose money, so the challenge is not a stronger model but a harness that traces figures to tool results, runs arithmetic as commands and reports missing data as missing.
 
 \section{Significance of the Project}\label{sec:significance}
-In theory, the project gives a controlled comparison in which the model and the data snapshot stay the same, which isolates the effect of the harness as a whole (\cref{ch:results}).
-In practice, it gives Vietnamese retail investors a research assistant whose figures can be checked against their sources, released under the Apache 2.0 licence and usable with free model tiers.
+In theory, the project compares three harnesses with the same model and the same data snapshot (\cref{sec:validation}), so that their differences can be traced to the harnesses rather than to the model or the data.
+In practice, it is a research assistant for Vietnamese retail investors whose figures can be checked against their sources; it is released under the Apache 2.0 licence and runs with free model tiers, within their daily request limits (\cref{sec:risk}).
 
 \section{Project Scope \& Limitations}\label{sec:scope}
 The project covers a research assistant that runs in a terminal for one user on one machine and analyses Vietnamese equities, with selected global market and macroeconomic data.
