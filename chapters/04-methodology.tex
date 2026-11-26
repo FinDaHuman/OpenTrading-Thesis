@@ -4,7 +4,29 @@
 \chapter{Methodology}\label{ch:methodology}
 
 \section{Research Questions and Objectives}\label{sec:rq}
-\guide{Identify the specific research questions and objectives that the project will address.}
+The objectives in \cref{sec:objective} are turned here into three research questions (RQs).
+Each RQ states what is measured and where it is answered, so that \cref{sec:summary} can answer them one by one.
+\begin{description}
+  \item[RQ1.~] Which parts must a harness add around a language model so that its financial analysis stays grounded in tool data, follows the constraints that the investor has stated and keeps actions under the user's control?
+  Each part of the design in \cref{sec:algorithm} and \cref{ch:design} serves one of these aims.
+  The grounding rules ask the model to take every figure from a tool, and figure tracing compares the figures of an answer with the numbers that the model has read.
+  Memory brings the investor's constraints into every turn, for the main agent and for every sub-agent.
+  The permission gate decides which actions need the user's approval.
+  The automated tests check that each of these rules does the job it was designed for (\cref{sec:testing}).
+  The benchmark measures the first aim: the secondary metrics of \cref{sec:metrics} count answers rejected for a figure outside the tolerance, figures given on tasks that should have been refused, and trials that end without an answer.
+  \item[RQ2.~] How should a market-data server return its results so that the agent knows the unit, the source and the availability of each figure?
+  The measure is whether every tool of the data server replies in one shape that states whether the data is available and where and when it was taken.
+  A contract test of the server calls every tool and checks this shape, and a second test checks that every tool returning a price or an amount of money states its units.
+  The answer is given in \cref{sec:integration}.
+  \item[RQ3.~] With the same model, the same data and the same scoring, does OpenTrading answer more financial tasks correctly than two general-purpose harnesses, OpenCode and DeepSeek Harness, and at what cost?
+  The measures are accuracy with confidence intervals, a sign test on paired results for the same tasks, and the time and cost of each trial (\cref{sec:metrics}).
+  The answer is given in \cref{sec:results}.
+\end{description}
+RQ1 is the main question, as it matches the objective with the largest weight.
+Tests show that a rule does what it was designed to do, but they do not show that the rule improves the answers.
+RQ3 checks this second point by comparing the answers of OpenTrading with those of the other harnesses.
+The questions do not ask whether the analysis leads to profitable trades.
+The harness is judged on whether its figures and conclusions match the data, not on market returns.
 
 \section{Data Collection and Preprocessing}\label{sec:data}
 OpenTrading does not store market data itself.
