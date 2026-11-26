@@ -52,6 +52,7 @@ PR thêm số mới phải thêm dòng vào bảng dưới. Ghi "đo" khi tự �
 | E33 | 20 kiểu biểu đồ; số lấy theo nhãn kết quả; model nhận bản tóm tắt | OpenTrading `7319264` `src/core/tools/chart/render.ts` (đếm từ schema), `summary.ts` | đo | |
 | E34 | Tool: 60 s, 30,000 ký tự, sổ bằng chứng 64 MiB; nén ngữ cảnh ở 95% của (cửa sổ − dự phòng tối đa 20,000 token) | OpenTrading `7319264` `src/core/tools/types.ts:197-198`, `src/core/tools/evidence.ts:26`, `src/core/compact.ts:27-70` | đo | 60 s và 30,000 là mặc định, tool đặt được mức riêng |
 | E35 | Kiểm tra tự động: test trên Ubuntu và Windows, shell trên macOS và mawk, build, quét khóa; nhánh chính bắt buộc quality (Ubuntu, Windows), secrets và 1 duyệt, admin vượt được | CI run 45617110999; `.github/workflows/ci.yml`; cấu hình bảo vệ nhánh đọc ngày 26/11/2026 | đo | |
+| E45 | Gộp 300 task (một bộ): compute 78/75/76 trên 79; investor 19/16/16 trên 36; lookup 110/110/110 trên 112; memory 58/30/50 trên 59; robustness 14/14/14; tổng 279/245/266. Dấu: OT vs OpenCode 40/6, p = 3.1e-7; OT vs DSH 19/6, p = 0.015. JSON hợp lệ 299/288/285; không trả lời 1/6/6; từ chối sai 0/10/0 trên 289; số ở câu bẫy 0 trên 11; loại vì sai số 1/15/5; chi phí mỗi lần đạt 0.0024/0.0053/0.0046 USD (tổng E42 chia số đạt); 12 task cả ba trượt, 3 task chỉ OT trượt | run `deepinfra-20261125` (máy Long, chưa commit vào repo benchmark) `FINAL-300-corrected.json`, trường `primary` | đo | OpenCode/DSH ở 119 task dùng câu trả lời bản trước (E16); chi phí OpenCode/DSH ở 100 task ước tính từ token |
 
 ## Luật riêng
 
