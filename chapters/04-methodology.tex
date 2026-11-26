@@ -361,11 +361,12 @@ A trial that ended without an answer counts as incorrect.
 
 Two harnesses are compared on the same tasks.
 Let $w$ be the number of tasks that OpenTrading answered correctly and the other harness did not, $l$ the reverse, and $n=w+l$.
-If the two harnesses were equally good, each of these $n$ tasks would be equally likely to fall either way, so the exact two-sided sign test gives
+If the two harnesses were equally good, each of these $n$ tasks would be equally likely to fall either way, so the exact two-sided sign test \parencite{dixon1946sign} gives
 \begin{equation}\label{eq:sign-test}
   p=\min\Bigl(1,\;2\sum_{k=0}^{\min(w,l)}\binom{n}{k}2^{-n}\Bigr).
 \end{equation}
 Tasks that both harnesses answered correctly, or both incorrectly, carry no information about the difference and are left out.
+This is the exact form of McNemar's test, which compares two systems on the same test items through the items on which they disagree \parencite{dietterich1998approximate}.
 
 Speed and cost are measured for every trial and reported separately, never added to accuracy as one score:
 \begin{enumerate}
@@ -374,7 +375,6 @@ Speed and cost are measured for every trial and reported separately, never added
   \item Cost, as the total over all trials and as the cost per correct answer.
 \end{enumerate}
 Reliability is described by the trials without an answer, false refusals of answerable tasks, numbers given where the correct answer is a refusal, and numbers outside the tolerance.
-\todo{Cite a statistics reference for the sign test after opening it.}
 
 \section{Implementation Plan}\label{sec:implementation-plan}
 \guide{Describe in detail how the method is implemented, and the tools or technologies used to support this process.}
