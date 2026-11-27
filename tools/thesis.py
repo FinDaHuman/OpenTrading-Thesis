@@ -188,8 +188,8 @@ def submit(event):
 
 
 def release():
-    plan, book = admin_build("draft")
     ready = check(strict=True) == 0
+    plan, book = admin_build("final" if ready else "draft")
     latex("final" if ready else "draft")
     tag = git("describe", "--tags", "--always", "--match", "v*")
     DIST.mkdir(exist_ok=True)
@@ -197,10 +197,10 @@ def release():
     shutil.copy2(BUILD / "main.pdf", out)
     outs = [out]
     for f in (plan, book):
-        outs.append(DIST / f"{f.stem}_{tag}_draft{f.suffix}")
+        outs.append(DIST / f"{f.stem}_{tag}{'' if ready else '_draft'}{f.suffix}")
         shutil.copy2(f, outs[-1])
     (DIST / "SHA256SUMS").write_text("".join(
-        f"{hashlib.sha256(o.read_bytes()).hexdigest()}  {o.name}\n" for o in outs), encoding="utf-8")
+        f"{hashlib.sha256(o.read_bytes()).hexdigest()}  {o.name}\n" for o in outs), encoding="utf-8", newline="\n")
     print(out.name)
 
 
