@@ -98,7 +98,6 @@ def sheet(wb, info, week):
     members = "\n".join(f"{i}. {m}" for i, m in enumerate(info["members"], 1))
     general = [("Tên đề tài (tiếng Anh)", info["title_en"]), ("Tên đề tài (tiếng Việt)", info["title_vi"]),
                ("Nhóm", info["group"]), ("Giảng viên hướng dẫn", info["supervisor"]), ("Thành viên", members),
-               ("Hình thức làm việc", week.get("form", info["form"])),
                ("Thời gian họp", week["meeting"]),
                ("Thành phần tham dự", week.get("attendees", info["attendees"]))]
     for i, (k, v) in enumerate(general, 1):

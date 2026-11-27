@@ -2,7 +2,7 @@
 # Nội dung tuần 0-11 lấy từ file theo dõi 2026_FALL_G11 (sheet B), đã sửa chính tả và biên tập câu văn, giữ nguyên ý; không kèm link nội bộ.
 # "[CẦN XÁC NHẬN]" = nhóm phải điền; bản nộp không được còn chữ này.
 # Khoảng ngày được suy ra từ: tuần 13 = Review 1.1 (30/11-03/12/2026), mỗi tuần bắt đầu thứ Hai.
-# GVHD họp trực tuyến với nhóm: tuần 0 lúc 15h00 Chủ Nhật 06/09/2026, từ tuần 1 lúc 20h30 thứ Năm hằng tuần.
+# GVHD họp trực tuyến với nhóm: tuần 0 vào Chủ Nhật 06/09/2026, từ tuần 1 nhóm họp nội bộ vào thứ Năm hằng tuần.
 # Trong nội dung: "- " là ý chính, "   + " là ý phụ (thụt lề).
 
 [info]
@@ -10,7 +10,6 @@ title_en = "OpenTrading: An Agentic AI Harness for Financial Analysis and Market
 title_vi = "OpenTrading: Hạ tầng điều phối AI Agent cho Phân tích Tài chính và Nghiên cứu Thị trường"
 group = "Nhóm 11 (AIP491_G11, ID 12721)"
 supervisor = "TS. Lê Đình Huynh"
-form = "Họp trực tuyến giữa GVHD và nhóm"
 attendees = "GVHD: TS. Lê Đình Huynh\nSinh viên: đủ 4 thành viên (Long, Hiếu, Tuấn, Trung)"
 members = ["Đoàn Duy Long – HE190352 (trưởng nhóm)", "Đoàn Minh Hiếu – HE190214", "Trần Huy Tuấn – HE190554", "Hoàng Hiếu Trung – HE191136"]
 
@@ -18,7 +17,7 @@ members = ["Đoàn Duy Long – HE190352 (trưởng nhóm)", "Đoàn Minh Hiếu
 number = 0
 from = "31/08/2026"
 to = "06/09/2026"
-meeting = "15h00, Chủ Nhật, 06/09/2026"
+meeting = "Chủ Nhật, 06/09/2026"
 done = '''
 - Hoàn thành đồ án đúng hạn và đạt điểm từ 7 trở lên.
 - Ứng dụng hệ thống đa tác tử (multi-agent) trong phân tích tài chính.
@@ -39,7 +38,7 @@ milestone = ''
 number = 1
 from = "07/09/2026"
 to = "13/09/2026"
-meeting = "20h30, Thứ Năm, 10/09/2026"
+meeting = "Thứ Năm, 10/09/2026"
 done = '''
 - Các thành viên tự trao đổi và hướng dẫn lẫn nhau về các công nghệ dự kiến sử dụng:
    + RAG, MCP, FastAPI, MongoDB, Redis.
@@ -54,7 +53,7 @@ milestone = ''
 number = 2
 from = "14/09/2026"
 to = "20/09/2026"
-meeting = "20h30, Thứ Năm, 17/09/2026"
+meeting = "Thứ Năm, 17/09/2026"
 done = '''
 - Tìm hiểu kiến trúc của Claude Code, OpenCode, Codex và ý tưởng thiết kế của Cursor.
 - Tìm hiểu chi tiết thiết kế bộ nhớ (memory) của các harness.
@@ -79,7 +78,7 @@ milestone = ''
 number = 3
 from = "21/09/2026"
 to = "27/09/2026"
-meeting = "20h30, Thứ Năm, 24/09/2026"
+meeting = "Thứ Năm, 24/09/2026"
 done = '''
 - Đọc các bài báo nghiên cứu và phân tích các sản phẩm liên quan (tài liệu Literature Paper).
 - Chốt chi tiết các chức năng và công nghệ sử dụng (tài liệu HarnessPlan.html).
@@ -107,7 +106,7 @@ milestone = ''
 number = 4
 from = "28/09/2026"
 to = "04/10/2026"
-meeting = "20h30, Thứ Năm, 01/10/2026"
+meeting = "Thứ Năm, 01/10/2026"
 done = '''
 - Hoàn thiện MVP MCP server với 136 tool.
 - Hoàn thiện giao diện cơ bản của harness.
@@ -149,7 +148,7 @@ Báo cáo demo I (quay video).'''
 number = 5
 from = "05/10/2026"
 to = "11/10/2026"
-meeting = "20h30, Thứ Năm, 08/10/2026"
+meeting = "Thứ Năm, 08/10/2026"
 done = '''
 - Hoàn thiện một số chức năng cơ bản:
    + Danh sách việc cần làm (todo list).
@@ -184,7 +183,7 @@ milestone = ''
 number = 6
 from = "12/10/2026"
 to = "18/10/2026"
-meeting = "20h30, Thứ Năm, 15/10/2026"
+meeting = "Thứ Năm, 15/10/2026"
 done = '''
 - Nâng cấp MCP server:
    + Bổ sung bộ đệm (cache) để tối ưu hiệu năng.
@@ -216,7 +215,7 @@ milestone = ''
 number = 7
 from = "19/10/2026"
 to = "25/10/2026"
-meeting = "20h30, Thứ Năm, 22/10/2026"
+meeting = "Thứ Năm, 22/10/2026"
 done = '''
 - Hoàn thành kế hoạch cho phần bộ nhớ.
 - Hoàn thành 2 mode cơ bản.
@@ -242,7 +241,7 @@ Báo cáo demo II (quay video).'''
 number = 8
 from = "26/10/2026"
 to = "01/11/2026"
-meeting = "20h30, Thứ Năm, 29/10/2026"
+meeting = "Thứ Năm, 29/10/2026"
 done = '''
 - Chốt kế hoạch hoàn chỉnh cho phần bộ nhớ.
 - Khảo sát chi phí API key:
@@ -260,7 +259,7 @@ milestone = ''
 number = 9
 from = "02/11/2026"
 to = "08/11/2026"
-meeting = "20h30, Thứ Năm, 05/11/2026"
+meeting = "Thứ Năm, 05/11/2026"
 done = '''
 - Hoàn thành phần bộ nhớ.
 - Tối ưu hệ thống.
@@ -275,7 +274,7 @@ milestone = ''
 number = 10
 from = "09/11/2026"
 to = "15/11/2026"
-meeting = "20h30, Thứ Năm, 12/11/2026"
+meeting = "Thứ Năm, 12/11/2026"
 done = '''
 - Hoàn thành chạy benchmark qua OpenRouter, chi phí 8 USD.
 - Kết quả benchmark chỉ ra 2 điểm yếu lớn cần cải thiện:
@@ -303,7 +302,7 @@ Report tuần 10 (PDF, không quá 4 trang), gồm:
 number = 11
 from = "16/11/2026"
 to = "22/11/2026"
-meeting = "20h30, Thứ Năm, 19/11/2026"
+meeting = "Thứ Năm, 19/11/2026"
 done = '''
 - Tổng kết công việc và tham gia kỳ thi.'''
 next = ''
@@ -315,7 +314,7 @@ milestone = ''
 number = 12
 from = "23/11/2026"
 to = "29/11/2026"
-meeting = "20h30, Thứ Năm, 26/11/2026"
+meeting = "Thứ Năm, 26/11/2026"
 done = '''
 - Phát hành OpenTrading v0.5.0 (24/11) và v0.5.1 (25/11).
 - Chạy benchmark v4.7 (24–26/11):
