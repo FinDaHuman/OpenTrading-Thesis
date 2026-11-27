@@ -1,404 +1,345 @@
 # Biên bản làm việc giữa GVHD và nhóm, nguồn để sinh file Excel (mỗi tuần một sheet).
-# Nội dung tuần 0-11 chép nguyên văn từ file theo dõi 2026_FALL_G11 (sheet B), không kèm link nội bộ.
+# Nội dung tuần 0-11 lấy từ file theo dõi 2026_FALL_G11 (sheet B), đã sửa chính tả và biên tập câu văn, giữ nguyên ý; không kèm link nội bộ.
 # "[CẦN XÁC NHẬN]" = nhóm phải điền; bản nộp không được còn chữ này.
 # Khoảng ngày được suy ra từ: tuần 13 = Review 1.1 (30/11-03/12/2026), mỗi tuần bắt đầu thứ Hai.
-# Họp vào thứ Năm hằng tuần, cả 4 thành viên dự đủ (nhóm xác nhận 26/11/2026).
+# GVHD họp trực tuyến với nhóm: tuần 0 vào Chủ Nhật 06/09/2026, từ tuần 1 nhóm họp nội bộ vào thứ Năm hằng tuần.
+# Trong nội dung: "- " là ý chính, "   + " là ý phụ (thụt lề).
 
 [info]
 title_en = "OpenTrading: An Agentic AI Harness for Financial Analysis and Market Research"
 title_vi = "OpenTrading: Hạ tầng điều phối AI Agent cho Phân tích Tài chính và Nghiên cứu Thị trường"
 group = "Nhóm 11 (AIP491_G11, ID 12721)"
 supervisor = "TS. Lê Đình Huynh"
-members = ["Đoàn Duy Long - HE190352 (trưởng nhóm)", "Đoàn Minh Hiếu - HE190214", "Trần Huy Tuấn - HE190554", "Hoàng Hiếu Trung - HE191136"]
+attendees = "GVHD: TS. Lê Đình Huynh\nSinh viên: đủ 4 thành viên (Long, Hiếu, Tuấn, Trung)"
+members = ["Đoàn Duy Long – HE190352 (trưởng nhóm)", "Đoàn Minh Hiếu – HE190214", "Trần Huy Tuấn – HE190554", "Hoàng Hiếu Trung – HE191136"]
 
 [[week]]
 number = 0
 from = "31/08/2026"
 to = "06/09/2026"
-meeting = "Thứ Năm, 03/09/2026"
-attendees = "GVHD TS. Lê Đình Huynh; đủ 4 thành viên (Long, Hiếu, Tuấn, Trung)"
-status = "done"
+meeting = "Chủ Nhật, 06/09/2026"
 done = '''
-- Hoàn thành đúng hạn và đạt 7+
-- Ứng dụng hệ thống multi-agents trong phân tích tài chính
-- Phân tích định lượng trong tài chính, tình báo địa chính trị toàn cầu, ...
-- Hệ thống đa tác tử hỗ trợ thu thập và phân tích tài chính toàn thế giới'''
-next = '''
-'''
-issues = '''
-'''
+- Hoàn thành đồ án đúng hạn và đạt điểm từ 7 trở lên.
+- Ứng dụng hệ thống đa tác tử (multi-agent) trong phân tích tài chính.
+- Định hướng nội dung:
+   + Phân tích định lượng trong tài chính.
+   + Tình báo địa chính trị toàn cầu, v.v.
+- Xây dựng hệ thống đa tác tử hỗ trợ thu thập và phân tích dữ liệu tài chính trên phạm vi toàn cầu.'''
+next = ''
+issues = ''
 supervisor = '''
-- Mục tiêu đồ án của mỗi thành viên
-- Đề tài ứng dụng/áp dụng hay "nghiên cứu"
-- Một số đề tài tiềm năng
-- Scope'''
-milestone = '''
-'''
+- Mục tiêu đồ án của từng thành viên.
+- Đề tài thuộc loại ứng dụng hay nghiên cứu.
+- Một số đề tài tiềm năng.
+- Phạm vi (scope) của đề tài.'''
+milestone = ''
 
 [[week]]
 number = 1
 from = "07/09/2026"
 to = "13/09/2026"
 meeting = "Thứ Năm, 10/09/2026"
-attendees = "GVHD TS. Lê Đình Huynh; đủ 4 thành viên (Long, Hiếu, Tuấn, Trung)"
-status = "done"
 done = '''
-- Tự trao đổi và giảng dạy về một số công nghệ sẽ sử dụng trong dự án (RAG, MCP, FastAPI, MongoDB, Redis)
-- Trao đổi và chốt kiến trúc dự án
-- Hiện tại chưa có khó khăn gì
-- Cần tham khảo thêm về kiến trúc để chốt dự án cho tuần tới'''
+- Các thành viên tự trao đổi và hướng dẫn lẫn nhau về các công nghệ dự kiến sử dụng:
+   + RAG, MCP, FastAPI, MongoDB, Redis.
+- Trao đổi và thống nhất kiến trúc tổng thể của dự án.'''
 next = '''
-'''
-issues = '''
-'''
-supervisor = '''
-'''
-milestone = '''
-'''
+- Tham khảo thêm các kiến trúc liên quan để chốt kiến trúc dự án trong tuần tới.'''
+issues = ''
+supervisor = ''
+milestone = ''
 
 [[week]]
 number = 2
 from = "14/09/2026"
 to = "20/09/2026"
 meeting = "Thứ Năm, 17/09/2026"
-attendees = "GVHD TS. Lê Đình Huynh; đủ 4 thành viên (Long, Hiếu, Tuấn, Trung)"
-status = "done"
 done = '''
-- Tìm hiểu kiến trúc của Claude code, opencode, codex và ý tưởng thiết kế của cursor
-- Tìm hiểu thiết kế memory chi tiết của các harness
-- Khảo sát các Providers: rate limit, quota, token/s
-- Thiết kế sơ bộ các skills và system prompt
-- Chốt key words: Agentic AI, Financial analysis và Agent harness'''
+- Tìm hiểu kiến trúc của Claude Code, OpenCode, Codex và ý tưởng thiết kế của Cursor.
+- Tìm hiểu chi tiết thiết kế bộ nhớ (memory) của các harness.
+- Khảo sát các nhà cung cấp mô hình (provider) theo các tiêu chí:
+   + Giới hạn tốc độ (rate limit).
+   + Hạn mức sử dụng (quota).
+   + Tốc độ sinh token (token/s).
+- Thiết kế sơ bộ các skill và system prompt.
+- Chốt các từ khóa chính: Agentic AI, Financial Analysis, Agent Harness.'''
 next = '''
-- Tìm kiếm và đọc các bài nghiên cứu liên quan theo key words
-- Xây dựng chi tiết kiến trúc harness cuối cùng
-- Thực hiện code phần UI cho CLI (UI tương tự Opencode) và Providers đảm bảo có thể chat như LLM thông thường'''
-issues = '''
-'''
+- Tìm kiếm và đọc các bài nghiên cứu liên quan theo các từ khóa đã chốt.
+- Xây dựng chi tiết kiến trúc harness hoàn chỉnh.
+- Lập trình giao diện CLI (tương tự OpenCode) và kết nối provider:
+   + Mục tiêu: trò chuyện được như một LLM thông thường.'''
+issues = ''
 supervisor = '''
-- "kiến trúc harness cuối cùng"
--> cân nhắc xây dựng kiến trúc trung gian, đơn giản, đủ dùng, vừa sức trước.'''
-milestone = '''
-'''
+- Về "kiến trúc harness cuối cùng":
+   + Nên cân nhắc xây dựng trước một kiến trúc trung gian, đơn giản, đủ dùng và vừa sức.'''
+milestone = ''
 
 [[week]]
 number = 3
 from = "21/09/2026"
 to = "27/09/2026"
 meeting = "Thứ Năm, 24/09/2026"
-attendees = "GVHD TS. Lê Đình Huynh; đủ 4 thành viên (Long, Hiếu, Tuấn, Trung)"
-status = "done"
 done = '''
-- Đọc các bài báo nghiên cứu và bóc tách các sản phẩm có liên quan Literature Paper
-- Chốt các chức năng chi tiết và công nghệ sử dụng HarnessPlan.html
-- Hoàn thành code UI và chức năng cơ bản bao gồm /connect , /models và một số chức năng phụ /new , /sessions , /exit , ...
-- Hoàn thành MVP cho MCP-server (đáp ứng local và remote)
-- Xác định các nguồn providers miễn phí (Google, Alibaba, Groq, Openrouter, Ollama) và các nguồn providers trả phí sẵn sàng nếu thiếu token khi test (opencode go và opencode zen)
-- Phân chia công việc hoàn thiện MVP sẵn sàng cho demo tuần 4'''
+- Đọc các bài báo nghiên cứu và phân tích các sản phẩm liên quan (tài liệu Literature Paper).
+- Chốt chi tiết các chức năng và công nghệ sử dụng (tài liệu HarnessPlan.html).
+- Hoàn thành giao diện và các lệnh cơ bản:
+   + Lệnh chính: /connect, /models.
+   + Lệnh phụ: /new, /sessions, /exit, v.v.
+- Hoàn thành MVP cho MCP server (hỗ trợ cả chạy local và remote).
+- Xác định các nguồn provider:
+   + Miễn phí: Google, Alibaba, Groq, OpenRouter, Ollama.
+   + Trả phí, dự phòng khi thiếu token lúc kiểm thử: OpenCode Go, OpenCode Zen.
+- Phân công công việc để hoàn thiện MVP, sẵn sàng cho buổi demo tuần 4.'''
 next = '''
-- Hoàn thành MVP và báo cáo demo video
-- Họp bàn giải quyết những vấn đè gặp phải khi xây dựng MVP'''
-issues = '''
-'''
+- Hoàn thành MVP và báo cáo bằng video demo.
+- Họp bàn giải quyết các vấn đề phát sinh trong quá trình xây dựng MVP.'''
+issues = ''
 supervisor = '''
-- MVP I nên ưu tiên tích hợp, chọn 1 provider đơn giản, dễ tích hợp, free.
-- MCP-server: local | server cái nào triển khai dễ dàng làm trước.'''
-milestone = '''
-'''
+- Với MVP I:
+   + Ưu tiên khâu tích hợp.
+   + Chọn một provider đơn giản, dễ tích hợp và miễn phí.
+- Với MCP server:
+   + Phương án nào (chạy local hay trên server) dễ triển khai hơn thì làm trước.'''
+milestone = ''
 
 [[week]]
 number = 4
 from = "28/09/2026"
 to = "04/10/2026"
 meeting = "Thứ Năm, 01/10/2026"
-attendees = "GVHD TS. Lê Đình Huynh; đủ 4 thành viên (Long, Hiếu, Tuấn, Trung)"
-status = "done"
 done = '''
-- Hoàn thiện MVP MCP-server với 136 tools
-- Hoàn thiện giao diện harness cơ bản
-- Kết nối MCP-server với harness
-- Viết 27 skills cơ bản để thực hiện demo
-- Làm chức năng memory cơ bản
-- Video demo 1: OpenTrading-Demo1.mp4'''
+- Hoàn thiện MVP MCP server với 136 tool.
+- Hoàn thiện giao diện cơ bản của harness.
+- Kết nối MCP server với harness.
+- Viết 27 skill cơ bản phục vụ demo.
+- Xây dựng chức năng bộ nhớ (memory) cơ bản.
+- Quay video demo 1 (OpenTrading-Demo1.mp4).'''
 next = '''
-- Họp bàn những điểm vướng mắc trong quá trình làm MVP và xử lí những vấn đề đó
-- Kiểm thử và cải thiện 136 tools (các mô tả gửi cho llm còn chưa chính xác, các nguồn dữ liệu cần fallback khi 1 nguồn bị chặn)
-- Lên kế hoạch cải thiện MCP-server (hiện tại đang show toàn bộ 136 tools, cần nhóm các tools tương đương lại thành các set để truyền cho LLM)
-- Lên kế hoạch cải thiện và nâng cấp memory dựa trên memory của opencode và cursor (hiện tại chỉ đang ghi nhớ cơ bản lưu ra file json)
-- Thiết kế system prompts tối ưu, cân bằng giữa chi phí và hiệu quả
-- Nghiên cứu các tài liệu nghiệp vụ tài chính chuyên ngành để thiết kế các skills'''
-issues = '''
-'''
+- Họp bàn các điểm vướng mắc khi làm MVP và xử lý các vấn đề đó.
+- Kiểm thử và cải thiện 136 tool:
+   + Mô tả tool gửi cho LLM còn chưa chính xác.
+   + Các nguồn dữ liệu cần cơ chế dự phòng (fallback) khi một nguồn bị chặn.
+- Lên kế hoạch cải thiện MCP server:
+   + Hiện đang hiển thị toàn bộ 136 tool cho LLM.
+   + Cần gom các tool tương đương thành từng nhóm trước khi truyền cho LLM.
+- Lên kế hoạch nâng cấp bộ nhớ:
+   + Tham khảo thiết kế của OpenCode và Cursor.
+   + Hiện mới chỉ ghi nhớ cơ bản ra file JSON.
+- Thiết kế system prompt tối ưu, cân bằng giữa chi phí và hiệu quả.
+- Nghiên cứu tài liệu nghiệp vụ tài chính chuyên ngành để thiết kế các skill.'''
+issues = ''
 supervisor = '''
-- hoàn thành sơ lược hệ thống.
-- Video không có âm thanh thuyết minh
-? Giao diện cli ( hiện tại ) là giao diện chính thức hay demo trong 4 tuần ?
-* cần làm rõ đối tượng sử dụng hệ thống vs giao diện cli có ăn nhập với nhau không.
-( người dùng trong lĩnh vực tài chính  + nghiên cứu thị trường cần giao diện trực quan hơn cli )
-* nếu giao diện cli hiện tại phục vụ demo. có thể ưu tiên cải tiến sau.
-* ưu tiên cải thiện chất lượng gồm skillset ( nhóm đang triển khai ) và output (  trong lĩnh vực tài chính  + nghiên cứu thị trường mong muốn hoặc ưu tiên các loại biểu diễn thông nào, hiện nhóm trả lời text hoặc table, có thể cần figure, ... )
-* cần suy nghĩ làm rõ hệ thống nhóm đang thực hiện khác gì một hệ thống tiêu chuẩn ( không có thiết kế riêng của nhóm ) => suy nghĩ dần.'''
+- Nhóm đã hoàn thành sơ lược hệ thống.
+- Video demo chưa có âm thanh thuyết minh.
+- Về giao diện CLI: đây là giao diện chính thức hay chỉ dùng để demo trong 4 tuần?
+   + Cần làm rõ đối tượng sử dụng và giao diện CLI có phù hợp với nhau hay không.
+   + Người dùng trong lĩnh vực tài chính và nghiên cứu thị trường cần giao diện trực quan hơn CLI.
+   + Nếu CLI hiện tại chỉ phục vụ demo thì có thể cải tiến sau.
+- Ưu tiên cải thiện chất lượng:
+   + Skillset (nhóm đang triển khai).
+   + Đầu ra: xác định người dùng cần những hình thức biểu diễn thông tin nào.
+   + Hiện nhóm mới trả lời bằng văn bản hoặc bảng, có thể cần thêm biểu đồ.
+- Cần từng bước làm rõ hệ thống của nhóm khác gì so với một hệ thống tiêu chuẩn
+  (không có thiết kế riêng của nhóm).'''
 milestone = '''
-Báo cáo - demo I ( quay video )'''
+Báo cáo demo I (quay video).'''
 
 [[week]]
 number = 5
 from = "05/10/2026"
 to = "11/10/2026"
 meeting = "Thứ Năm, 08/10/2026"
-attendees = "GVHD TS. Lê Đình Huynh; đủ 4 thành viên (Long, Hiếu, Tuấn, Trung)"
-status = "done"
 done = '''
-- Hoàn thiện 1 số chức năng cơ bản: todo list, thiết kế subagents cơ bản, compact, tool search
-- Hoàn thiện và kiểm thử 27 (+3) skills hoạt động chính xác
-- Họp nêu vấn đề gặp phải trong quá trình thực hiện và đưa ra kế hoach xử lí
+- Hoàn thiện một số chức năng cơ bản:
+   + Danh sách việc cần làm (todo list).
+   + Thiết kế sub-agent cơ bản.
+   + Nén ngữ cảnh (compact) và tìm kiếm tool (tool search).
+- Hoàn thiện và kiểm thử 30 skill (27 skill ban đầu và 3 skill bổ sung), bảo đảm hoạt động chính xác.
+- Họp rà soát các vấn đề phát sinh và đề ra kế hoạch xử lý.
 - Họp lên kế hoạch nâng cấp và cải thiện:
-+ Memory cần chọn lọc ghi nhớ những thông tin không bị out-date
-+ Sub-agents cần kiểm soát số lượng và chất lượng tránh rate-limit từ MCP-server
-+ Các mode cần đáp ứng được thực tế bài toán (Plan/Build chỉ phù hợp cho các coding harness)
-+ Trực quan hóa cần nghiên cứu thêm do dữ liệu tài chính có nhiều dạng'''
+   + Bộ nhớ: chọn lọc, chỉ ghi nhớ những thông tin không bị lỗi thời.
+   + Sub-agent: kiểm soát số lượng và chất lượng để tránh bị MCP server giới hạn tốc độ.
+   + Chế độ làm việc (mode): sát với bài toán thực tế (Plan/Build chỉ hợp với coding harness).
+   + Trực quan hóa: cần nghiên cứu thêm do dữ liệu tài chính có nhiều dạng.'''
 next = '''
-- Thực hiện nghiên cứu và lên kế hoạch phát triển các tính năng (memory, subagents, agent loop, visualization, mode) tối ưu hơn so với các coding agents (opencode)'''
+- Nghiên cứu và lên kế hoạch phát triển các tính năng theo hướng tối ưu hơn các coding agent như OpenCode:
+   + Bộ nhớ (memory), sub-agent, agent loop.
+   + Trực quan hóa, chế độ làm việc (mode).'''
 issues = '''
-- Nhóm muốn sử dụng giao diện CLI như hiện tại là giao diện chính thức cho đồ án (nhóm muốn tập trung vào học hỏi và xây dựng 1 harness chứ không tập trung thương mại hóa)
-- Hiện tại 3 biểu đồ (line, pie, donut) trên CLI không hỗ trợ, hình vẽ chỉ là các điểm pixel chứ không phải đường thẳng hay đường cong'''
+- Về giao diện:
+   + Nhóm muốn dùng CLI hiện tại làm giao diện chính thức của đồ án.
+   + Lý do: nhóm tập trung vào học hỏi và xây dựng một harness, không hướng tới thương mại hóa.
+- Về biểu đồ:
+   + CLI chưa hiển thị tốt 3 loại biểu đồ: đường, tròn, vành khuyên.
+   + Hình vẽ chỉ là các điểm pixel, không phải đường thẳng hay đường cong.'''
 supervisor = '''
-- không thương mại hóa: oke.
-?cần trả lời được băn khoăn như week 4 đã mô tả.
-và/hoặc trả lời các băn khoản đã mô tả trước đó ( sự khác biệt so với sản phẩm tương tự, hoặc agent thông thường + customize; chất lượng so sánh với  công cụ tương đương )'''
-milestone = '''
-'''
+- Về việc không thương mại hóa: đồng ý.
+- Nhóm cần trả lời được các băn khoăn đã nêu ở tuần 4:
+   + Sự khác biệt so với các sản phẩm tương tự, hoặc so với một agent thông thường có tùy biến.
+   + Chất lượng so với các công cụ tương đương.'''
+milestone = ''
 
 [[week]]
 number = 6
 from = "12/10/2026"
 to = "18/10/2026"
 meeting = "Thứ Năm, 15/10/2026"
-attendees = "GVHD TS. Lê Đình Huynh; đủ 4 thành viên (Long, Hiếu, Tuấn, Trung)"
-status = "done"
 done = '''
-- Nâng cấp MCP-server thêm cache để tối ưu hiệu năng và tránh rate limit xảy ra thường xuyên
-- Kiểm tra và hoàn thiện system prompts
-- Kiểm tra và bổ sung skills và tools
-- Kiểm tra subagents, compact, agent loop, context window
-- Test và đánh giá trên tập 236 câu hỏi --> trả lời chính xác và chứa thông tin cần hỏi, câu không có thông tin thì báo không có thông tin (không halucinate)'''
+- Nâng cấp MCP server:
+   + Bổ sung bộ đệm (cache) để tối ưu hiệu năng.
+   + Hạn chế bị giới hạn tốc độ (rate limit).
+- Kiểm tra và hoàn thiện system prompt.
+- Kiểm tra và bổ sung skill, tool.
+- Kiểm tra sub-agent, compact, agent loop và cửa sổ ngữ cảnh (context window).
+- Kiểm thử trên tập 236 câu hỏi:
+   + Hệ thống trả lời chính xác, đúng thông tin cần hỏi.
+   + Với câu không có dữ liệu, hệ thống báo không có thông tin, không bịa đặt (hallucinate).'''
 next = '''
-- Bàn luận và đưa ra kế hoạch cho phần memory --> nhóm muốn nghiên cứu và có giải pháp đột phá ở phần này, cải thiện so với các harness khác
-- Cải thiện khả năng visualize
-- Triển khai 2 modes như kế hoạch đã chốt tuần trước
-- Thiết kế các bài test cho từng modules của harness để đánh giá và báo cáo'''
+- Thảo luận và lập kế hoạch cho phần bộ nhớ:
+   + Nhóm muốn nghiên cứu để có giải pháp đột phá, cải thiện so với các harness khác.
+- Cải thiện khả năng trực quan hóa.
+- Triển khai 2 mode theo kế hoạch đã chốt ở tuần trước.
+- Thiết kế bài kiểm thử cho từng module của harness để đánh giá và báo cáo.'''
 issues = '''
-- Nhóm đã họp bàn nhưng chưa chốt được thiết kế memory tối ưu hơn harness khác cho mảng tài chính'''
+- Nhóm đã họp bàn nhưng chưa chốt được thiết kế bộ nhớ tối ưu hơn các harness khác cho lĩnh vực tài chính.'''
 supervisor = '''
-- nhóm muốn nghiên cứu và có giải pháp đột phá
-=> oke, tự do nghiên cứu
-
-- Nhóm đã họp bàn nhưng chưa chốt được thiết kế memory tối ưu hơn harness khác cho mảng tài chính
-=> không chốt được => liệt số lượng , thử trên một số lượng kích bản ít/đủ phiên bản thiết kế tối ưu
-=> ghi nhận, tổng hợp.'''
-milestone = '''
-'''
+- Về mong muốn nghiên cứu giải pháp đột phá:
+   + Đồng ý, nhóm được tự do nghiên cứu.
+- Về việc chưa chốt được thiết kế bộ nhớ:
+   + Liệt kê các phương án thiết kế.
+   + Thử nghiệm trên một số lượng kịch bản vừa đủ để chọn ra phiên bản tối ưu.
+   + Ghi nhận và tổng hợp kết quả.'''
+milestone = ''
 
 [[week]]
 number = 7
 from = "19/10/2026"
 to = "25/10/2026"
 meeting = "Thứ Năm, 22/10/2026"
-attendees = "GVHD TS. Lê Đình Huynh; đủ 4 thành viên (Long, Hiếu, Tuấn, Trung)"
-status = "done"
 done = '''
-- Hoàn thành lên kế hoạch cho memory
-- Hoàn thành 2 modes cơ bản
-- Rà soát lại hệ thống, phát hiện được một số issues cần xử lí
-- Nâng hiệu quả và tốc độ làm việc với sub-agents
-- Video demo 2: OpenTrading-demo2'''
+- Hoàn thành kế hoạch cho phần bộ nhớ.
+- Hoàn thành 2 mode cơ bản.
+- Rà soát hệ thống, phát hiện một số vấn đề cần xử lý.
+- Nâng cao hiệu quả và tốc độ làm việc của sub-agent.
+- Quay video demo 2 (OpenTrading-demo2).'''
 next = '''
-- Lên kế hoạch thực hiện evals, lựa chọn so sánh với một số harness để đánh giá hiệu quả
-- Triển khai phần memory
-- TIếp tục rà soát lại toàn bộ hệ thống và fix bugs'''
+- Lên kế hoạch đánh giá (evals), lựa chọn một số harness để so sánh hiệu quả.
+- Triển khai phần bộ nhớ.
+- Tiếp tục rà soát toàn bộ hệ thống và sửa lỗi.'''
 issues = '''
-- Nhóm em dự tính đánh giá chất lượng harness so sánh với opencode và pi harness, với 2 đối tượng so sánh vậy đã đủ chưa ạ?'''
+- Nhóm dự định đánh giá chất lượng harness bằng cách so sánh với OpenCode và Pi harness.
+   + Xin ý kiến GVHD: hai đối tượng so sánh như vậy đã đủ chưa?'''
 supervisor = '''
-Cần hỏi:
-- Nhóm em dự tính đánh giá chất lượng harness so sánh với opencode và pi harness, với 2 đối tượng so sánh vậy đã đủ chưa ạ?
-==> liệt kê một số lượng nhiều harness,
-chọn [số lượng], [harness nào] mang đi đánh giá, so sánh tùy nhóm (đủ năng lực thời gian, chi phí, dễ cài đặt, ... ) kết quả tệ hơn. tốt hơn đều ghi nhận.'''
+- Về số lượng harness để so sánh:
+   + Liệt kê nhiều harness, sau đó nhóm tự chọn số lượng và harness cụ thể để đánh giá.
+   + Tiêu chí chọn tùy nhóm: năng lực, thời gian, chi phí, mức độ dễ cài đặt, v.v.
+   + Kết quả tốt hơn hay kém hơn đều cần được ghi nhận.'''
 milestone = '''
-Báo cáo - demo II ( quay video )'''
+Báo cáo demo II (quay video).'''
 
 [[week]]
 number = 8
 from = "26/10/2026"
 to = "01/11/2026"
 meeting = "Thứ Năm, 29/10/2026"
-attendees = "GVHD TS. Lê Đình Huynh; đủ 4 thành viên (Long, Hiếu, Tuấn, Trung)"
-status = "done"
 done = '''
-- Đã chốt được kế hoạch hoàn chỉnh cho memory
-- Thực hiện khảo sát chi phí api key (dự kiến sử dụng key opencode-go với chi phí $10 - $15)
-- Lựa chọn OpenCode và Deepseek harness làm đối tượng so sánh (loại pi harness vì không hỗ trợ MCP)'''
+- Chốt kế hoạch hoàn chỉnh cho phần bộ nhớ.
+- Khảo sát chi phí API key:
+   + Dự kiến dùng gói OpenCode Go, chi phí khoảng 10–15 USD.
+- Chọn đối tượng so sánh: OpenCode và DeepSeek Harness.
+   + Loại Pi harness vì không hỗ trợ MCP.'''
 next = '''
-- Xây dựng benchmark đánh giá phù hợp
-- Hoàn thiện memory'''
-issues = '''
-'''
-supervisor = '''
-'''
-milestone = '''
-'''
+- Xây dựng bộ benchmark đánh giá phù hợp.
+- Hoàn thiện phần bộ nhớ.'''
+issues = ''
+supervisor = ''
+milestone = ''
 
 [[week]]
 number = 9
 from = "02/11/2026"
 to = "08/11/2026"
 meeting = "Thứ Năm, 05/11/2026"
-attendees = "GVHD TS. Lê Đình Huynh; đủ 4 thành viên (Long, Hiếu, Tuấn, Trung)"
-status = "done"
 done = '''
-- Hoàn thành memory
-- Optimize
-- Fix bug trong quá trình thực hiện benchmark'''
+- Hoàn thành phần bộ nhớ.
+- Tối ưu hệ thống.
+- Sửa các lỗi phát sinh trong quá trình chạy benchmark.'''
 next = '''
-- Chạy benchmark ra kết quả sơ bộ'''
-issues = '''
-'''
-supervisor = '''
-'''
-milestone = '''
-'''
+- Chạy benchmark để có kết quả sơ bộ.'''
+issues = ''
+supervisor = ''
+milestone = ''
 
 [[week]]
 number = 10
 from = "09/11/2026"
 to = "15/11/2026"
 meeting = "Thứ Năm, 12/11/2026"
-attendees = "GVHD TS. Lê Đình Huynh; đủ 4 thành viên (Long, Hiếu, Tuấn, Trung)"
-status = "done"
 done = '''
-- Hoàn thành benchmark sử dụng key Openrouter với chi phí $8
-- Benchmark chỉ ra 2 lỗ hổng lớn cần cải thiện về system prompt và về tools tính toán
-- Hoàn thành báo cáo tuần 10: Report tuần 10.pdf'''
+- Hoàn thành chạy benchmark qua OpenRouter, chi phí 8 USD.
+- Kết quả benchmark chỉ ra 2 điểm yếu lớn cần cải thiện:
+   + System prompt.
+   + Các tool tính toán.
+- Hoàn thành báo cáo tuần 10 (Report tuần 10.pdf).'''
 next = '''
-- Thực hiện vá 2 lỗ hổng lớn và thực hiện chạy lại benchmark
-- Lên kế hoạch chuẩn bị báo cáo và bảo vệ'''
-issues = '''
-'''
+- Khắc phục 2 điểm yếu trên và chạy lại benchmark.
+- Lên kế hoạch chuẩn bị báo cáo và bảo vệ.'''
+issues = ''
 supervisor = '''
-GỬI SOURCE CODE REVIEW
-
-
-> nghỉ ngơi, thi cử, chậm lại/tổng kết việc đã hoàn thành.
-> chuẩn bị tuần 12 viết báo cáo'''
+- Nhóm gửi source code để GVHD review.
+- Giai đoạn nghỉ ngơi, thi cử:
+   + Giảm nhịp độ, tổng kết những việc đã hoàn thành.
+- Chuẩn bị viết báo cáo từ tuần 12.'''
 milestone = '''
-Tuần 10.'''
+Report tuần 10 (PDF, không quá 4 trang), gồm:
+1. Mô tả cấu trúc source code, kèm link GitHub hoặc Google Drive.
+2. Hướng dẫn cài đặt.
+3. Chỉ rõ phần việc nhóm thực hiện.
+   + Nếu dựa trên source có sẵn thì chỉ rõ các chỗ sửa đổi.
+4. Các thực nghiệm và kết quả sơ bộ.'''
 
 [[week]]
 number = 11
 from = "16/11/2026"
 to = "22/11/2026"
 meeting = "Thứ Năm, 19/11/2026"
-attendees = "GVHD TS. Lê Đình Huynh; đủ 4 thành viên (Long, Hiếu, Tuấn, Trung)"
-status = "done"
 done = '''
-Tổng kết và thi'''
-next = '''
-'''
-issues = '''
-'''
-supervisor = '''
-'''
-milestone = '''
-'''
+- Tổng kết công việc và tham gia kỳ thi.'''
+next = ''
+issues = ''
+supervisor = ''
+milestone = ''
 
 [[week]]
 number = 12
 from = "23/11/2026"
 to = "29/11/2026"
 meeting = "Thứ Năm, 26/11/2026"
-attendees = "GVHD TS. Lê Đình Huynh; đủ 4 thành viên (Long, Hiếu, Tuấn, Trung)"
-status = "current"
 done = '''
-- Phát hành OpenTrading v0.5.0 (24/11) và v0.5.1 (25/11)
-- Chạy benchmark v4.7: 300 task, 3 harness, 900 trial (24-26/11)
-- Lập khung thesis LaTeX và luật viết (25/11); viết các phần I đến VI và phụ lục (26/11)'''
+- Phát hành OpenTrading v0.5.0 (24/11) và v0.5.1 (25/11).
+- Chạy benchmark v4.7 (24–26/11):
+   + 300 task, 3 harness, tổng cộng 900 lượt chạy.
+- Viết thesis bằng LaTeX:
+   + 25/11: lập khung và quy định viết.
+   + 26/11: viết các phần I đến VI và phụ lục.'''
 next = '''
-- Viết phần VII, hoàn thiện slide, time plan và biên bản
-- Nộp tài liệu Review 1.1 trước 23h59 ngày 28/11'''
-issues = '''
-'''
-supervisor = '''
-'''
+- Viết phần VII.
+- Hoàn thiện slide, time plan và biên bản làm việc.
+- Nộp tài liệu Review 1.1 trước 23h59 ngày 28/11/2026.'''
+issues = ''
+supervisor = ''
 milestone = '''
-'''
-
-[[week]]
-number = 13
-from = "30/11/2026"
-to = "06/12/2026"
-meeting = "Thứ Năm, 03/12/2026 (dự kiến)"
-attendees = "GVHD TS. Lê Đình Huynh; 4 thành viên (dự kiến)"
-status = "planned"
-done = '''
-'''
-next = '''
-'''
-issues = '''
-'''
-supervisor = '''
-'''
-milestone = '''
-Review 1.1'''
-
-[[week]]
-number = 14
-from = "07/12/2026"
-to = "13/12/2026"
-meeting = "Thứ Năm, 10/12/2026 (dự kiến)"
-attendees = "GVHD TS. Lê Đình Huynh; 4 thành viên (dự kiến)"
-status = "planned"
-done = '''
-'''
-next = '''
-'''
-issues = '''
-'''
-supervisor = '''
-'''
-milestone = '''
-'''
-
-[[week]]
-number = 15
-from = "14/12/2026"
-to = "20/12/2026"
-meeting = "Thứ Năm, 17/12/2026 (dự kiến)"
-attendees = "GVHD TS. Lê Đình Huynh; 4 thành viên (dự kiến)"
-status = "planned"
-done = '''
-'''
-next = '''
-'''
-issues = '''
-'''
-supervisor = '''
-'''
-milestone = '''
-'''
-
-[[week]]
-number = 16
-from = "21/12/2026"
-to = "27/12/2026"
-meeting = "Thứ Năm, 24/12/2026 (dự kiến)"
-attendees = "GVHD TS. Lê Đình Huynh; 4 thành viên (dự kiến)"
-status = "planned"
-done = '''
-'''
-next = '''
-'''
-issues = '''
-'''
-supervisor = '''
-'''
-milestone = '''
-'''
+Chuẩn bị Review 1.1 (tuần 13) theo yêu cầu của GVHD:
+- Nộp bài trên EduNext theo lịch của Phòng Đào tạo:
+   + Bản PDF thesis và PDF slide tại thời điểm nộp.
+- Time plan:
+   + Liệt kê việc đã hoàn thành và dự kiến, dựa trên báo cáo hằng tuần.
+   + Đặt tên theo mẫu 2026FALL_Group, không quá 2 trang A4.
+- Slide bản rút gọn, trình bày trong 15 phút:
+   + Nội dung tuần 0 và tóm tắt việc đã hoàn thành.
+   + Phương pháp và kết quả sơ bộ.
+- Khi trình bày:
+   + Mở sẵn tài liệu và source code.
+   + Ghi lại các câu hỏi, góp ý của hội đồng để chỉnh sửa.
+- Hội đồng có thể xem thêm source code, sản phẩm để xác minh nhóm tự thực hiện và nắm vững nội dung.
+   + Kết quả có thể là: góp ý kèm quyết định được bảo vệ lần 1, vào thẳng vòng 2, hoặc khuyến nghị không đạt.'''
