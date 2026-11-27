@@ -83,7 +83,7 @@ python tools/thesis.py admin              # Time plan (PDF) và Biên bản làm
 | Time plan, tối đa 2 trang A4 | `admin/time-plan/2026FALL_G11.tex` | `2026FALL_G11.pdf` |
 | Biên bản làm việc GVHD và nhóm, mỗi tuần một sheet | `admin/minutes/minutes.toml` | `2026FALL_G11_Bien-ban-lam-viec.xlsx` |
 
-Hai tài liệu sau đang là **bản nháp**: chữ đỏ là chỗ nhóm phải xác nhận. Slide không nằm trong repo này.
+Hai tài liệu sau đang là **bản nháp**: chữ đỏ là chỗ nhóm phải xác nhận. Slide không nằm trong repo này; yêu cầu slide ở [presentation/SLIDE-PRESENTATION.md](presentation/SLIDE-PRESENTATION.md).
 
 ## Cấu trúc
 

@@ -11,3 +11,6 @@ __pycache__/
 /local/
 .DS_Store
 Thumbs.db
+
+# Slide tham khảo tải về, bản quyền của tác giả
+presentation/slide-reference/*.pdf
