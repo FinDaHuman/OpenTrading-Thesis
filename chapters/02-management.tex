@@ -3,6 +3,7 @@
 
 \section{Team Work}\label{sec:teamwork}
 \label{sec:roles}
+%% Evidence: E74, E79.
 The team has four members and one supervisor; each member works on the areas listed in \cref{tab:roles} and writes and defends their own parts of this report.
 
 \begin{table}[H]
@@ -15,10 +16,10 @@ The team has four members and one supervisor; each member works on the areas lis
     Đoàn Duy Long & Team leader & Market-data server (opentrading-mcp), benchmark (opentrading-benchmark), analysis skills\\
     Trần Huy Tuấn & Member & Harness core (agent loop, tools, permissions, sub-agents), terminal interface, releases\\
     Đoàn Minh Hiếu & Member & Memory of the harness; later, contributions to tools, permissions and the agent loop\\
-    Hoàng Hiếu Trung & Member & Quality assurance and control: manual and offline test cases of the harness and their reports; fixes to the MCP client, web search and fetch tools, the stop gate and compaction; evaluation thresholds\\
+    Hoàng Hiếu Trung & Member & Quality assurance, continuous integration and system prompts: the test suite, the automated checks and the system prompts of the harness; manual and offline test cases and their reports\\
     \bottomrule
   \end{tabularx}
-  \fignote{Source: merged pull requests and test reports on issues in the group's repositories.}
+  \fignote{Source: the split of work agreed by the members; merged pull requests and test reports on issues in the group's repositories.}
 \end{table}
 
 \label{sec:communication}
@@ -41,18 +42,18 @@ The harness depends on the data server only through the Model Context Protocol, 
     \toprule
     {Package} & {Main tasks} & {Output} & {Lead}\\
     \midrule
-    Agent harness & Agent loop, system prompt, tools, permissions, sub-agents, ultradesk, terminal interface & OpenTrading version 0.5.1 & Tuấn\\
+    Agent harness & Agent loop, tools, permissions, sub-agents, ultradesk, terminal interface & OpenTrading version 0.5.1 & Tuấn\\
     Memory & Memory store, investor constraints, recall & Memory of OpenTrading & Hiếu\\
     Market-data server & Market-data tools, shared answer contract, cloud deployment & opentrading-mcp & Long\\
     Evaluation & Task set, frozen data snapshot, comparison of three harnesses & opentrading-benchmark & Long\\
-    Quality assurance & Manual and offline test cases of the harness, and fixes to the faults they found & Test reports on the issues of the harness & Trung\\
+    Quality assurance & Test suite, automated checks on each pull request, system prompts, manual and offline test cases & Tests, checks and system prompts of OpenTrading; test reports & Trung\\
     Report & Parts I to IX, figures, references & This report & All members\\
     \bottomrule
   \end{tabularx}
   \fignote{Source: the group's time plan and tracking issue; merged pull requests and test reports on issues in the group's repositories.}
 \end{table}
 
-%% Evidence: E52, E53, E37.
+%% Evidence: E52, E53, E37, E78.
 \label{sec:milestones}
 \begin{table}[htb]
   \centering
@@ -65,10 +66,10 @@ The harness depends on the data server only through the Model Context Protocol, 
     4 & 28 Sep -- 4 Oct & Demo I: first data server, first skills, basic memory\\
     7 & 19 Oct -- 25 Oct & Demo II; version 0.2.1, the first public release, on 23 October\\
     12 & 23 Nov -- 29 Nov & Versions 0.5.0 and 0.5.1; benchmark v4.7 completed (300 tasks); Review 1.1 documents submitted\\
-    13 & 30 Nov -- 6 Dec & Review 1.1, held from 30 November to 3 December\\
+    13 & 30 Nov -- 6 Dec & Review 1.1, held online from 30 November to 3 December; the group presents on 2 December\\
     \bottomrule
   \end{tabularx}
-  \fignote{Note: the weekly plan is given in the separate time plan. Source: the group's time plan and minutes; release page of OpenTrading.}
+  \fignote{Note: the weekly plan is given in the separate time plan. Source: the group's time plan and minutes; review schedule of the university; release page of OpenTrading.}
 \end{table}
 
 \label{sec:risk}
