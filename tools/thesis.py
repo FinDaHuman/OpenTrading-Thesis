@@ -4,7 +4,9 @@
   thesis.py snapshot [NOTE]    draft build, copied to dist/drafts with a versioned name
   thesis.py final              build/main.pdf in final look; fails on open TODO or unconfirmed values
   thesis.py admin              time plan (PDF) and weekly minutes (Excel), drafts in dist/drafts
-  thesis.py submit EVENT       thesis, time plan and minutes: clean, tagged, checked, in dist/submissions
+  thesis.py submit EVENT [SLIDES.pdf]
+                               thesis, time plan, minutes (and slides) under Edunext names,
+                               plus one archive for Progress Reports: clean, tagged, checked
   thesis.py release            used by GitHub Actions on a v* tag
   thesis.py test               all checks and fixtures
   thesis.py check [--strict]   static checks only
@@ -20,11 +22,14 @@ import re
 import shutil
 import subprocess
 import sys
+import zipfile
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 BUILD, DIST = ROOT / "build", ROOT / "dist"
 NAME = "OpenTrading-Thesis"
-GROUP = "2026FALL_G11"  # file name asked for by the supervisor
+GROUP = "2026FALL_G11"  # source and build name of the time plan
+# Edunext: no group code, no spaces or special characters in uploaded file names
+UPLOAD = {"thesis": "Thesis.pdf", "plan": "Time_Plan.pdf", "minutes": "Bien_ban_lam_viec.xlsx", "slides": "Slide.pdf"}
 FIELDS = ["created", "kind", "file", "version", "commit", "dirty", "pages", "sha256", "note"]
 TEXBIN = [pathlib.Path(p) for p in (os.environ.get("TEXLIVE_BIN", ""), "D:/texlive/2026/bin/windows",
                                     "C:/texlive/2026/bin/windows") if p]
@@ -162,9 +167,17 @@ def admin():
     record("draft", book, DIST / "drafts" / f"{GROUP}_Bien-ban-lam-viec_{stamp}.xlsx", "minutes")
 
 
-def submit(event):
+def upload_name(name):
+    if not re.fullmatch(r"[A-Za-z0-9_]+\.[a-z0-9]+", name) or re.search(r"G\d+", name):
+        sys.exit(f"{name}: Edunext names take letters, digits and _ only, and no group code")
+    return name
+
+
+def submit(event, slides=None):
     if not re.fullmatch(r"[a-z0-9.-]+", event):
         sys.exit("EVENT: lower case, digits, dot and dash only, e.g. review1.1")
+    if slides and (not pathlib.Path(slides).is_file() or pathlib.Path(slides).suffix.lower() != ".pdf"):
+        sys.exit(f"{slides}: the slides must be an existing PDF")
     tag = git("describe", "--tags", "--exact-match", "--match", "v*")
     if state()["dirty"]:
         sys.exit("working tree is not clean: commit first")
@@ -177,13 +190,24 @@ def submit(event):
         sys.exit("format check failed")
     plan, book = admin_build("final")
     folder = DIST / "submissions" / f"{event}_{tag}"
-    rows = [record("submission", src, folder / name, event) for src, name in (
-        (BUILD / "main.pdf", f"{GROUP}_Thesis.pdf"), (plan, plan.name), (book, book.name))]
+    files = [(BUILD / "main.pdf", UPLOAD["thesis"]), (plan, UPLOAD["plan"]), (book, UPLOAD["minutes"])]
+    if slides:
+        files.append((pathlib.Path(slides), UPLOAD["slides"]))
+    rows = [record("submission", src, folder / upload_name(name), event) for src, name in files]
+    archive = upload_name(re.sub(r"[^A-Za-z0-9]+", "_", event).strip("_").capitalize() + ".zip")
+    staged = BUILD / archive
+    with zipfile.ZipFile(staged, "w", zipfile.ZIP_DEFLATED) as z:
+        for row in rows:
+            z.write(ROOT / row["file"], pathlib.Path(row["file"]).name)
+    rows.append(record("submission", staged, folder / archive, event))
     with (ROOT / "SUBMISSIONS.csv").open("a", newline="", encoding="utf-8") as f:
         w = csv.writer(f, lineterminator="\n")
         for row in rows:
             w.writerow([row["created"], event, tag, row["commit"], row["pages"], row["sha256"],
                         pathlib.Path(row["file"]).name])
+    if not slides:
+        print(f"no slides given: {UPLOAD['slides']} is not in {archive}")
+    print(f"upload {folder.relative_to(ROOT).as_posix()}/{archive} to Edunext, folder Progress Reports")
     print("SUBMISSIONS.csv updated: commit it")
 
 
@@ -249,8 +273,8 @@ def main():
         latex(cmd)
     elif cmd == "snapshot":
         snapshot(" ".join(rest))
-    elif cmd == "submit" and len(rest) == 1:
-        submit(rest[0])
+    elif cmd == "submit" and len(rest) in (1, 2):
+        submit(*rest)
     elif cmd == "admin":
         admin()
     elif cmd == "release":

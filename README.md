@@ -79,9 +79,12 @@ python tools/thesis.py admin              # Time plan (PDF) và Biên bản làm
 
 | Tài liệu | Nguồn | File sinh ra |
 |---|---|---|
-| Thesis | `main.tex` | `2026FALL_G11_Thesis.pdf` |
-| Time plan, tối đa 2 trang A4 | `admin/time-plan/2026FALL_G11.tex` | `2026FALL_G11.pdf` |
-| Biên bản làm việc GVHD và nhóm, mỗi tuần một sheet | `admin/minutes/minutes.toml` | `2026FALL_G11_Bien-ban-lam-viec.xlsx` |
+| Thesis | `main.tex` | `Thesis.pdf` |
+| Time plan, tối đa 2 trang A4 | `admin/time-plan/2026FALL_G11.tex` | `Time_Plan.pdf` |
+| Biên bản làm việc GVHD và nhóm, mỗi tuần một sheet | `admin/minutes/minutes.toml` | `Bien_ban_lam_viec.xlsx` |
+| Slide (làm trên Canva, không nằm trong repo) | | `Slide.pdf` |
+
+`thesis.py submit` đặt tên theo luật Edunext (không mã nhóm, không dấu cách) và gói tất cả vào `Review1_1.zip` để tải vào thư mục Progress Reports.
 
 Hai tài liệu sau đang là **bản nháp**: chữ đỏ là chỗ nhóm phải xác nhận. Slide không nằm trong repo này.
 
