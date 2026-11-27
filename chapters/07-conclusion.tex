@@ -2,36 +2,41 @@
 \chapter{Conclusion}\label{ch:conclusion}
 
 \section{Summary of Findings}\label{sec:summary}
-\Cref{sec:rq-answers} answers the research questions in detail; this section draws them together.
-The first and main objective was met as far as it was measured: OpenTrading 0.5.1 adds the rules of \cref{sec:algorithm} around the model, and these rules passed their tests.
-In the benchmark, which measured version 0.5.0 with the change that allows buy and sell recommendations, OpenTrading followed the user's earlier rules in 58 of 59 memory tasks, a group designed around its memory, and gave no number on any of the 11 tasks whose data does not exist.
-%% Evidence: E11, E16, E45.
-The second objective was met in part: the data server returns its results in one envelope with their availability, source and time, but units are stated only for the checked price tools and the live contract check is not yet automated.
-%% Evidence: E13.
+The first and main objective was met as far as it was measured.
+OpenTrading 0.5.1 adds the rules of \cref{sec:algorithm} around the model, and these rules passed their tests.
+The benchmark measured version 0.5.0 with the change that allows buy and sell recommendations; there, the harness applied the user's earlier rules almost without error in a memory group designed around it, while the stop gate never acted.
+
+The second objective was met in part.
+The data server returns its results in one envelope with their availability, source and time, but units are stated only for the checked price tools, and the live contract check is neither automated nor recorded for the version described.
+
 The third objective gave a positive but limited result.
-OpenTrading answered 279 of 300 tasks correctly, against 266 for DeepSeek Harness and 245 for OpenCode, at about half the cost per correct answer of DeepSeek Harness and less than half that of OpenCode.
-%% Evidence: E45.
-Taken together, the findings suggest that, in this benchmark, the harness changed the answers most where the task needed information that the model cannot recover from the data, such as the rules a user gave earlier.
-On calculation and retrieval tasks the three harnesses were close, and on the 16 buy, hold or sell calls none did better than a rule that always answers \enquote{sell}.
+OpenTrading answered more tasks correctly than both general-purpose harnesses, at about half the cost per correct answer of DeepSeek Harness and less than half that of OpenCode (\cref{sec:rq-answers}).
+%% Evidence: E11, E13, E16, E45.
+
+Taken together, the harness changed the answers most where the task needed information that the model cannot recover from the data, such as the rules a user gave earlier.
+On calculation and retrieval the three harnesses were close, and on buy, hold or sell calls none did better than always answering \enquote{sell}.
 %% Evidence: E39, E45.
 
 \section{Contributions and Reflections on the Project}\label{sec:contributions}
 The project makes three contributions.
 \begin{enumerate}
-  \item An open-source harness for research on Vietnamese equities, released under the Apache 2.0 licence: its rules ask the model to take each figure from a tool result, no built-in tool places orders, and only the user decides what it remembers (\cref{sec:algorithm}).
+  \item An open-source harness for research on Vietnamese equities, released under the Apache 2.0 licence.
+  Its rules ask the model to take each figure from a tool result, no built-in tool places orders, and only the user decides what it remembers (\cref{sec:algorithm}).
   \item A market-data server, released under the MIT licence, whose results say whether data is available and where it came from, so that a missing figure is reported as missing (\cref{sec:tool-exposure}).
   \item A comparison of three harnesses on financial tasks that held the model and the data fixed, reported cost next to accuracy, and recorded ties and losses as well as wins (\cref{sec:validation}).
 \end{enumerate}
 %% Evidence: E53.
 The comparison supports the view that the system around a model matters (\cref{sec:related-results}), with the caveat that the memory tasks were designed around OpenTrading.
-On reflection (\cref{sec:reflection}), much of the effort of making an agent reliable lay outside the model: in what it is shown, what it may do and how its claims are checked.
+On reflection, much of the effort of making an agent reliable lay outside the model: in what it is shown, what it may do and how its claims are checked.
+The lessons that the group drew from this are given in \cref{sec:reflection}.
 
 \section{Limitations and Future Work}\label{sec:future}
 The limitations of the benchmark (\cref{sec:threats}) mean that the figures describe this run rather than a stable ranking, and that the memory lead holds for tasks of this kind rather than for memory in general.
 The investor calls, from one falling market over about three weeks, say little about investing.
 %% Evidence: E15, E16.
-The scope of the project adds further limits (\cref{sec:scope}), and several rules were tested but not measured in the benchmark.
-Beyond the five next steps of \cref{sec:recommendations}, three directions follow from these limits.
+The scope of the project adds further limits (\cref{sec:scope}).
+Beyond the recommendations of \cref{sec:recommendations}, which concern the rules of the harness, three directions follow.
 First, running the held-out task set that the group designed, with several runs per task, would show how stable the results are.
 %% Evidence: E09.
-Second, answers graded by people would show how far the judge can be trusted; third, a study with real users would test memory where rules change over time.
+Second, answers graded by people would show how far the judge can be trusted.
+Third, a study with real users would test memory where rules change over time.

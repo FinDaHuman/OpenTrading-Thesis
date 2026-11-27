@@ -2,29 +2,9 @@
 \chapter{Project Introduction}\label{ch:introduction}
 
 \section{Overview}\label{sec:overview}
-This section introduces the project, its three products and the structure of this report.
-
 \label{sec:project-information}
-\Cref{tab:project-info} gives the basic information of the project.
-
-\begin{table}[htb]
-  \centering
-  \caption{Basic information of the project}\label{tab:project-info}
-  \begin{tabularx}{\textwidth}{@{}p{0.24\textwidth} L@{}}
-    \toprule
-    {Item} & {Value}\\
-    \midrule
-    Project name & \ThesisGet{title}\\
-    Vietnamese name & \ThesisGet{titlevi}\\
-    Project code & \ThesisGet{projectcode}\\
-    Group & \ThesisGet{group}\\
-    Supervisor & \ThesisGet{supervisor}\\
-    Members & Đoàn Duy Long (HE190352, leader), Đoàn Minh Hiếu (HE190214), Trần Huy Tuấn (HE190554), Hoàng Hiếu Trung (HE191136)\\
-    Keywords & \ThesisGet{keywords}\\
-    \bottomrule
-  \end{tabularx}
-  \fignote{Source: the group.}
-\end{table}
+The project, \ThesisGet{projectcode}, is carried out by \ThesisGet{group} under the supervision of \ThesisGet{supervisor}.
+Its Vietnamese title is \enquote{\ThesisGet{titlevi}}, and its keywords are agentic AI, financial analysis and agent harness.
 
 \label{sec:project-overview}
 OpenTrading is a harness for financial analysis and market research on Vietnamese equities.
@@ -35,13 +15,10 @@ OpenTrading is the harness: a terminal program that runs the agent loop, the too
 opentrading-mcp is a market-data server that offers its data tools through the Model Context Protocol (MCP), an open standard for connecting models to tools and data \parencite{anthropic2024introducing}.
 opentrading-benchmark compares OpenTrading with two general-purpose harnesses on the same model and data.
 
-The report then covers the management of the work (\cref{ch:management}), existing systems (\cref{ch:existing}), the methods (\cref{ch:methodology}), the design (\cref{ch:design}), the results (\cref{ch:results}) and the conclusion (\cref{ch:conclusion}).
+The rest of the report covers the management of the work (\cref{ch:management}) and existing systems (\cref{ch:existing}), then the methods (\cref{ch:methodology}), the design (\cref{ch:design}), the results (\cref{ch:results}) and the conclusion (\cref{ch:conclusion}).
 
 \section{Project Background}\label{sec:background}
-Large language models have moved from answering questions to taking actions.
-An agent plans, calls tools, reads their results and decides the next step in a loop \parencite{xi2025rise,sapkota2026agents}.
-Harnesses for software engineering have shown that the program around the model shapes what an agent can achieve \parencite{yang2024sweagent,wang2025openhands}.
-Finance has followed with models trained on financial text \parencite{wu2023bloomberggpt,yang2023fingpt} and with surveys of their use \parencite{li2023large}.
+Language-model agents now plan, call tools and read their results in a loop \parencite{xi2025rise,sapkota2026agents}, and harnesses for software engineering have shown that the program around the model shapes what an agent can achieve \parencite{yang2024sweagent,wang2025openhands}.
 Financial analysis, however, rests on figures.
 A price, a ratio or a growth rate is either right or wrong, and the reader must be able to trace it to a source.
 Studies report that language models still invent financial figures \parencite{kang2023deficiency} and, when the first benchmarks of numerical reasoning over financial reports appeared in 2021, models fell short of human experts \parencite{chen2021finqa,zhu2021tatqa}.
@@ -62,18 +39,29 @@ It has three objectives, ordered by weight.
 
 \section{Problem Statement}\label{sec:problem}
 A general agent is not enough for financial analysis, for three reasons.
-First, models invent figures: with a retrieval system, a strong model in 2023 answered wrongly or refused \qty{81}{\percent} of questions on public company filings \parencite{islam2023financebench}, hallucination is a known problem of language models in general \parencite{huang2025hallucination}, and off-the-shelf models hallucinate seriously on financial tasks \parencite{kang2023deficiency}.
+First, models invent figures.
+Hallucination is a known problem of language models in general \parencite{huang2025hallucination}, and off-the-shelf models hallucinate seriously on financial tasks \parencite{kang2023deficiency}.
+Even with a retrieval system, a strong model in 2023 answered wrongly or refused \qty{81}{\percent} of questions on public company filings \parencite{islam2023financebench}.
 Second, models calculate poorly when they reason in words, and writing the computation as a program gives more reliable results \parencite{chen2023program}.
 Third, data sources fail, and a general agent cannot tell a failure from a valid result; the group met an expired data library during the project (\cref{sec:risk}).
-An investor who acts on a wrong figure can lose money, so the challenge is not a stronger model but a harness that traces figures to tool results, runs arithmetic as commands and reports missing data as missing.
+An investor who acts on a wrong figure can lose money.
+The challenge is therefore not a stronger model but a harness that traces figures to tool results, runs arithmetic as commands and reports missing data as missing.
 
 \section{Significance of the Project}\label{sec:significance}
 In theory, the project compares three harnesses with the same model and the same data snapshot (\cref{sec:validation}), so that their differences can be traced to the harnesses rather than to the model or the data.
-In practice, it is a research assistant for Vietnamese retail investors whose figures can be checked against their sources; it is released under the Apache 2.0 licence and runs with free model tiers, within their daily request limits (\cref{sec:risk}).
+In practice, it is a research assistant for Vietnamese retail investors whose figures can be checked against their sources.
+It is released under the Apache 2.0 licence and runs with free model tiers, within their daily request limits (\cref{sec:risk}).
 
 \section{Project Scope \& Limitations}\label{sec:scope}
 The project covers a research assistant that runs in a terminal for one user on one machine and analyses Vietnamese equities, with selected global market and macroeconomic data.
 Its tools only read data unless the user allows more, and no built-in tool can place an order.
-It does not manage portfolios, train models or serve many users; when asked, it may give a buy, hold or sell recommendation from the figures of its tools, and the user decides (\cref{sec:ethics}).
-It has four limitations: it depends on external data providers and on a data server hosted on a free plan; free model tiers allow few requests per day; shell commands are not isolated on Windows; and each harness ran every benchmark task only once.
+It does not manage portfolios, train models or serve many users.
+When asked, it may give a buy, hold or sell recommendation from the figures of its tools, and the user decides (\cref{sec:ethics}).
+It has four limitations:
+\begin{enumerate}
+  \item it depends on external data providers and on a data server hosted on a free plan;
+  \item free model tiers allow few requests per day;
+  \item shell commands are not isolated on Windows;
+  \item each harness ran every benchmark task only once.
+\end{enumerate}
 %% Evidence: E37.

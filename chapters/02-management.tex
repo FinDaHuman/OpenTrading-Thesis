@@ -13,8 +13,8 @@ The team has four members and one supervisor; each member works on the areas lis
     {Member} & {Role} & {Main areas of work}\\
     \midrule
     Đoàn Duy Long & Team leader & Market-data server (opentrading-mcp), benchmark (opentrading-benchmark), analysis skills\\
-    Trần Huy Tuấn & Member & Harness core, terminal interface, releases\\
-    Đoàn Minh Hiếu & Member & Memory of the harness; later tools, permissions and the agent loop\\
+    Trần Huy Tuấn & Member & Harness core (agent loop, tools, permissions, sub-agents), terminal interface, releases\\
+    Đoàn Minh Hiếu & Member & Memory of the harness; later, contributions to tools, permissions and the agent loop\\
     Hoàng Hiếu Trung & Member & Quality assurance and control: manual and offline test cases of the harness and their reports; fixes to the MCP client, web search and fetch tools, the stop gate and compaction; evaluation thresholds\\
     \bottomrule
   \end{tabularx}
@@ -23,21 +23,21 @@ The team has four members and one supervisor; each member works on the areas lis
 
 \label{sec:communication}
 For communication, the group met the supervisor every Thursday, with all four members present, and the supervisor's feedback was recorded in the weekly minutes.
-Two demonstrations, in weeks 4 and 7, showed the working product to the supervisor, and between meetings members discussed each change in writing in its pull request on GitHub.
+Two demonstrations, in weeks 4 and 7, showed the working product to the supervisor, and between meetings members discussed each change in writing in its pull request (PR) on GitHub.
 %% Evidence: E62.
 From week 10, tasks were also tracked as GitHub issues, so that each decision sits next to the change it affects.
 
 \section{Project Management Approach}\label{sec:approach}
 \label{sec:wbs}
 This section covers the work breakdown structure (WBS), risk, quality, budget, change management and closure.
-\Cref{tab:wbs} breaks the project into five work packages, and \cref{tab:milestones} places their milestones in time.
-Each product package has one lead.
+\Cref{tab:wbs} breaks the project into six work packages, and \cref{tab:milestones} places their milestones in time.
+Each package except the report has one lead, who coordinates it; members also contribute to packages that they do not lead, as \cref{tab:roles} shows.
 The harness depends on the data server only through the Model Context Protocol, which let the two be developed and tested separately.
 
-\begin{table}[H]
+\begin{table}[htb]
   \centering
   \caption{Work packages, their outputs and their leads}\label{tab:wbs}
-  \begin{tabularx}{\textwidth}{@{}p{0.2\textwidth} L p{0.22\textwidth} p{0.14\textwidth}@{}}
+  \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.2\textwidth} L >{\raggedright\arraybackslash}p{0.22\textwidth} p{0.14\textwidth}@{}}
     \toprule
     {Package} & {Main tasks} & {Output} & {Lead}\\
     \midrule
@@ -45,14 +45,16 @@ The harness depends on the data server only through the Model Context Protocol, 
     Memory & Memory store, investor constraints, recall & Memory of OpenTrading & Hiếu\\
     Market-data server & Market-data tools, shared answer contract, cloud deployment & opentrading-mcp & Long\\
     Evaluation & Task set, frozen data snapshot, comparison of three harnesses & opentrading-benchmark & Long\\
+    Quality assurance & Manual and offline test cases of the harness, and fixes to the faults they found & Test reports on the issues of the harness & Trung\\
     Report & Parts I to IX, figures, references & This report & All members\\
     \bottomrule
   \end{tabularx}
-  \fignote{Source: the group's time plan and tracking issue.}
+  \fignote{Source: the group's time plan and tracking issue; merged pull requests and test reports on issues in the group's repositories.}
 \end{table}
 
 %% Evidence: E52, E53, E37.
-\begin{table}[H]
+\label{sec:milestones}
+\begin{table}[htb]
   \centering
   \caption{Milestones of the project}\label{tab:milestones}
   \begin{tabularx}{\textwidth}{@{}p{0.08\textwidth} p{0.22\textwidth} L@{}}
@@ -66,7 +68,7 @@ The harness depends on the data server only through the Model Context Protocol, 
     13 & 30 Nov -- 6 Dec & Review 1.1, held from 30 November to 3 December\\
     \bottomrule
   \end{tabularx}
-  \fignote{Source: the group's time plan and minutes; release page of OpenTrading.}
+  \fignote{Note: the weekly plan is given in the separate time plan. Source: the group's time plan and minutes; release page of OpenTrading.}
 \end{table}
 
 \label{sec:risk}
@@ -92,20 +94,22 @@ For risk management, the group tracked risks from week 10 as GitHub issues with 
 \end{table}
 
 \label{sec:quality}
-For quality management, almost every change to the product goes through a pull request.
-Each pull request runs a type check and tests on Ubuntu and Windows, shell tests on macOS and Linux, a build check and a secret scan for known key patterns; releases also run installer checks on three operating systems.
+For quality management, almost every change to the product goes through a PR.
+Each PR runs a type check and tests on Ubuntu and Windows, shell tests on macOS and Linux, a build check and a secret scan for known key patterns.
+Releases also run installer checks on three operating systems.
 The test counts are in \cref{sec:testing}, and the benchmark repository has \num{1199} passing tests of the current study.
 %% Evidence: E11, E13, E35, E59.
 On OpenTrading, a member without administrator rights cannot merge a change until it has one approval and the tests on Ubuntu and Windows and the secret scan pass.
 %% Evidence: E74.
 Some cases were also tested by hand in the terminal or offline, with a simulated model and a simulated data server, and their reports were written on the issues of the harness.
 %% Evidence: E63.
-From week 11, a change to a prompt or a tool also needs a small paired measurement, run before and after the change; \cref{ch:results} reports the validation of the product as a whole.
+From week 11, a change to a prompt or a tool also needs a small paired measurement, run before and after the change.
 
 \label{sec:budget}
 The project had no external funding.
 %% Evidence: E60, E66.
-The group kept costs low with free model tiers and a free hosting plan for the data server, although the data server reads financial statements through a paid API key (\cref{sec:data}) and the model calls of the benchmark were paid.
+The group kept costs low with free model tiers and a free hosting plan for the data server.
+Two items were paid: the data server reads financial statements through a paid API key (\cref{sec:data}), and the model calls of the benchmark were paid.
 The 900 trials of the benchmark used about 75.6 million tokens; the cost of each harness is in \cref{sec:speed-cost}.
 
 \label{sec:change}

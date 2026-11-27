@@ -10,21 +10,21 @@ OpenTrading answered 279 of the 300 tasks correctly (\qty{93.0}{\percent}), Deep
 
 \begin{table}[H]
   \centering
-  \caption{Tasks answered correctly by each harness}\label{tab:accuracy}
-  \begin{tabularx}{\textwidth}{@{}L *{4}{S[table-format=3.0]}@{}}
+  \caption{Tasks answered correctly by each harness, with \qty{95}{\percent} Wilson intervals}\label{tab:accuracy}
+  \begin{tabularx}{\textwidth}{@{}L r l l l@{}}
     \toprule
     {Group} & {Tasks} & {OpenTrading} & {OpenCode} & {DeepSeek Harness}\\
     \midrule
-    Compute & 79 & 78 & 75 & 76\\
-    Investor & 36 & 19 & 16 & 16\\
-    Lookup & 112 & 110 & 110 & 110\\
-    Memory & 59 & 58 & 30 & 50\\
-    Robustness & 14 & 14 & 14 & 14\\
+    Compute & 79 & 78 (93.2--99.8) & 75 (87.7--98.0) & 76 (89.4--98.7)\\
+    Investor & 36 & 19 (37.0--68.0) & 16 (29.5--60.4) & 16 (29.5--60.4)\\
+    Lookup & 112 & 110 (93.7--99.5) & 110 (93.7--99.5) & 110 (93.7--99.5)\\
+    Memory & 59 & 58 (91.0--99.7) & 30 (38.4--63.2) & 50 (73.5--91.8)\\
+    Robustness & 14 & 14 (78.5--100.0) & 14 (78.5--100.0) & 14 (78.5--100.0)\\
     \midrule
-    All tasks & 300 & 279 & 245 & 266\\
+    All tasks & 300 & 279 (89.5--95.4) & 245 (76.9--85.6) & 266 (84.6--91.8)\\
     \bottomrule
   \end{tabularx}
-  \fignote{Source: the group.}
+  \fignote{Note: each cell gives the tasks answered correctly and, in brackets, the \qty{95}{\percent} Wilson interval of the accuracy in per cent. Source: the group.}
 \end{table}
 %% Evidence: E45.
 
@@ -37,7 +37,7 @@ OpenTrading answered 279 of the 300 tasks correctly (\qty{93.0}{\percent}), Deep
 
 On compute, lookup and robustness tasks the three harnesses were within three tasks of each other, so plain calculation and retrieval did not separate them.
 The difference came mostly from memory: OpenTrading applied the rules that a user had given in an earlier session, including rules later updated or withdrawn, in 58 of 59 tasks, against 50 for DeepSeek Harness and 30 for OpenCode.
-On the investor tasks all three were weak, near one half.
+On the investor tasks all three were weak, near one half, and their intervals overlap widely; on the 16 buy, hold or sell calls none of them did better than a rule that always answers \enquote{sell}, as the analysis of the errors below shows.
 
 The memory group shows when memory in the harness matters (\cref{tab:memory-kinds-results}).
 When the user's rules were given in the same session, or the user returned to the session in which a portfolio had been given, the three harnesses scored within one task of each other, because the rules were still in the conversation that each of them could read.
@@ -137,6 +137,13 @@ Outside that group, each harness had between one and three numbers outside the t
 Answers in an invalid format came mostly from investor and memory tasks, where the answer is long (6 and 5 for OpenCode, 6 and 6 for DeepSeek Harness); OpenTrading's machine profile follows the format that the calling program gives (\cref{sec:grounding-rules}), and its one invalid answer was the memory trial without an answer.
 %% Evidence: E73.
 
+The trial records also show how often the stop gate of OpenTrading acted.
+In none of its 300 trials did the gate send an answer back: no recovery was recorded, and the one trial without an answer ended with an error, not with a verdict of the gate.
+With this model and these tasks, the gate was therefore never triggered.
+This means that it raised no false alarm, but also that the benchmark did not test whether it improves answers.
+The records published with the benchmark do not include the figures that tracing found unsupported, so the share of traced figures is not reported here.
+%% Evidence: E75.
+
 \begin{table}[H]
   \centering
   \caption{Reliability of each harness over the 300 tasks}\label{tab:reliability}
@@ -199,18 +206,22 @@ This section answers the three research questions of \cref{sec:rq}, explains whe
 
 \label{sec:rq-answers}
 RQ1 asked which parts a harness must add around a model so that its analysis stays grounded, follows the investor's constraints and keeps actions under the user's control.
-The answer of this project is the set of rules in \cref{sec:algorithm}, which automated tests check against their design (\cref{sec:testing}).
-The benchmark measured only part of this answer, through its memory group and reliability measures (\cref{tab:reliability}).
-OpenTrading followed the user's earlier rules in 58 of 59 memory tasks and gave no number on the 11 tasks whose data does not exist, but had one answer rejected and ended one trial without an answer; tool search, the permission gate, skills, sub-agents and ultradesk were not used.
-%% Evidence: E11, E45.
+The answer of this project is the set of rules in \cref{sec:algorithm}, which automated tests check against their design (\cref{sec:testing}); the benchmark measured only part of it, through its memory group and reliability measures.
+OpenTrading followed the user's earlier rules in 58 of 59 memory tasks and gave no number on the 11 tasks whose data does not exist.
+It had one answer rejected and ended one trial without an answer.
+The stop gate never acted in the benchmark, and tool search, the permission gate, skills, sub-agents and ultradesk were not used, so their effect on answers remains untested.
+%% Evidence: E11, E45, E75.
 
 RQ2 asked how a data server should return its results so that the agent knows the unit, the source and the availability of each figure.
 The answer is one envelope that states whether the data is available, its source and time, and, when data is missing, the reason and whether a retry may help (\cref{sec:tool-exposure}).
 Its two gaps are that units are stated only for the checked price tools and that the contract check with live data does not yet run automatically.
-%% Evidence: E13.
+The second acceptance criterion of the project is therefore met only in part: the design and its automated tests are in place, but the group has no recorded live run that shows how many of the tools pass the check.
+%% Evidence: E13, E76.
 
 RQ3 asked whether OpenTrading answers more financial tasks correctly than two general-purpose harnesses with the same model and data, and at what cost.
-The answer is yes, but only for some kinds of question (\cref{sec:results}): OpenTrading answered more tasks correctly than DeepSeek Harness and OpenCode, at about half the cost per correct answer of DeepSeek Harness and less than half that of OpenCode.
+The answer is yes, but only for some kinds of question (\cref{sec:results}).
+OpenTrading answered more tasks correctly than DeepSeek Harness and OpenCode, at about half the cost per correct answer of DeepSeek Harness and less than half that of OpenCode.
+On the investor tasks the three harnesses were close.
 The difference came mostly from the memory tasks, and the limits listed at the end of this section apply to it.
 %% Evidence: E45, E46.
 
@@ -249,17 +260,17 @@ Finally, four limits apply to these results:
 The results lead to five recommendations for the harness and its evaluation.
 \begin{enumerate}
   \item Let figure tracing send answers back in every turn.
-  In version 0.5.1 it only records untraced figures when tools ran, and sends an answer back only when no tool ran (\cref{tab:stop-gate}); the records of real use can show how often it would send back a correct answer before this is enforced.
-  \item Measure each rule on its own, with repeated runs and with one rule switched off at a time (\cref{sec:threats}).
+  In version 0.5.1 it sends an answer back only when no tool ran (\cref{tab:stop-gate}); records of real use should first show how often it would reject a correct answer.
+  \item Measure each rule on its own, with repeated runs and with one rule switched off at a time (\cref{sec:threats}), and keep the records of the stop gate and of figure tracing with the published results.
   \item Test memory with tasks written outside the group (\cref{sec:threats}).
-  \item Treat buy, hold and sell calls as analysis, not as forecasts.
-  No harness did better than a rule that always answers \enquote{sell} in this period (\cref{sec:error-analysis}), so a call should come with its data and risks, as the system prompt already requires.
-  \item Run the contract check of the data server with every change, and extend the stated units from the checked price tools to every tool that returns an amount (\cref{sec:rq-answers}).
+  \item Users should treat buy, hold and sell calls as analysis, not as forecasts, and check each figure against the source that the answer names.
+  No harness beat a rule that always answers \enquote{sell} in this period (\cref{sec:error-analysis}).
+  \item Run the data server's contract check with every change, and state units for every tool that returns an amount (\cref{sec:rq-answers}).
 \end{enumerate}
-For users, the advice is to check each figure against the source that the answer names and to treat a call as one input to their own decision.
 
 \section{Personal Reflection (Optional)}\label{sec:reflection}
-The group drew three lessons.
+The group drew three lessons from the project.
 First, a rule should be measured before and after it changes (\cref{sec:quality}).
 Second, tests show that a rule behaves as designed, while a benchmark is needed to show whether the answers improve (\cref{sec:rq-answers}).
+The stop gate is an example: its tests pass, but in the benchmark it never acted, so its effect on answers is still unknown (\cref{sec:reliability}).
 Third, data sources fail more often than expected, so reporting a failure as a failure is part of the design (\cref{sec:risk}).
