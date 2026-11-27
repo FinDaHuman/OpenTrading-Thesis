@@ -96,11 +96,12 @@ def sheet(wb, info, week):
         r += 1
 
     section("I. THÔNG TIN CHUNG")
-    general = [("Đề tài", f"{info['title_en']}\n{info['title_vi']}"), ("Nhóm", info["group"]),
-               ("Giảng viên hướng dẫn", info["supervisor"]), ("Thành viên", "\n".join(info["members"])),
+    members = "\n".join(f"{i}. {m}" for i, m in enumerate(info["members"], 1))
+    general = [("Đề tài", f"Tiếng Anh: {info['title_en']}\nTiếng Việt: {info['title_vi']}"),
+               ("Nhóm", info["group"]), ("Giảng viên hướng dẫn", info["supervisor"]), ("Thành viên", members),
                ("Hình thức làm việc", week.get("form", info["form"])),
-               ("Thời gian họp với GVHD" if first else "Họp nội bộ nhóm", week["meeting"]),
-               ("Thành phần tham dự", week["attendees"]),
+               ("Thời gian họp", week["meeting"]),
+               ("Thành phần tham dự", week.get("attendees", info["attendees"])),
                ("Trạng thái tuần", STATUS[week["status"]])]
     for i, (k, v) in enumerate(general, 1):
         item(i, k, v)
