@@ -19,7 +19,6 @@ SIZE = 12
 LABEL = PatternFill("solid", fgColor="F2F2F2")
 THIN = Side(style="thin", color="000000")
 EDGE = Border(left=THIN, right=THIN, top=THIN, bottom=THIN)
-STATUS = {"done": "Đã hoàn thành", "current": "Đang thực hiện"}
 WIDTHS = {"A": 5, "B": 25, "C": 40, "D": 40}
 BODY = 88  # characters per line in the merged C:D cell at 12 pt (kept a little short so text never clips)
 WIDE = 120  # characters per line across A:D
@@ -97,12 +96,11 @@ def sheet(wb, info, week):
 
     section("I. THÔNG TIN CHUNG")
     members = "\n".join(f"{i}. {m}" for i, m in enumerate(info["members"], 1))
-    general = [("Đề tài", f"Tiếng Anh: {info['title_en']}\nTiếng Việt: {info['title_vi']}"),
+    general = [("Tên đề tài (tiếng Anh)", info["title_en"]), ("Tên đề tài (tiếng Việt)", info["title_vi"]),
                ("Nhóm", info["group"]), ("Giảng viên hướng dẫn", info["supervisor"]), ("Thành viên", members),
                ("Hình thức làm việc", week.get("form", info["form"])),
                ("Thời gian họp", week["meeting"]),
-               ("Thành phần tham dự", week.get("attendees", info["attendees"])),
-               ("Trạng thái tuần", STATUS[week["status"]])]
+               ("Thành phần tham dự", week.get("attendees", info["attendees"]))]
     for i, (k, v) in enumerate(general, 1):
         item(i, k, v)
     r += 1

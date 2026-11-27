@@ -19,7 +19,6 @@ number = 0
 from = "31/08/2026"
 to = "06/09/2026"
 meeting = "15h00, Chủ Nhật, 06/09/2026"
-status = "done"
 done = '''
 - Hoàn thành đồ án đúng hạn và đạt điểm từ 7 trở lên.
 - Ứng dụng hệ thống đa tác tử (multi-agent) trong phân tích tài chính.
@@ -41,7 +40,6 @@ number = 1
 from = "07/09/2026"
 to = "13/09/2026"
 meeting = "20h30, Thứ Năm, 10/09/2026"
-status = "done"
 done = '''
 - Các thành viên tự trao đổi và hướng dẫn lẫn nhau về các công nghệ dự kiến sử dụng:
    + RAG, MCP, FastAPI, MongoDB, Redis.
@@ -57,7 +55,6 @@ number = 2
 from = "14/09/2026"
 to = "20/09/2026"
 meeting = "20h30, Thứ Năm, 17/09/2026"
-status = "done"
 done = '''
 - Tìm hiểu kiến trúc của Claude Code, OpenCode, Codex và ý tưởng thiết kế của Cursor.
 - Tìm hiểu chi tiết thiết kế bộ nhớ (memory) của các harness.
@@ -83,7 +80,6 @@ number = 3
 from = "21/09/2026"
 to = "27/09/2026"
 meeting = "20h30, Thứ Năm, 24/09/2026"
-status = "done"
 done = '''
 - Đọc các bài báo nghiên cứu và phân tích các sản phẩm liên quan (tài liệu Literature Paper).
 - Chốt chi tiết các chức năng và công nghệ sử dụng (tài liệu HarnessPlan.html).
@@ -112,7 +108,6 @@ number = 4
 from = "28/09/2026"
 to = "04/10/2026"
 meeting = "20h30, Thứ Năm, 01/10/2026"
-status = "done"
 done = '''
 - Hoàn thiện MVP MCP server với 136 tool.
 - Hoàn thiện giao diện cơ bản của harness.
@@ -155,7 +150,6 @@ number = 5
 from = "05/10/2026"
 to = "11/10/2026"
 meeting = "20h30, Thứ Năm, 08/10/2026"
-status = "done"
 done = '''
 - Hoàn thiện một số chức năng cơ bản:
    + Danh sách việc cần làm (todo list).
@@ -191,7 +185,6 @@ number = 6
 from = "12/10/2026"
 to = "18/10/2026"
 meeting = "20h30, Thứ Năm, 15/10/2026"
-status = "done"
 done = '''
 - Nâng cấp MCP server:
    + Bổ sung bộ đệm (cache) để tối ưu hiệu năng.
@@ -224,7 +217,6 @@ number = 7
 from = "19/10/2026"
 to = "25/10/2026"
 meeting = "20h30, Thứ Năm, 22/10/2026"
-status = "done"
 done = '''
 - Hoàn thành kế hoạch cho phần bộ nhớ.
 - Hoàn thành 2 mode cơ bản.
@@ -251,7 +243,6 @@ number = 8
 from = "26/10/2026"
 to = "01/11/2026"
 meeting = "20h30, Thứ Năm, 29/10/2026"
-status = "done"
 done = '''
 - Chốt kế hoạch hoàn chỉnh cho phần bộ nhớ.
 - Khảo sát chi phí API key:
@@ -270,7 +261,6 @@ number = 9
 from = "02/11/2026"
 to = "08/11/2026"
 meeting = "20h30, Thứ Năm, 05/11/2026"
-status = "done"
 done = '''
 - Hoàn thành phần bộ nhớ.
 - Tối ưu hệ thống.
@@ -286,7 +276,6 @@ number = 10
 from = "09/11/2026"
 to = "15/11/2026"
 meeting = "20h30, Thứ Năm, 12/11/2026"
-status = "done"
 done = '''
 - Hoàn thành chạy benchmark qua OpenRouter, chi phí 8 USD.
 - Kết quả benchmark chỉ ra 2 điểm yếu lớn cần cải thiện:
@@ -315,7 +304,6 @@ number = 11
 from = "16/11/2026"
 to = "22/11/2026"
 meeting = "20h30, Thứ Năm, 19/11/2026"
-status = "done"
 done = '''
 - Tổng kết công việc và tham gia kỳ thi.'''
 next = ''
@@ -328,7 +316,6 @@ number = 12
 from = "23/11/2026"
 to = "29/11/2026"
 meeting = "20h30, Thứ Năm, 26/11/2026"
-status = "current"
 done = '''
 - Phát hành OpenTrading v0.5.0 (24/11) và v0.5.1 (25/11).
 - Chạy benchmark v4.7 (24–26/11):
