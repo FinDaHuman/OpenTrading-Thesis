@@ -37,7 +37,7 @@ OpenTrading answered 279 of the 300 tasks correctly (\qty{93.0}{\percent}), Deep
 
 On compute, lookup and robustness tasks the three harnesses were within three tasks of each other, so plain calculation and retrieval did not separate them.
 The difference came mostly from memory: OpenTrading applied the rules that a user had given in an earlier session, including rules later updated or withdrawn, in 58 of 59 tasks, against 50 for DeepSeek Harness and 30 for OpenCode.
-On the investor tasks all three were weak, near one half, and their intervals overlap widely; on the 16 buy, hold or sell calls none of them did better than a rule that always answers \enquote{sell} (\cref{sec:error-analysis}).
+On the investor tasks all three were weak, near one half, and their intervals overlap widely; on the 16 buy, hold or sell calls none of them did better than a rule that always answers \enquote{sell}, as the analysis of the errors below shows.
 
 The memory group shows when memory in the harness matters (\cref{tab:memory-kinds-results}).
 When the user's rules were given in the same session, or the user returned to the session in which a portfolio had been given, the three harnesses scored within one task of each other, because the rules were still in the conversation that each of them could read.

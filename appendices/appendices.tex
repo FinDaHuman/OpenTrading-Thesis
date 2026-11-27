@@ -5,7 +5,7 @@ This appendix gives a short excerpt of the group's source code, copied without c
 
 \Cref{lst:envelope} builds the shared envelope in which the data server returns its results (\cref{sec:tool-exposure}).
 
-\begin{lstlisting}[language=Python,caption={The shared answer envelope, from opentrading-mcp \parencite{group2026opentradingmcp}},label={lst:envelope}]
+\begin{lstlisting}[language=Python,caption={The shared answer envelope, from opentrading-mcp \parencite{group2026opentradingmcp}},label={lst:envelope},breakatwhitespace=true]
 has_data = data not in (None, {}, [], ())
 body: dict[str, Any] = {
     "data": normalize_dates(data),
